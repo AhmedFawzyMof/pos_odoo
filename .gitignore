@@ -28,3 +28,4 @@ pos-app.db-*
 scripts/
 products-export-*
 pos-app.db
+graphify-out/

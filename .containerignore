@@ -1,0 +1,7 @@
+**/.git
+.nuxt/
+.output/
+graphify-out/
+pos-app.db*
+*.md
+todo.md

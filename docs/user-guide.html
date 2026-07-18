@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دليل المستخدم — نظام نقاط البيع المخصص</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif; }
+    .page-card { transition: all 0.2s ease; }
+    .arrow { transition: transform 0.3s ease; }
+    .active-tab { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 700; }
+    .inactive-tab { color: #9ca3af; cursor: pointer; }
+    .inactive-tab:hover { color: #6b7280; }
+    .chip { transition: all 0.2s ease; cursor: pointer; }
+    .chip.active { background: #2563eb; color: white; }
+    .card-expand.hidden { display: none; }
+    kbd { background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-family: monospace; }
+    .dark kbd { background: #374151; border-color: #4b5563; color: #e5e7eb; }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
+  <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+          <h1 class="text-xl font-bold">دليل المستخدم</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-500 dark:text-gray-400">نظام نقاط البيع المخصص</span>
+          <button onclick="toggleDark()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" title="الوضع الليلي">
+            <svg id="dark-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex gap-8">
+        <button id="tab-btn-comparison" onclick="switchTab('comparison')" class="active-tab py-4 text-sm transition-colors">مقارنة التدفق</button>
+        <button id="tab-btn-pages" onclick="switchTab('pages')" class="inactive-tab py-4 text-sm transition-colors">دليل الصفحات</button>
+      </div>
+    </div>
+  </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div id="tab-comparison" class="tab-content">
+      <div class="space-y-10">
+        <section>
+          <h2 class="text-2xl font-bold mb-6">نظرة عامة على النظام</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">هذا النظام هو واجهة أمامية مخصصة (Frontend) مبنية باستخدام <strong>Nuxt 3 + Vue 3 + Nitro</strong> تتصل بخادم <strong>Odoo</strong> عبر واجهة <strong>XML-RPC</strong>. يهدف النظام إلى توفير تجربة بيع سريعة ومبسطة تناسب المتاجر والمطاعم الصغيرة مع دعم كامل للغة العربية واختصارات لوحة المفاتيح.</p>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-2"><svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><h3 class="font-bold text-blue-800 dark:text-blue-300">الهدف</h3></div>
+              <p class="text-sm text-blue-700 dark:text-blue-200">توفير واجهة بيع سريعة وعربية بالكامل مع تحسين سرعة إتمام عمليات البيع اليومية لتتناسب مع احتياجات السوق المحلي.</p>
+            </div>
+            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-2"><svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><h3 class="font-bold text-green-800 dark:text-green-300">النطاق</h3></div>
+              <p class="text-sm text-green-700 dark:text-green-200">نقاط البيع بالتجزئة، المطاعم الصغيرة، والمتاجر التي تحتاج نظام بيع سريع مع إدارة مخزون ومحاسبة مبسطة.</p>
+            </div>
+            <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-2"><svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg><h3 class="font-bold text-purple-800 dark:text-purple-300">الجمهور</h3></div>
+              <p class="text-sm text-purple-700 dark:text-purple-200">الكاشيرات، مديري المتاجر، المحاسبين، وأصحاب المتاجر الصغيرة والمتوسطة الذين يحتاجون نظام نقاط بيع عربي سهل الاستخدام.</p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2 class="text-2xl font-bold mb-6">مقارنة التدفق: Odoo القياسي مقابل التدفق المخصص</h2>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+              <div class="bg-red-50 dark:bg-red-900/20 px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-bold text-red-700 dark:text-red-300 text-lg">Odoo القياسي</h3>
+                <p class="text-sm text-red-600 dark:text-red-400">التدفق التقليدي داخل Odoo (الواجهة الأصلية)</p>
+              </div>
+              <div class="p-5 space-y-5">
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 flex items-center justify-center text-sm font-bold">1</span>
+                  <div><h4 class="font-bold text-sm">تهيئة نقطة البيع (pos.config)</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">تكوين الكاشير، وسائل الدفع، الضرائب، الطابعات، الشاشات المساعدة.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 flex items-center justify-center text-sm font-bold">2</span>
+                  <div><h4 class="font-bold text-sm">فتح الجلسة (pos.session)</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">فتح النقدية الأولية، إنشاء القيود المحاسبية، تخصيص المخزون للجلسة.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 flex items-center justify-center text-sm font-bold">3</span>
+                  <div><h4 class="font-bold text-sm">إنشاء الطلبات (pos.order)</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">إضافة منتجات، خصومات، اختيار عميل، دفع، طباعة إيصال.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 flex items-center justify-center text-sm font-bold">4</span>
+                  <div><h4 class="font-bold text-sm">إغلاق الجلسة والتسوية</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">عد النقدية، حساب الفروق، إنشاء التقارير المالية للجلسة.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 flex items-center justify-center text-sm font-bold">5</span>
+                  <div><h4 class="font-bold text-sm">التقارير والمحاسبة</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">تقارير المبيعات، حساب الأرباح والخسائر، المخزون، القيود المحاسبية.</p></div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+              <div class="bg-primary-50 dark:bg-primary-900/20 px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-bold text-primary-700 dark:text-primary-300 text-lg">النظام المخصص</h3>
+                <p class="text-sm text-primary-600 dark:text-primary-400">التدفق المبسط في الواجهة المخصصة</p>
+              </div>
+              <div class="p-5 space-y-5">
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-sm font-bold">1</span>
+                  <div><h4 class="font-bold text-sm">تسجيل الدخول واختيار نقطة البيع</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">تسجيل الدخول، اختيار الكاشير، إدخال النقدية الافتتاحية، التوجيه إلى /cashier.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-sm font-bold">2</span>
+                  <div><h4 class="font-bold text-sm">شاشة الكاشير — البيع السريع</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">شبكة منتجات، بحث، ماسح باركود، تصفية بالفئات، سلة مشتريات سريعة.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-sm font-bold">3</span>
+                  <div><h4 class="font-bold text-sm">إتمام الدفع — اختصارات لوحة المفاتيح</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">F1 نقداً، F2 بطاقة، F3 خصم، F4 عميل، F5 تعليق، F12 إغلاق، أسهم التنقل، +/- كمية.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-sm font-bold">4</span>
+                  <div><h4 class="font-bold text-sm">إدارة الجلسة — الخزنة والإغلاق</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">إيداع وسحب من الخزنة، إغلاق الجلسة مع عد النقدية والتسوية.</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-sm font-bold">5</span>
+                  <div><h4 class="font-bold text-sm">المتابعة الإدارية — صفحات متخصصة</h4><p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">المنتجات، العملاء، الموردين، المشتريات، المخزون، المحاسبة، التقارير.</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
+              <div class="flex items-center gap-2 mb-3"><svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg><h3 class="font-bold text-red-800 dark:text-red-300">متى يبقى Odoo القياسي أفضل؟</h3></div>
+              <ul class="space-y-2 text-sm text-red-700 dark:text-red-200">
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span><span>المحاسبة المعقدة — قيود محاسبية يدوية متعددة العملات</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span><span>CRM وإدارة علاقات العملاء المتقدمة</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span><span>التصنيع وإدارة الإنتاج وجدولة الموارد</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span><span>التقارير المالية المتقدمة والموحدة</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span><span>إدارة الموارد البشرية والرواتب</span></li>
+              </ul>
+            </div>
+            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
+              <div class="flex items-center gap-2 mb-3"><svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><h3 class="font-bold text-green-800 dark:text-green-300">متى يكون النظام المخصص أفضل؟</h3></div>
+              <ul class="space-y-2 text-sm text-green-700 dark:text-green-200">
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></span><span>المتاجر الصغيرة والمتوسطة — تحتاج واجهة بيع بسيطة وسريعة</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></span><span>الواجهة العربية أولاً — دعم كامل للغة العربية والاتجاه RTL</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></span><span>سرعة البيع — اختصارات لوحة المفاتيح تزيد سرعة الكاشير 3x</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></span><span>مخزون بسيط — لا حاجة لإدارة مستودعات معقدة</span></li>
+                <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></span><span>نشر سريع — منصة Nuxt SPA خفيفة وسريعة التحميل</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2 class="text-2xl font-bold mb-6">جدول مقارنة تفصيلي</h2>
+          <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                  <th class="text-right px-5 py-3 font-bold">الميزة</th>
+                  <th class="text-right px-5 py-3 font-bold text-red-600 dark:text-red-400">Odoo القياسي</th>
+                  <th class="text-right px-5 py-3 font-bold text-primary-600 dark:text-primary-400">النظام المخصص</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                <tr><td class="px-5 py-3 font-medium">واجهة المستخدم</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">الواجهة الأصلية لـ Odoo، إنكليزية، تقليدية</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">واجهة عربية حديثة بتصميم RTL مع Tailwind CSS</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">شاشة البيع</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">شاشة POE التقليدية مثبتة المنتجات يميناً</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">شبكة منتجات مع بحث فوري، باركود، فلترة</td></tr>
+                <tr><td class="px-5 py-3 font-medium">سرعة البيع</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">يعتمد على الفأرة، بطيء نسبياً</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">اختصارات لوحة مفاتيح كاملة، بيع بضغطة زر</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">قراءة الباركود</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">مدعومة لكن بتهيئة معقدة</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">دعم فوري بدون إعداد إضافي</td></tr>
+                <tr><td class="px-5 py-3 font-medium">إدارة الجلسات</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">يدوية متعددة الخطوات في Odoo Backend</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">مبسطة: فتح/إغلاق جلسة بنقرة مع تسوية نقدية</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">إدارة المنتجات</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">شاملة لكن معقدة لكثرة الحقول</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">مبسطة مع الحقول الأساسية فقط</td></tr>
+                <tr><td class="px-5 py-3 font-medium">إدارة المخزون</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">متقدمة: مواقع، مسارات، جرد دوري</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">مبسطة: حركات، تحويلات، أرصدة</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">المشتريات</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">نظام مشتريات كامل مع طلبات شراء وعروض</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">أوامر شراء مبسطة مع تتبع الحالة</td></tr>
+                <tr><td class="px-5 py-3 font-medium">فواتير الموردين</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">نظام محاسبي متكامل للفواتير</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">تسجيل ودفع ومتابعة فواتير مبسطة</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">التقارير</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">تقارير مالية متقدمة قابلة للتخصيص</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">تقارير أساسية ورسوم بيانية تفاعلية</td></tr>
+                <tr><td class="px-5 py-3 font-medium">نظام الصلاحيات</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">نظام صلاحيات مفصل بمستويات متعددة</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">صلاحيات مبسطة (كاشير، مدير، مشرف)</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">اللغة والدعم</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">دعم رسمي للعربية لكن غير كامل في واجهة البيع</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">عربي كامل RTL مع تحسينات للسياق المحلي</td></tr>
+                <tr><td class="px-5 py-3 font-medium">طباعة الإيصالات</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">يدعم طابعات ESC/POS لكن بتهيئة</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">طباعة مباشرة مع تصميم إيصال قابل للتخصيص</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">المدفوعات المتأخرة</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">تتبع يدوي عبر نظام الحسابات</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">صفحة مخصصة مع تنبيهات وإشعارات</td></tr>
+                <tr><td class="px-5 py-3 font-medium">النظام البيئي</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">متكامل مع جميع تطبيقات Odoo</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">مبني فوق Odoo، يستخدم XML-RPC ويتكامل معه</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">الإعداد والنشر</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">تثبيت Odoo، إعداد قاعدة بيانات، وحدات</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">Nuxt build + deploy على أي CDN</td></tr>
+                <tr><td class="px-5 py-3 font-medium">منحنى التعلم</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">حوالي 2-4 أسابيع للمستخدم الجديد</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">يوم إلى يومين للكاشير</td></tr>
+                <tr class="bg-gray-50 dark:bg-gray-800/50"><td class="px-5 py-3 font-medium">التكلفة</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">ترخيص Odoo Enterprise أو تكاليف استضافة</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">مجاني ومفتوح المصدر + استضافة رخيصة</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2 class="text-2xl font-bold mb-6">البنية المعمارية للنظام</h2>
+          <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-8">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 w-full md:w-64 text-center shadow-sm">
+              <div class="text-4xl mb-2">🌐</div>
+              <h3 class="font-bold text-sm">المتصفح</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nuxt SPA<br>Vue 3 + Pinia + Vue Router</p>
+              <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 space-y-0.5">
+                <p>Tailwind CSS للتصميم</p>
+                <p>RTL للغة العربية</p>
+                <p>التخزين المحلي للجلسة</p>
+              </div>
+            </div>
+            <div class="text-2xl text-gray-400 dark:text-gray-500 hidden md:block">⟶</div>
+            <div class="text-2xl text-gray-400 dark:text-gray-500 block md:hidden rotate-90">⟶</div>
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 w-full md:w-64 text-center shadow-sm">
+              <div class="text-4xl mb-2">⚙️</div>
+              <h3 class="font-bold text-sm">Nitro API (Middleware)</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">خادم Nitro الوسيط<br>H3 endpoints + Proxy</p>
+              <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 space-y-0.5">
+                <p>تحويل XML-RPC إلى REST</p>
+                <p>إدارة الجلسات والمصادقة</p>
+                <p>معالجة الأخطاء والتخزين المؤقت</p>
+              </div>
+            </div>
+            <div class="text-2xl text-gray-400 dark:text-gray-500 hidden md:block">⟶</div>
+            <div class="text-2xl text-gray-400 dark:text-gray-500 block md:hidden rotate-90">⟶</div>
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 w-full md:w-64 text-center shadow-sm">
+              <div class="text-4xl mb-2">🗄️</div>
+              <h3 class="font-bold text-sm">Odoo Server</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">XML-RPC API<br>قاعدة بيانات PostgreSQL</p>
+              <div class="mt-2 text-xs text-gray-400 dark:text-gray-500 space-y-0.5">
+                <p>بيانات المنتجات والعملاء</p>
+                <p>المخزون والمحاسبة</p>
+                <p>الطلبات والفواتير</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
+            <h3 class="font-bold text-lg mb-4">مثال: كيف تتم عملية بيع؟</h3>
+            <div class="space-y-3">
+              <div class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-xs font-bold">1</span>
+                <div class="text-sm"><strong>الكاشير يضغط F1</strong> ← المتصفح يرسل طلب POST إلى Nitro API مع بيانات السلة وطريقة الدفع</div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-xs font-bold">2</span>
+                <div class="text-sm"><strong>Nitro API</strong> يستقبل الطلب، يتحقق من صلاحية الجلسة، ويحول البيانات إلى استدعاء XML-RPC</div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-xs font-bold">3</span>
+                <div class="text-sm"><strong>Odoo Server</strong> ينشئ pos.order، يسجل القيود المحاسبية، ويحدث المخزون</div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-xs font-bold">4</span>
+                <div class="text-sm"><strong>Nitro API</strong> يعيد الرد مع order_id وبيانات الإيصال</div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 flex items-center justify-center text-xs font-bold">5</span>
+                <div class="text-sm"><strong>المتصفح</strong> يعرض الإيصال ويطبع عبر WebUSB أو طابعة حرارية</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div id="tab-pages" class="tab-content hidden">
+      <div class="mb-8 space-y-4">
+        <div class="relative">
+          <input type="text" id="searchInput" oninput="filterPages()" placeholder="ابحث عن صفحة بالاسم أو الوصف..." class="w-full px-4 py-3 pr-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <div class="flex flex-wrap gap-2" id="filterChips">
+          <span onclick="setFilter('all')" class="chip active px-4 py-1.5 rounded-full text-xs font-medium bg-primary-600 text-white">الكل <span class="opacity-75">(27)</span></span>
+          <span onclick="setFilter('pos')" class="chip px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">نقاط البيع</span>
+          <span onclick="setFilter('products')" class="chip px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">المنتجات</span>
+          <span onclick="setFilter('customers')" class="chip px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">العملاء والموردين</span>
+          <span onclick="setFilter('purchases')" class="chip px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">المشتريات والمحاسبة</span>
+          <span onclick="setFilter('warehouse')" class="chip px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">المخزون</span>
+          <span onclick="setFilter('reports')" class="chip px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">التقارير</span>
+          <span onclick="setFilter('settings')" class="chip px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">الإعدادات</span>
+        </div>
+      </div>
+      <div id="cardsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="general">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/</span>
+                  <h3 class="text-base font-bold mt-0.5">لوحة التحكم</h3>
+                </div>
+                <span class="bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded">عام</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">الصفحة الرئيسية بعد تسجيل الدخول، تعرض ملخصاً سريعاً لأهم المؤشرات والإحصائيات.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>لوحة تحكم تفاعلية تعرض نظرة شاملة على أداء نقاط البيع.</li>
+                        <li>تظهر إحصائيات المبيعات اليومية والأسبوعية والشهرية بشكل رسوم بيانية.</li>
+                        <li>يمكن تخصيص المحتوى المعروض حسب صلاحيات المستخدم.</li>
+                        <li>تدعم التحديث المباشر للبيانات دون الحاجة لإعادة تحميل الصفحة.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إجمالي المبيعات اليومية والأسبوعية</li>
+                        <li>عدد الفواتير المنشأة</li>
+                        <li>الطلبات النشطة في نقاط البيع</li>
+                        <li>قائمة آخر الطلبات المنفذة</li>
+                        <li>إشعارات المدفوعات المتأخرة</li>
+                        <li>مؤشرات أداء سريعة مع رسوم بيانية</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>عرض تفاصيل المبيعات عند النقر على أي مؤشر</li>
+                        <li>التنقل السريع لصفحات النظام عبر قائمة جانبية</li>
+                        <li>تصفية البيانات حسب الفترة الزمنية</li>
+                        <li>تحديث البيانات يدوياً عند الحاجة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة أداء اليوم في بداية الدوام</li>
+                        <li>متابعة إجمالي المبيعات أثناء ساعات العمل</li>
+                        <li>التأكد من عدم وجود مدفوعات متأخرة</li>
+                        <li>مراقبة نشاط نقاط البيع المختلفة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>يمكنك تثبيت الصفحة كشاشة رئيسية للمتصفح للوصول السريع.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/pos/sales — تفاصيل المبيعات</li>
+                        <li>/reports — تقارير متقدمة</li>
+                        <li>/notifications — قائمة الإشعارات الكاملة</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="general">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/login</span>
+                  <h3 class="text-base font-bold mt-0.5">تسجيل الدخول</h3>
+                </div>
+                <span class="bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded">عام</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">بوابة الدخول الآمنة للنظام باستخدام بيانات اعتماد Odoo.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>شاشة تسجيل دخول آمنة تتحقق من الهوية عبر XML-RPC مع خادم Odoo.</li>
+                        <li>تدعم خاصية تذكر الجلسة للحفاظ على تسجيل الدخول.</li>
+                        <li>تتحقق من صلاحيات المستخدم وتوجهه للواجهة المناسبة.</li>
+                        <li>تصميم بسيط مع دعم كامل للغة العربية.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>حقل إدخال اسم المستخدم</li>
+                        <li>حقل إدخال كلمة المرور</li>
+                        <li>زر تسجيل الدخول</li>
+                        <li>خيار تذكر الجلسة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل الدخول باستخدام بيانات Odoo</li>
+                        <li>التحقق من صحة البيانات وإظهار رسائل الخطأ</li>
+                        <li>توجيه المستخدم إلى لوحة التحكم بعد النجاح</li>
+                        <li>تسجيل الخروج وإنهاء الجلسة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>بداية يوم العمل وتسجيل الدخول للنظام</li>
+                        <li>التبديل بين المستخدمين في نفس الجهاز</li>
+                        <li>الدخول من أجهزة مختلفة مع الحفاظ على الأمان</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>استخدم متصفحاً محدثاً لضمان عمل خاصية تذكر الجلسة بشكل صحيح.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/ — لوحة التحكم بعد تسجيل الدخول</li>
+                        <li>/pos — اختيار نقطة البيع للعمل</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="pos">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/pos</span>
+                  <h3 class="text-base font-bold mt-0.5">إدارة نقاط البيع</h3>
+                </div>
+                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-medium px-2 py-0.5 rounded">نقاط البيع</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">عرض وإدارة جميع نقاط البيع المتاحة للمستخدم.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة تعرض جميع نقاط البيع المسموح للمستخدم التعامل معها.</li>
+                        <li>يمكن فتح جلسة جديدة أو متابعة جلسة موجودة لكل نقطة بيع.</li>
+                        <li>تظهر معلومات أساسية مثل اسم النقطة وحالتها والنقدية الافتتاحية.</li>
+                        <li>تدعم البحث والتصفية بين نقاط البيع المختلفة.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>قائمة نقاط البيع مع حالة كل منها</li>
+                        <li>النقدية الافتتاحية لكل جلسة</li>
+                        <li>حالة الجلسة (مغلقة / مفتوحة)</li>
+                        <li>إجمالي مبيعات الجلسة الحالية</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>فتح جلسة جديدة لنقطة بيع</li>
+                        <li>متابعة جلسة موجودة</li>
+                        <li>عرض تفاصيل كل نقطة بيع</li>
+                        <li>إغلاق الجلسة مع التسوية النقدية</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>بدء دوام جديد وفتح جلسة للكاشير</li>
+                        <li>التنقل بين نقاط البيع في حال وجود عدة فروع</li>
+                        <li>مراجعة حالة الجلسات قبل إغلاق اليوم</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/cashier — شاشة الكاشير بعد فتح الجلسة</li>
+                        <li>/pos/sales — سجل مبيعات النقطة</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="pos">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/pos/sales</span>
+                  <h3 class="text-base font-bold mt-0.5">شاشة البيع</h3>
+                </div>
+                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-medium px-2 py-0.5 rounded">نقاط البيع</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">واجهة البيع الرئيسية لإدارة الطلبات وإتمام عمليات البيع.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>واجهة البيع الرئيسية التي تعرض سجل الطلبات والجلسات.</li>
+                        <li>يمكن إنشاء طلبات جديدة وإدارة الطلبات المعلقة والملغية.</li>
+                        <li>تدعم عرض الجلسات النشطة والمغلقة مع تفاصيلها.</li>
+                        <li>ترتبط مباشرة بشاشة الكاشير للبيع السريع.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>قائمة الطلبات مع أرقامها وتواريخها</li>
+                        <li>حالة كل طلب (معلق / مكتمل / ملغي)</li>
+                        <li>إجمالي قيمة كل طلب</li>
+                        <li>طريقة الدفع المستخدمة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إنشاء طلب بيع جديد</li>
+                        <li>عرض تفاصيل الطلب</li>
+                        <li>إلغاء طلب</li>
+                        <li>طباعة إيصال للطلب</li>
+                        <li>البحث في الطلبات حسب التاريخ أو الرقم</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة طلبات اليوم في نهاية الدوام</li>
+                        <li>التحقق من حالة طلب محدد</li>
+                        <li>إلغاء طلب خاطئ</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/cashier — شاشة الكاشير للبيع السريع</li>
+                        <li>/orders — تفاصيل أكثر عن الطلبات</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="pos">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/cashier</span>
+                  <h3 class="text-base font-bold mt-0.5">شاشة الكاشير</h3>
+                </div>
+                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-medium px-2 py-0.5 rounded">نقاط البيع</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">الواجهة الأهم — شاشة البيع السريع مع دعم الباركود واختصارات لوحة المفاتيح.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>شاشة البيع الأساسية المصممة للسرعة والكفاءة في إتمام عمليات البيع.</li>
+                        <li>تدعم إضافة المنتجات عبر البحث أو الماسح الضوئي للباركود مع فلترة بالفئات.</li>
+                        <li>توفر اختصارات لوحة مفاتيح شاملة لتنفيذ جميع الإجراءات دون لمس الفأرة.</li>
+                        <li>تتكامل مع الخزنة لإدارة النقد والجلسة وإغلاقها في نهاية اليوم.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">اختصارات لوحة المفاتيح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li><kbd>F1</kbd> — الدفع نقداً</li>
+                        <li><kbd>F2</kbd> — الدفع ببطاقة</li>
+                        <li><kbd>F3</kbd> — إضافة خصم</li>
+                        <li><kbd>F4</kbd> — تحديد عميل</li>
+                        <li><kbd>F5</kbd> — تعليق الطلب (Park)</li>
+                        <li><kbd>F6</kbd> — فتح الخزنة</li>
+                        <li><kbd>F7</kbd> — إيداع خزنة</li>
+                        <li><kbd>F8</kbd> — سحب خزنة</li>
+                        <li><kbd>F9</kbd> — طباعة الإيصال</li>
+                        <li><kbd>F10</kbd> — فتح السجل النقدي</li>
+                        <li><kbd>F11</kbd> — ملء الشاشة</li>
+                        <li><kbd>F12</kbd> — إغلاق الجلسة</li>
+                        <li><kbd>↑</kbd> <kbd>↓</kbd> — التنقل بين المنتجات</li>
+                        <li><kbd>+</kbd> <kbd>-</kbd> — زيادة/تقليل الكمية</li>
+                        <li><kbd>Enter</kbd> — إضافة المنتج للسلة</li>
+                        <li><kbd>Delete</kbd> — حذف عنصر من السلة</li>
+                        <li><kbd>Esc</kbd> — إلغاء العملية الحالية</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>شبكة المنتجات مع الصور والأسعار</li>
+                        <li>شريط البحث مع دعم الباركود</li>
+                        <li>قائمة الفئات الجانبية</li>
+                        <li>سلة المشتريات مع تفاصيل الكميات</li>
+                        <li>إجمالي الفاتورة والضريبة</li>
+                        <li>معلومات الجلسة والنقدية الحالية</li>
+                        <li>اختصارات لوحة المفاتيح المتاحة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>البحث عن المنتجات بالنص أو الباركود</li>
+                        <li>تصفية المنتجات حسب الفئات</li>
+                        <li>إضافة منتجات للسلة بالنقر أو بالباركود</li>
+                        <li>تعديل كميات المنتجات (بالماوس أو لوحة المفاتيح)</li>
+                        <li>تحديد طريقة الدفع (نقدي F1 / بطاقة F2)</li>
+                        <li>إضافة خصم على الفاتورة (F3)</li>
+                        <li>تحديد العميل (F4)</li>
+                        <li>تعليق الطلب وإعادته لاحقاً (F5)</li>
+                        <li>إدارة الخزنة (إيداع F7 / سحب F8)</li>
+                        <li>طباعة الإيصال (F9)</li>
+                        <li>إغلاق الجلسة مع التسوية (F12)</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>بيع سريع: مسح باركود المنتجات واختيار الدفع → يتم في ثوانٍ</li>
+                        <li>بيع مع خصم: إضافة منتجات، ضغط F3، إدخال نسبة الخصم</li>
+                        <li>بيع لعميل محدد: ضغط F4، اختيار العميل، إتمام البيع</li>
+                        <li>منتجات وزنية: إضافة المنتج، استخدام +/- لتحديد الوزن</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>احفظ اختصارات لوحة المفاتيح — ستضاعف سرعة البيع 3 أضعاف على الأقل.</li>
+                        <li>يمكن للماسح الضوئي التعرف على الباركود مباشرة دون الحاجة للنقر على حقل البحث.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/pos — اختيار نقطة البيع</li>
+                        <li>/products — إدارة المنتجات</li>
+                        <li>/customers — إدارة العملاء</li>
+                        <li>/pos/sales — سجل المبيعات</li>
+                        <li>/stock-movements — متابعة المخزون</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="products">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/products</span>
+                  <h3 class="text-base font-bold mt-0.5">المنتجات</h3>
+                </div>
+                <span class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-xs font-medium px-2 py-0.5 rounded">المنتجات</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة كتالوج المنتجات مع إمكانية إضافة وتعديل وحذف المنتجات.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة متكاملة لإدارة جميع المنتجات في النظام.</li>
+                        <li>تعرض جدولاً بالمنتجات مع إمكانية البحث والتصفية حسب التصنيف أو الحالة.</li>
+                        <li>يمكن إضافة منتجات جديدة مع صور وأسعار وباركود.</li>
+                        <li>تتزامن مباشرة مع قاعدة بيانات Odoo عبر XML-RPC.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم المنتج والصورة</li>
+                        <li>سعر البيع وتكلفة الشراء</li>
+                        <li>الباركود (إذا وجد)</li>
+                        <li>التصنيف التابع له المنتج</li>
+                        <li>الكمية المتاحة في المخزون</li>
+                        <li>حالة المنتج (نشط / غير نشط)</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة منتج جديد</li>
+                        <li>تعديل بيانات منتج موجود</li>
+                        <li>حذف منتج</li>
+                        <li>تصدير قائمة المنتجات</li>
+                        <li>البحث بالاسم أو الباركود</li>
+                        <li>تصفية حسب التصنيف</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة منتج جديد للكتالوج</li>
+                        <li>تحديث سعر منتج موسمي</li>
+                        <li>البحث عن منتج بواسطة الباركود لمراجعة مخزونه</li>
+                        <li>تعطيل منتج توقف بيعه</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تأكد من إدخال الباركود بشكل صحيح فور إضافة المنتج لضمان عمل الماسح الضوئي.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/categories — إدارة التصنيفات</li>
+                        <li>/stock-movements — حركات المخزون</li>
+                        <li>/cashier — شاشة البيع</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="products">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/categories</span>
+                  <h3 class="text-base font-bold mt-0.5">التصنيفات</h3>
+                </div>
+                <span class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-xs font-medium px-2 py-0.5 rounded">المنتجات</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">تنظيم المنتجات في تصنيفات هرمية لتسهيل التصفح والبحث.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إدارة التصنيفات التي تنظم المنتجات في مجموعات منطقية.</li>
+                        <li>تدعم بناء هيكلاً هرمياً متعدد المستويات.</li>
+                        <li>تستخدم في شاشة الكاشير لتصفية المنتجات وعرضها حسب الفئة.</li>
+                        <li>تتزامن مع تصنيفات Odoo بشكل كامل.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم التصنيف</li>
+                        <li>التصنيف الأب (إن وجد)</li>
+                        <li>عدد المنتجات في كل تصنيف</li>
+                        <li>صورة رمزية للتصنيف</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة تصنيف جديد</li>
+                        <li>تعديل اسم أو ترتيب تصنيف</li>
+                        <li>حذف تصنيف</li>
+                        <li>إضافة تصنيف فرعي</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إنشاء تصنيف رئيسي مثل 'مشروبات' وتصنيفات فرعية 'مشروبات باردة' و'مشروبات ساخنة'</li>
+                        <li>إعادة تنظيم المنتجات في تصنيفات جديدة لتسهيل الوصول</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/products — المنتجات المرتبطة بالتصنيفات</li>
+                        <li>/cashier — تصفية المنتجات حسب الفئة في شاشة البيع</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="customers">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/customers</span>
+                  <h3 class="text-base font-bold mt-0.5">العملاء</h3>
+                </div>
+                <span class="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs font-medium px-2 py-0.5 rounded">العملاء والموردين</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">قاعدة بيانات العملاء مع سجل المشتريات والمدفوعات.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة شاملة لإدارة جميع العملاء المسجلين في النظام.</li>
+                        <li>تعرض معلومات الاتصال وسجل المشتريات والمدفوعات.</li>
+                        <li>يمكن إضافة عملاء جدد أو استيرادهم من Odoo مباشرة.</li>
+                        <li>ترتبط بصفحة تفاصيل العميل للحصول على معلومات متعمقة.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم العميل ورقم الهاتف</li>
+                        <li>البريد الإلكتروني والعنوان</li>
+                        <li>إجمالي المشتريات وعدد الفواتير</li>
+                        <li>الرصيد الحالي والمستحق</li>
+                        <li>آخر عملية شراء</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة عميل جديد</li>
+                        <li>عرض تفاصيل العميل</li>
+                        <li>تعديل بيانات العميل</li>
+                        <li>حذف عميل</li>
+                        <li>البحث بالاسم أو الهاتف</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل عميل جديد لدى أول شراء</li>
+                        <li>مراجعة سجل مشتريات عميل</li>
+                        <li>البحث عن رقم هاتف عميل لإيصال طلب</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/customer-details — تفاصيل العميل</li>
+                        <li>/cashier — إضافة عميل للفاتورة</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="customers">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/customer-details</span>
+                  <h3 class="text-base font-bold mt-0.5">تفاصيل العميل</h3>
+                </div>
+                <span class="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs font-medium px-2 py-0.5 rounded">العملاء والموردين</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">صفحة متعمقة لعرض كل معلومات عميل معين.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة تفصيلية لعميل واحد تعرض جميع المعلومات والسجلات المرتبطة به.</li>
+                        <li>تتضمن سجل المشتريات الكامل مع تواريخها وقيمها.</li>
+                        <li>تعرض حالة المدفوعات والرصيد المتبقي.</li>
+                        <li>تسمح بإضافة ملاحظات وطلبات خاصة.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>جميع بيانات الاتصال (هاتف، بريد، عنوان)</li>
+                        <li>سجل المشتريات مع التواريخ</li>
+                        <li>الفواتير الغير مدفوعة</li>
+                        <li>إجمالي الإنفاق والرصيد</li>
+                        <li>الملاحظات والتفضيلات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تعديل بيانات العميل</li>
+                        <li>إضافة ملاحظة</li>
+                        <li>عرض فاتورة محددة</li>
+                        <li>تسجيل دفعة جديدة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة سجل عميل قبل منحه ائتمان</li>
+                        <li>متابعة فاتورة غير مدفوعة لعميل</li>
+                        <li>تحديث معلومات الاتصال</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/customers — قائمة العملاء</li>
+                        <li>/late-payments — المدفوعات المتأخرة</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="customers">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/suppliers</span>
+                  <h3 class="text-base font-bold mt-0.5">الموردين</h3>
+                </div>
+                <span class="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs font-medium px-2 py-0.5 rounded">العملاء والموردين</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة بيانات الموردين ومعلومات الاتصال بهم.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>قاعدة بيانات الموردين الذين يتم الشراء منهم لتزويد المخزون.</li>
+                        <li>تظهر معلومات الاتصال الأساسية وتاريخ التعامل مع كل مورد.</li>
+                        <li>يمكن ربط كل مورد بالفواتير وأوامر الشراء الخاصة به.</li>
+                        <li>تتزامن مع قاعدة بيانات Odoo للموردين.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم المورد ورقم الهاتف</li>
+                        <li>البريد الإلكتروني والعنوان</li>
+                        <li>عدد أوامر الشراء المرتبطة</li>
+                        <li>إجمالي المشتريات من المورد</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة مورد جديد</li>
+                        <li>عرض تفاصيل المورد</li>
+                        <li>تعديل بيانات المورد</li>
+                        <li>حذف مورد</li>
+                        <li>عرض فواتير المورد</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل مورد جديد للمنتجات</li>
+                        <li>مراجعة تاريخ التعامل مع مورد قبل تقديم طلب شراء</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/supplier-details — تفاصيل المورد</li>
+                        <li>/purchase-orders — أوامر الشراء</li>
+                        <li>/vendor-bills — فواتير الموردين</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="customers">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/supplier-details</span>
+                  <h3 class="text-base font-bold mt-0.5">تفاصيل المورد</h3>
+                </div>
+                <span class="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs font-medium px-2 py-0.5 rounded">العملاء والموردين</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">صفحة تفصيلية لمورد معرض مع سجل المشتريات والفواتير.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة تفصيلية لمورد واحد تعرض جميع المعلومات والتعاملات السابقة.</li>
+                        <li>تتضمن سجل أوامر الشراء والفواتير المرتبطة بالمورد.</li>
+                        <li>تظهر ملخص المشتريات والتواريخ الهامة.</li>
+                        <li>تساعد في تقييم أداء الموردين.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>بيانات الاتصال الكاملة</li>
+                        <li>قائمة أوامر الشراء السابقة</li>
+                        <li>فواتير الموردين المعلقة والمسددة</li>
+                        <li>إجمالي المشتريات والمدفوعات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تعديل بيانات المورد</li>
+                        <li>إنشاء أمر شراء جديد للمورد</li>
+                        <li>عرض فاتورة محددة</li>
+                        <li>تسجيل دفعة لمورد</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة تاريخ المورد قبل طلب شراء جديد</li>
+                        <li>متابعة الفواتير غير المسددة لمورد</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/suppliers — قائمة الموردين</li>
+                        <li>/purchase-orders — أوامر الشراء</li>
+                        <li>/vendor-bills — فواتير الموردين</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="pos">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/orders</span>
+                  <h3 class="text-base font-bold mt-0.5">الطلبات</h3>
+                </div>
+                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-medium px-2 py-0.5 rounded">نقاط البيع</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">سجل جميع طلبات البيع مع إمكانية البحث والتصفية المتقدمة.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>سجل كامل لجميع طلبات البيع المنفذة عبر النظام.</li>
+                        <li>يدعم البحث المتقدم حسب التاريخ والعميل وطريقة الدفع.</li>
+                        <li>يعرض تفاصيل كل طلب بما في ذلك المنتجات والكميات والأسعار.</li>
+                        <li>يمكن إعادة طباعة الإيصالات أو إلغاء الطلبات.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>رقم الطلب وتاريخه</li>
+                        <li>اسم العميل (إن وجد)</li>
+                        <li>قائمة المنتجات والكميات</li>
+                        <li>الإجمالي والضريبة</li>
+                        <li>طريقة الدفع</li>
+                        <li>حالة الطلب</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>عرض تفاصيل الطلب</li>
+                        <li>إعادة طباعة الإيصال</li>
+                        <li>إلغاء الطلب</li>
+                        <li>إنشاء طلب إرجاع</li>
+                        <li>تصدير قائمة الطلبات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة طلبات يوم محدد</li>
+                        <li>البحث عن طلب لعميل</li>
+                        <li>معالجة طلب إرجاع واسترداد</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/pos/sales — شاشة المبيعات</li>
+                        <li>/cashier — إنشاء طلب جديد</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="purchases">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/purchase-orders</span>
+                  <h3 class="text-base font-bold mt-0.5">أوامر الشراء</h3>
+                </div>
+                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-medium px-2 py-0.5 rounded">المشتريات والمحاسبة</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة طلبات الشراء من الموردين لتزويد المخزون.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>نظام متكامل لإدارة أوامر الشراء المقدمة للموردين.</li>
+                        <li>يتيح إنشاء أمر شراء جديد واختيار المنتجات والكميات.</li>
+                        <li>يتتبع حالة الأمر (معلق / مسلم / ملغي).</li>
+                        <li>يرتبط مباشرة بحركات المخزون لاستلام البضائع.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>رقم أمر الشراء وتاريخه</li>
+                        <li>اسم المورد</li>
+                        <li>قائمة المنتجات والكميات المطلوبة</li>
+                        <li>الحالة والتاريخ المتوقع للتسليم</li>
+                        <li>الإجمالي</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إنشاء أمر شراء جديد</li>
+                        <li>تعديل أمر شراء موجود</li>
+                        <li>تأكيد استلام الطلب</li>
+                        <li>إلغاء أمر شراء</li>
+                        <li>طباعة أمر الشراء</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تقديم طلب شراء لمورد عند انخفاض المخزون</li>
+                        <li>متابعة حالة أمر شراء قيد التوصيل</li>
+                        <li>تأكيد استلام بضاعة جديدة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/suppliers — الموردين</li>
+                        <li>/stock-movements — حركات المخزون</li>
+                        <li>/vendor-bills — فواتير الموردين</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="purchases">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/vendor-bills</span>
+                  <h3 class="text-base font-bold mt-0.5">فواتير الموردين</h3>
+                </div>
+                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-medium px-2 py-0.5 rounded">المشتريات والمحاسبة</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة وتسوية فواتير المشتريات من الموردين.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة إدارة فواتير الشراء المستلمة من الموردين.</li>
+                        <li>تسجل الفواتير المستحقة والمدفوعة مع تواريخ الاستحقاق.</li>
+                        <li>تسمح بتسجيل الدفعات ومتابعة الأرصدة المعلقة.</li>
+                        <li>ترتبط بأوامر الشراء لضمان تطابق البيانات.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>رقم الفاتورة وتاريخها</li>
+                        <li>اسم المورد</li>
+                        <li>المبلغ الإجمالي</li>
+                        <li>تاريخ الاستحقاق</li>
+                        <li>الحالة (مدفوعة / غير مدفوعة / جزئية)</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل فاتورة مورد جديدة</li>
+                        <li>تسجيل دفعة</li>
+                        <li>تعديل فاتورة</li>
+                        <li>عرض تفاصيل الفاتورة</li>
+                        <li>طباعة الفاتورة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل فاتورة شراء جديدة من مورد</li>
+                        <li>متابعة الفواتير المستحقة قبل نهاية الشهر</li>
+                        <li>تسديد فاتورة مورد</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/purchase-orders — أوامر الشراء</li>
+                        <li>/suppliers — الموردين</li>
+                        <li>/accounting — المحاسبة</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="warehouse">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/stock-movements</span>
+                  <h3 class="text-base font-bold mt-0.5">حركات المخزون</h3>
+                </div>
+                <span class="bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 text-xs font-medium px-2 py-0.5 rounded">المخزون</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">سجل جميع حركات المخزون من إدخال وإخراج وتعديل.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>سجل كامل لجميع الحركات المخزنية في النظام.</li>
+                        <li>يشمل عمليات البيع والشراء والتحويلات والتعديلات.</li>
+                        <li>يتيح تتبع الكميات الداخلة والخارجة من المخزون.</li>
+                        <li>يدعم البحث والعرض حسب المنتج أو التاريخ.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تاريخ ووقت الحركة</li>
+                        <li>المنتج والكمية</li>
+                        <li>نوع الحركة (داخل / خارج)</li>
+                        <li>المرجع (فاتورة بيع، أمر شراء، تحويل)</li>
+                        <li>الرصيد بعد الحركة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>عرض حركات منتج معين</li>
+                        <li>تصفية حسب نوع الحركة</li>
+                        <li>تصفية حسب الفترة الزمنية</li>
+                        <li>تصدير التقرير</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة حركات منتج بعد استلام شحنة</li>
+                        <li>التحقق من تسجيل بيع في المخزون</li>
+                        <li>متابعة الفاقد في المخزون</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/stock-movements/product/:id — حركات منتج محدد</li>
+                        <li>/products — المنتجات</li>
+                        <li>/stock-transfers — التحويلات المخزنية</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="warehouse">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/stock-movements/product/:id</span>
+                  <h3 class="text-base font-bold mt-0.5">حركات منتج</h3>
+                </div>
+                <span class="bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 text-xs font-medium px-2 py-0.5 rounded">المخزون</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">سجل مفصل لحركات منتج محدد مع تحليل الحركة.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة تفصيلية تعرض كامل حركات منتج واحد في المخزون.</li>
+                        <li>تساعد في تحليل نمط حركة المنتج ومعرفة معدل الدوران.</li>
+                        <li>تظهر الكميات الداخلة والخارجة والرصيد المتراكم عبر الزمن.</li>
+                        <li>تستخدم لحل مشكلات المخزون وتتبع الفروقات.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم المنتج وصورته</li>
+                        <li>الرصيد الحالي</li>
+                        <li>قائمة الحركات زمنياً</li>
+                        <li>نوع ومرجع كل حركة</li>
+                        <li>متوسط سعر التكلفة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>عرض الحركات في فترة محددة</li>
+                        <li>تصدير تقرير الحركات</li>
+                        <li>تعديل المخزون (جرد)</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>التحقق من سبب نقص مخزون منتج</li>
+                        <li>مراجعة حركات منتج قبل إعادة طلبه</li>
+                        <li>اكتشاف أخطاء في تسجيل المخزون</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/stock-movements — قائمة الحركات</li>
+                        <li>/products — معلومات المنتج</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="warehouse">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/stock-transfers</span>
+                  <h3 class="text-base font-bold mt-0.5">التحويلات المخزنية</h3>
+                </div>
+                <span class="bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 text-xs font-medium px-2 py-0.5 rounded">المخزون</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة تحويل المنتجات بين المستودعات أو المواقع المختلفة.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>نظام إدارة التحويلات بين المستودعات المختلفة.</li>
+                        <li>يدعم نقل المنتجات من موقع إلى آخر داخل نفس الفرع أو بين الفروع.</li>
+                        <li>يسجل تاريخ وكميات المنتجات المنقولة.</li>
+                        <li>يرتبط بحركات المخزون لتحديث الأرصدة تلقائياً.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>رقم التحويل وتاريخه</li>
+                        <li>من مستودع / إلى مستودع</li>
+                        <li>قائمة المنتجات والكميات</li>
+                        <li>حالة التحويل (معلق / مكتمل)</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إنشاء تحويل جديد</li>
+                        <li>تأكيد استلام التحويل</li>
+                        <li>إلغاء تحويل</li>
+                        <li>طباعة مستند التحويل</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>نقل بضائع من المستودع الرئيسي إلى فرع آخر</li>
+                        <li>إعادة توزيع المخزون بين الرفوف</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/warehouse — المستودع</li>
+                        <li>/stock-movements — حركات المخزون</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="settings">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/receipt-design</span>
+                  <h3 class="text-base font-bold mt-0.5">تصميم الإيصال</h3>
+                </div>
+                <span class="bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300 text-xs font-medium px-2 py-0.5 rounded">الإعدادات</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">تخصيص شكل ومحتوى إيصالات الطباعة.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>أداة تخصيص إيصالات الطباعة لتتناسب مع هوية المتجر.</li>
+                        <li>تسمح بتعديل النصوص والشعار والألوان المطبوعة.</li>
+                        <li>تدعم معاينة حية للإيصال قبل حفظ التغييرات.</li>
+                        <li>تحفظ الإعدادات محلياً وترسلها لطابعة الإيصالات الحرارية.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>معاينة الإيصال في الوقت الفعلي</li>
+                        <li>خيارات تخصيص النصوص</li>
+                        <li>رفع الشعار</li>
+                        <li>إعدادات الطباعة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>رفع شعار المتجر</li>
+                        <li>تعديل النصوص (الرأس، التذييل، الشكر)</li>
+                        <li>اختيار حجم الورق</li>
+                        <li>معاينة الإيصال</li>
+                        <li>حفظ الإعدادات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تغيير شعار المتجر على الإيصالات</li>
+                        <li>إضافة رسالة ترويجية في أسفل الإيصال</li>
+                        <li>تعديل تنسيق الإيصال للمناسبات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>استخدم شعاراً بدقة منخفضة (200px) لضمان طباعة سريعة ونظيفة على الإيصالات الحرارية.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/cashier — طباعة الإيصال بعد البيع</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="reports">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/reports</span>
+                  <h3 class="text-base font-bold mt-0.5">التقارير</h3>
+                </div>
+                <span class="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 text-xs font-medium px-2 py-0.5 rounded">التقارير</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">تقارير متقدمة عن المبيعات والمخزون والأداء المالي.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مركز التقارير الموحد الذي يجمع جميع تقارير النظام في مكان واحد.</li>
+                        <li>يقدم تقارير المبيعات اليومية والشهرية مع مقارنات سنوية.</li>
+                        <li>يشمل تقارير المخزون والأرباح والخسائر والضرائب.</li>
+                        <li>يدعم تصدير التقارير وتخصيص الفترات الزمنية.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تقرير المبيعات الإجمالية</li>
+                        <li>تقرير الأرباح والخسائر</li>
+                        <li>تقرير الضرائب</li>
+                        <li>تقرير المخزون</li>
+                        <li>تقرير حركة النقدية</li>
+                        <li>رسوم بيانية ومخططات تفاعلية</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>عرض التقرير حسب الفترة</li>
+                        <li>تصدير التقرير (PDF/Excel)</li>
+                        <li>طباعة التقرير</li>
+                        <li>مقارنة الفترات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تحليل أداء المبيعات في نهاية الشهر</li>
+                        <li>مراجعة تقرير الأرباح للربع السنوي</li>
+                        <li>تجهيز تقرير الضرائب للمحاسب</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>حمل التقارير بصيغة Excel إذا كنت بحاجة لتحليل إضافي باستخدام pivot tables.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/accounting — المحاسبة</li>
+                        <li>/ — لوحة التحكم</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="purchases">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/accounting</span>
+                  <h3 class="text-base font-bold mt-0.5">المحاسبة</h3>
+                </div>
+                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-medium px-2 py-0.5 rounded">المشتريات والمحاسبة</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">نظام محاسبة مبسط لإدارة القيود والحسابات.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>واجهة محاسبة مبسطة تظهر القيود المحاسبية الناتجة عن عمليات البيع والشراء.</li>
+                        <li>تعرض الحسابات الرئيسية والأرصدة الجارية.</li>
+                        <li>ترتبط بفواتير الموردين والمبيعات لتسجيل القيود تلقائياً.</li>
+                        <li>تساعد في متابعة التدفق النقدي والمركز المالي.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>دفتر الأستاذ العام</li>
+                        <li>الحسابات الدائنة والمدينة</li>
+                        <li>القيود اليومية</li>
+                        <li>ميزان المراجعة</li>
+                        <li>الأرصدة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>عرض القيود المحاسبية</li>
+                        <li>تصفية حسب الحساب</li>
+                        <li>تصدير كشف حساب</li>
+                        <li>طباعة تقرير محاسبي</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة القيود المحاسبية لشهر معين</li>
+                        <li>متابعة الحسابات المدينة</li>
+                        <li>تحضير البيانات للمحاسب الخارجي</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/reports — التقارير المالية</li>
+                        <li>/vendor-bills — فواتير الموردين</li>
+                        <li>/operational-expenses — المصروفات التشغيلية</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="settings">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/notifications</span>
+                  <h3 class="text-base font-bold mt-0.5">الإشعارات</h3>
+                </div>
+                <span class="bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300 text-xs font-medium px-2 py-0.5 rounded">الإعدادات</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">مركز الإشعارات والتنبيهات للنظام.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مركز الإشعارات الذي يجمع جميع تنبيهات النظام الهامة.</li>
+                        <li>يعرض إشعارات المدفوعات المتأخرة ونقص المخزون وإغلاق الجلسات.</li>
+                        <li>يدعم تحديد الإشعارات كمقروءة وغير مقروءة.</li>
+                        <li>يساعد في متابعة الأحداث الهامة دون تفويت أي شيء.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>قائمة الإشعارات مع تواريخها</li>
+                        <li>نوع الإشعار ونصه</li>
+                        <li>حالة الإشعار (مقروء / غير مقروء)</li>
+                        <li>رابط للصفحة المرتبطة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>عرض الإشعار</li>
+                        <li>تحديد كمقروء</li>
+                        <li>حذف إشعار</li>
+                        <li>التنقل للصفحة المرتبطة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>متابعة إشعار المدفوعات المتأخرة يومياً</li>
+                        <li>التنبيه عند انخفاض مخزون منتج</li>
+                        <li>معرفة إغلاق جلسات الأمس</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/late-payments — المدفوعات المتأخرة</li>
+                        <li>/ — لوحة التحكم</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="settings">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/user-profile</span>
+                  <h3 class="text-base font-bold mt-0.5">الملف الشخصي</h3>
+                </div>
+                <span class="bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300 text-xs font-medium px-2 py-0.5 rounded">الإعدادات</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة الملف الشخصي للمستخدم وتعديل الإعدادات الخاصة.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة الملف الشخصي للمستخدم لعرض وتعديل بياناته الشخصية.</li>
+                        <li>يمكن تغيير كلمة المرور وتحديث البريد الإلكتروني.</li>
+                        <li>تعرض الصلاحيات والأدوار المخولة للمستخدم.</li>
+                        <li>تحتفظ بسجل آخر نشاطات المستخدم في النظام.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>الاسم والبريد الإلكتروني</li>
+                        <li>رقم الهاتف</li>
+                        <li>الصورة الشخصية</li>
+                        <li>الدور والصلاحيات</li>
+                        <li>آخر نشاط</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تعديل البيانات الشخصية</li>
+                        <li>تغيير كلمة المرور</li>
+                        <li>رفع صورة شخصية</li>
+                        <li>عرض سجل النشاطات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تحديث بيانات الاتصال</li>
+                        <li>تغيير كلمة المرور بشكل دوري</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/users — إدارة المستخدمين</li>
+                        <li>/login — تسجيل الدخول</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="settings">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/users</span>
+                  <h3 class="text-base font-bold mt-0.5">المستخدمين</h3>
+                </div>
+                <span class="bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300 text-xs font-medium px-2 py-0.5 rounded">الإعدادات</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة مستخدمي النظام وتحديد صلاحيات الوصول.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إدارة جميع مستخدمي النظام الذين لديهم صلاحية الوصول.</li>
+                        <li>تعرض أسماء المستخدمين وأدوارهم وصلاحياتهم.</li>
+                        <li>تسمح بإضافة مستخدمين جدد أو تعطيل حسابات موجودة.</li>
+                        <li>تتزامن مع بيانات مستخدمي Odoo مباشرة.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم المستخدم والبريد الإلكتروني</li>
+                        <li>الدور الوظيفي</li>
+                        <li>الصلاحيات الممنوحة</li>
+                        <li>حالة الحساب (نشط / غير نشط)</li>
+                        <li>آخر تسجيل دخول</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة مستخدم جديد</li>
+                        <li>تعديل صلاحيات مستخدم</li>
+                        <li>تعطيل / تفعيل حساب</li>
+                        <li>إعادة تعيين كلمة المرور</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة كاشير جديد للمتجر</li>
+                        <li>تعديل صلاحيات مدير ليشمل التقارير المالية</li>
+                        <li>تعطيل حساب موظف غادر العمل</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/user-profile — الملف الشخصي</li>
+                        <li>/company-profile — بيانات الشركة</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="purchases">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/late-payments</span>
+                  <h3 class="text-base font-bold mt-0.5">المدفوعات المتأخرة</h3>
+                </div>
+                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-medium px-2 py-0.5 rounded">المشتريات والمحاسبة</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">متابعة الفواتير والمدفوعات المتأخرة للعملاء والموردين.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة متخصصة لعرض وإدارة المدفوعات المتأخرة.</li>
+                        <li>تظهر الفواتير التي تجاوزت تاريخ استحقاقها.</li>
+                        <li>تساعد في متابعة التحصيل وإدارة التدفق النقدي.</li>
+                        <li>تسمح بإرسال تذكيرات للعملاء المدينة.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>العميل / المورد</li>
+                        <li>رقم الفاتورة وتاريخها</li>
+                        <li>المبلغ المستحق</li>
+                        <li>تاريخ الاستحقاق</li>
+                        <li>عدد أيام التأخير</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل دفعة مستلمة</li>
+                        <li>إرسال تذكير للعميل</li>
+                        <li>طباعة كشف حساب</li>
+                        <li>تصدير قائمة المتأخرات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>مراجعة المتأخرات في نهاية الشهر</li>
+                        <li>متابعة عميل تأخر عن سداد فاتورتين</li>
+                        <li>تجهيز تقرير المتأخرات للإدارة</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تفقد هذه الصفحة يومياً لتجنب تراكم المديونيات.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/customers — العملاء</li>
+                        <li>/accounting — المحاسبة</li>
+                        <li>/notifications — الإشعارات</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="warehouse">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/warehouse</span>
+                  <h3 class="text-base font-bold mt-0.5">المستودع</h3>
+                </div>
+                <span class="bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 text-xs font-medium px-2 py-0.5 rounded">المخزون</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إدارة المستودعات والمواقع المخزنية.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة إدارة المستودعات والمواقع الجغرافية للمخزون.</li>
+                        <li>تعرض قائمة المستودعات مع سعتها وإشغالها الحالي.</li>
+                        <li>تسمح بإنشاء مستودعات جديدة أو تعديل القائمة.</li>
+                        <li>ترتبط بحركات المخزون والتحويلات المخزنية.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم المستودع</li>
+                        <li>الموقع الجغرافي</li>
+                        <li>السعة الإجمالية والمستخدمة</li>
+                        <li>عدد المنتجات المخزنة</li>
+                        <li>حالة المستودع</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة مستودع جديد</li>
+                        <li>تعديل بيانات مستودع</li>
+                        <li>عرض محتوى المستودع</li>
+                        <li>حذف مستودع</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>إضافة مستودع جديد لفرع جديد</li>
+                        <li>مراجعة مخزون المستودع الرئيسي</li>
+                        <li>إعادة تنظيم المواقع المخزنية</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/stock-transfers — التحويلات المخزنية</li>
+                        <li>/stock-movements — حركات المخزون</li>
+                        <li>/products — المنتجات</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="settings">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/company-profile</span>
+                  <h3 class="text-base font-bold mt-0.5">بيانات الشركة</h3>
+                </div>
+                <span class="bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300 text-xs font-medium px-2 py-0.5 rounded">الإعدادات</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">إعدادات الشركة والمعلومات الأساسية للنظام.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة إعدادات الشركة التي تحتوي على المعلومات الأساسية للمؤسسة.</li>
+                        <li>تشمل الاسم والشعار والعنوان وبيانات التواصل.</li>
+                        <li>تؤثر هذه البيانات على الإيصالات والتقارير الصادرة.</li>
+                        <li>يمكن تعديلها حسب الحاجة مع حفظ التغييرات في Odoo.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>اسم الشركة والشعار</li>
+                        <li>العنوان ورقم الهاتف</li>
+                        <li>البريد الإلكتروني والموقع الإلكتروني</li>
+                        <li>السجل التجاري والرقم الضريبي</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تعديل بيانات الشركة</li>
+                        <li>تغيير الشعار</li>
+                        <li>حفظ التغييرات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تحديث بيانات الشركة بعد تغيير العنوان</li>
+                        <li>تغيير الشعار في بداية الموسم</li>
+                        <li>إضافة الرقم الضريبي</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/receipt-design — تصميم الإيصال</li>
+                        <li>/users — المستخدمين</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="page-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow" data-category="purchases">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <span class="text-xs font-medium text-gray-400 dark:text-gray-500 font-mono">/operational-expenses</span>
+                  <h3 class="text-base font-bold mt-0.5">المصروفات التشغيلية</h3>
+                </div>
+                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-medium px-2 py-0.5 rounded">المشتريات والمحاسبة</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">تسجيل ومتابعة المصروفات اليومية والتشغيلية.</p>
+              <button onclick="toggleCard(this)" class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 font-medium">
+                <span>عرض التفاصيل الكاملة</span>
+                <svg class="arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="card-expand hidden">
+                <div class="pt-3 border-t border-gray-100 dark:border-gray-700 mt-3 space-y-3 text-sm">
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">وصف مفصل</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صفحة إدارة المصروفات اليومية والتشغيلية للمتجر.</li>
+                        <li>تسجل جميع المصروفات مثل الإيجار والكهرباء والرواتب.</li>
+                        <li>تصنف المصروفات حسب النوع لسهولة التحليل.</li>
+                        <li>ترتبط بالمحاسبة لتسجيل القيود المحاسبية تلقائياً.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">البيانات المعروضة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تاريخ المصروف</li>
+                        <li>نوع المصروف (إيجار، كهرباء، رواتب، أخرى)</li>
+                        <li>المبلغ المدفوع</li>
+                        <li>طريقة الدفع</li>
+                        <li>الملاحظات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الإجراءات المتاحة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل مصروف جديد</li>
+                        <li>تعديل مصروف</li>
+                        <li>حذف مصروف</li>
+                        <li>تصفية حسب النوع أو التاريخ</li>
+                        <li>تصدير تقرير المصروفات</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">حالات الاستخدام</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>تسجيل فاتورة الكهرباء الشهرية</li>
+                        <li>متابعة إجمالي المصروفات الشهرية</li>
+                        <li>تحليل بنود التكلفة التشغيلية</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">نصائح</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>صنف المصروفات بدقة (إيجار، رواتب، كهرباء) ليسهل تحليل التكاليف لاحقاً.</li>
+                      </ul>
+                    </div>
+                    <div class="detail-section">
+                      <h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2">الصفحات المرتبطة</h4>
+                      <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-gray-400 text-xs">
+                        <li>/accounting — المحاسبة</li>
+                        <li>/reports — التقارير</li>
+                      </ul>
+                    </div>
+                </div>
+              </div>
+            </div>
+      </div>
+    </div>
+  </main>
+  <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500 dark:text-gray-400">
+      <p>دليل المستخدم — نظام نقاط البيع المخصص  |  جميع الحقوق محفوظة &copy; 2026</p>
+    </div>
+  </footer>
+  <script>
+    function toggleDark() {
+      document.documentElement.classList.toggle('dark');
+    }
+    function switchTab(name) {
+      document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.add('hidden'); });
+      document.getElementById('tab-' + name).classList.remove('hidden');
+      document.querySelectorAll('[id^="tab-btn-"]').forEach(function(b) {
+        b.classList.remove('active-tab');
+        b.classList.add('inactive-tab');
+      });
+      document.getElementById('tab-btn-' + name).classList.remove('inactive-tab');
+      document.getElementById('tab-btn-' + name).classList.add('active-tab');
+    }
+    function toggleCard(btn) {
+      var expand = btn.nextElementSibling;
+      expand.classList.toggle('hidden');
+      var arrow = btn.querySelector('.arrow');
+      if (expand.classList.contains('hidden')) {
+        btn.querySelector('span').textContent = 'عرض التفاصيل الكاملة';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        btn.querySelector('span').textContent = 'إخفاء التفاصيل';
+        arrow.style.transform = 'rotate(180deg)';
+      }
+    }
+    var currentFilter = 'all';
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.chip').forEach(function(c) {
+        c.classList.remove('active', 'bg-primary-600', 'text-white');
+        c.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+      });
+      if (filter === 'all') {
+        document.querySelectorAll('.chip')[0].classList.add('active', 'bg-primary-600', 'text-white');
+        document.querySelectorAll('.chip')[0].classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+      } else {
+        var chips = document.querySelectorAll('.chip');
+        for (var i = 0; i < chips.length; i++) {
+          if (chips[i].textContent.trim().indexOf(filter === 'pos' ? 'نقاط' : filter === 'products' ? 'المنتجات' : filter === 'customers' ? 'العملاء' : filter === 'purchases' ? 'المشتريات' : filter === 'warehouse' ? 'المخزون' : filter === 'reports' ? 'التقارير' : 'الإعدادات') !== -1) {
+            chips[i].classList.add('active', 'bg-primary-600', 'text-white');
+            chips[i].classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+            break;
+          }
+        }
+      }
+      filterPages();
+    }
+    function filterPages() {
+      var search = document.getElementById('searchInput').value.toLowerCase();
+      document.querySelectorAll('.page-card').forEach(function(card) {
+        var cat = card.getAttribute('data-category');
+        var text = card.textContent.toLowerCase();
+        var matchSearch = !search || text.indexOf(search) !== -1;
+        var matchFilter = currentFilter === 'all' || cat === currentFilter;
+        card.style.display = matchSearch && matchFilter ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

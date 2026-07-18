@@ -1,0 +1,1383 @@
+{
+  "communities": {
+    "0": [
+      "app_components_pos_pospaymentsheet_vue",
+      "pos_pospaymentsheet_allocatedtotal",
+      "pos_pospaymentsheet_any",
+      "pos_pospaymentsheet_applydiscount",
+      "pos_pospaymentsheet_applyservicefee",
+      "pos_pospaymentsheet_cart",
+      "pos_pospaymentsheet_clearcustomer",
+      "pos_pospaymentsheet_closecompleted",
+      "pos_pospaymentsheet_closemodal",
+      "pos_pospaymentsheet_customerdrawererror",
+      "pos_pospaymentsheet_customerdrawersaving",
+      "pos_pospaymentsheet_customersearchquery",
+      "pos_pospaymentsheet_discountvalue",
+      "pos_pospaymentsheet_errormessage",
+      "pos_pospaymentsheet_fetchcustomers",
+      "pos_pospaymentsheet_findmethod",
+      "pos_pospaymentsheet_getchange",
+      "pos_pospaymentsheet_getmethodicon",
+      "pos_pospaymentsheet_handlesubmit",
+      "pos_pospaymentsheet_isfullypaid",
+      "pos_pospaymentsheet_issaving",
+      "pos_pospaymentsheet_lastorderdiscount",
+      "pos_pospaymentsheet_lastordergrandtotal",
+      "pos_pospaymentsheet_lastorderservicefee",
+      "pos_pospaymentsheet_lastordersubtotal",
+      "pos_pospaymentsheet_loadingcustomers",
+      "pos_pospaymentsheet_method",
+      "pos_pospaymentsheet_newcustomer",
+      "pos_pospaymentsheet_oncustomersearch",
+      "pos_pospaymentsheet_ordername",
+      "pos_pospaymentsheet_ordernote",
+      "pos_pospaymentsheet_printreceipt",
+      "pos_pospaymentsheet_remaining",
+      "pos_pospaymentsheet_removepaymentallocation",
+      "pos_pospaymentsheet_resetlocalpayments",
+      "pos_pospaymentsheet_selectcustomer",
+      "pos_pospaymentsheet_selectpaymentmethod",
+      "pos_pospaymentsheet_servicefeevalue",
+      "pos_pospaymentsheet_showcustomer",
+      "pos_pospaymentsheet_showcustomerdrawer",
+      "pos_pospaymentsheet_showdiscount",
+      "pos_pospaymentsheet_shownote",
+      "pos_pospaymentsheet_showservicefee",
+      "pos_pospaymentsheet_successmessage",
+      "pos_pospaymentsheet_updateallocation",
+      "pos_pospaymentsheet_updatereceived"
+    ],
+    "1": [
+      "app_pages_vendor_bills_vue",
+      "pages_vendor_bills_cancelbill",
+      "pages_vendor_bills_loadingall",
+      "pages_vendor_bills_openpaymodal",
+      "pages_vendor_bills_overduecount",
+      "pages_vendor_bills_payamount",
+      "pages_vendor_bills_paydate",
+      "pages_vendor_bills_paymentstateclass",
+      "pages_vendor_bills_paymentstatetext",
+      "pages_vendor_bills_postbill",
+      "pages_vendor_bills_showpaymentmodal",
+      "pages_vendor_bills_showtoast",
+      "pages_vendor_bills_showtoastmessage",
+      "pages_vendor_bills_stateclass",
+      "pages_vendor_bills_statetext",
+      "pages_vendor_bills_submitpayment",
+      "pages_vendor_bills_toastmessage",
+      "pages_vendor_bills_totalitems",
+      "pages_vendor_bills_totalpages",
+      "pages_vendor_bills_totalpayable",
+      "pages_vendor_bills_totalvendorbills",
+      "pages_vendor_bills_unpaidcount"
+    ],
+    "2": [
+      "app_pages_company_profile_vue",
+      "pages_company_profile_actionerror",
+      "pages_company_profile_actionsuccess",
+      "pages_company_profile_countries",
+      "pages_company_profile_editcity",
+      "pages_company_profile_editcompanyregistry",
+      "pages_company_profile_editemail",
+      "pages_company_profile_editlogo",
+      "pages_company_profile_editname",
+      "pages_company_profile_editphone",
+      "pages_company_profile_editstreet",
+      "pages_company_profile_editstreet2",
+      "pages_company_profile_editvat",
+      "pages_company_profile_editwebsite",
+      "pages_company_profile_editzip",
+      "pages_company_profile_filteredstates",
+      "pages_company_profile_handlediscard",
+      "pages_company_profile_handlelogochange",
+      "pages_company_profile_handlesave",
+      "pages_company_profile_initform",
+      "pages_company_profile_issaving",
+      "pages_company_profile_states"
+    ],
+    "3": [
+      "app_types_pos_ts",
+      "types_pos_cart",
+      "types_pos_cartitem",
+      "types_pos_cashmovement",
+      "types_pos_cashmovementresponse",
+      "types_pos_orderdetailresponse",
+      "types_pos_orderline",
+      "types_pos_orderlistresponse",
+      "types_pos_orderpayload",
+      "types_pos_orderpayment",
+      "types_pos_orderpaymentspayload",
+      "types_pos_orderremoveitempayload",
+      "types_pos_orderresponse",
+      "types_pos_orderstatuspayload",
+      "types_pos_paymentline",
+      "types_pos_paymentmethod",
+      "types_pos_poscategory",
+      "types_pos_posorder",
+      "types_pos_posproduct",
+      "types_pos_posregister",
+      "types_pos_sessionsummary"
+    ],
+    "4": [
+      "components_json",
+      "pos_components_aliases",
+      "pos_components_aliases_components",
+      "pos_components_aliases_composables",
+      "pos_components_aliases_lib",
+      "pos_components_aliases_ui",
+      "pos_components_aliases_utils",
+      "pos_components_font",
+      "pos_components_iconlibrary",
+      "pos_components_pointer",
+      "pos_components_registries",
+      "pos_components_rtl",
+      "pos_components_schema",
+      "pos_components_style",
+      "pos_components_tailwind",
+      "pos_components_tailwind_basecolor",
+      "pos_components_tailwind_config",
+      "pos_components_tailwind_css",
+      "pos_components_tailwind_cssvariables",
+      "pos_components_tailwind_prefix",
+      "pos_components_typescript"
+    ],
+    "5": [
+      "pos_package_dependencies",
+      "pos_package_dependencies_axios",
+      "pos_package_dependencies_chart_js",
+      "pos_package_dependencies_class_variance_authority",
+      "pos_package_dependencies_clsx",
+      "pos_package_dependencies_dotenv",
+      "pos_package_dependencies_html5_qrcode",
+      "pos_package_dependencies_lucide_vue",
+      "pos_package_dependencies_nuxt",
+      "pos_package_dependencies_nuxt_auth_utils",
+      "pos_package_dependencies_odoo_await",
+      "pos_package_dependencies_pinia",
+      "pos_package_dependencies_pinia_nuxt",
+      "pos_package_dependencies_reka_ui",
+      "pos_package_dependencies_shadcn_nuxt",
+      "pos_package_dependencies_sheetjs_xlsx",
+      "pos_package_dependencies_tailwind_merge",
+      "pos_package_dependencies_vue",
+      "pos_package_dependencies_vue_chartjs",
+      "pos_package_dependencies_vue_router",
+      "pos_package_dependencies_vueuse_core"
+    ],
+    "6": [
+      "app_pages_cashier_vue",
+      "pages_cashier_error",
+      "pages_cashier_handleaddtocart",
+      "pages_cashier_handleaddtocartfromdetail",
+      "pages_cashier_handlecategoryselect",
+      "pages_cashier_handlecheckout",
+      "pages_cashier_handleloadmore",
+      "pages_cashier_handlelocationchange",
+      "pages_cashier_handleordercompleted",
+      "pages_cashier_handleproductclick",
+      "pages_cashier_handlescan",
+      "pages_cashier_handlesearch",
+      "pages_cashier_handlesessionclosed",
+      "pages_cashier_hasmore",
+      "pages_cashier_if",
+      "pages_cashier_loading",
+      "pages_cashier_loadmasterdata",
+      "pages_cashier_parsed",
+      "pages_cashier_selectedcartindex",
+      "pages_cashier_totalpages"
+    ],
+    "7": [
+      "app_components_orders_orderdetaildrawer_vue",
+      "orders_orderdetaildrawer_addpaymenterror",
+      "orders_orderdetaildrawer_addpaymentline",
+      "orders_orderdetaildrawer_changestatus",
+      "orders_orderdetaildrawer_closedrawer",
+      "orders_orderdetaildrawer_error",
+      "orders_orderdetaildrawer_fetchdetail",
+      "orders_orderdetaildrawer_formatdate",
+      "orders_orderdetaildrawer_loading",
+      "orders_orderdetaildrawer_newpaymentamount",
+      "orders_orderdetaildrawer_newpaymentname",
+      "orders_orderdetaildrawer_removeline",
+      "orders_orderdetaildrawer_savepayments",
+      "orders_orderdetaildrawer_saving",
+      "orders_orderdetaildrawer_selectedstatus",
+      "orders_orderdetaildrawer_showaddpayment",
+      "orders_orderdetaildrawer_showtoast",
+      "orders_orderdetaildrawer_string",
+      "orders_orderdetaildrawer_totalfromlines"
+    ],
+    "8": [
+      "package_json",
+      "pos_package_devdependencies",
+      "pos_package_devdependencies_nuxtjs_tailwindcss",
+      "pos_package_devdependencies_tailwindcss",
+      "pos_package_devdependencies_tw_animate_css",
+      "pos_package_devdependencies_types_node",
+      "pos_package_devdependencies_typescript",
+      "pos_package_name",
+      "pos_package_overrides",
+      "pos_package_overrides_uuid",
+      "pos_package_private",
+      "pos_package_scripts",
+      "pos_package_scripts_build",
+      "pos_package_scripts_dev",
+      "pos_package_scripts_generate",
+      "pos_package_scripts_postinstall",
+      "pos_package_scripts_preview",
+      "pos_package_type"
+    ],
+    "9": [
+      "app_pages_orders_vue",
+      "pages_orders_any",
+      "pages_orders_closedetail",
+      "pages_orders_completedcount",
+      "pages_orders_enditem",
+      "pages_orders_formattime",
+      "pages_orders_nextpage",
+      "pages_orders_opendetail",
+      "pages_orders_prevpage",
+      "pages_orders_showtoastmessage",
+      "pages_orders_startitem",
+      "pages_orders_string",
+      "pages_orders_totalitems",
+      "pages_orders_totalpages",
+      "pages_orders_totalsales",
+      "pages_orders_voidorder"
+    ],
+    "10": [
+      "app_components_ui_chart_chartcontainer_vue",
+      "app_components_ui_chart_chartlegendcontent_vue",
+      "app_components_ui_chart_charttooltipcontent_vue",
+      "app_components_ui_chart_index_ts",
+      "app_components_ui_chart_utils_ts",
+      "chart_chartcontainer_chartid",
+      "chart_chartcontainer_uniqueid",
+      "chart_index_chartconfig",
+      "chart_index_chartcontextprops",
+      "chart_index_themes",
+      "chart_index_usechart_providechartcontext",
+      "chart_utils_cache",
+      "chart_utils_componenttostring",
+      "chart_utils_constructor",
+      "chart_utils_serializekey"
+    ],
+    "11": [
+      "app_pages_products_vue",
+      "pages_products_actionerror",
+      "pages_products_draweropen",
+      "pages_products_filteredproducts",
+      "pages_products_handledelete",
+      "pages_products_handleedit",
+      "pages_products_ids",
+      "pages_products_issaving",
+      "pages_products_livestockloading",
+      "pages_products_nextpage",
+      "pages_products_openadddrawer",
+      "pages_products_prevpage",
+      "pages_products_searchquery",
+      "pages_products_totalitems",
+      "pages_products_totalpages"
+    ],
+    "12": [
+      "app_pages_suppliers_vue",
+      "pages_suppliers_actionerror",
+      "pages_suppliers_closedrawer",
+      "pages_suppliers_draweropen",
+      "pages_suppliers_issaving",
+      "pages_suppliers_nextpage",
+      "pages_suppliers_openaddsupplier",
+      "pages_suppliers_openeditsupplier",
+      "pages_suppliers_outstanding",
+      "pages_suppliers_overdue",
+      "pages_suppliers_prevpage",
+      "pages_suppliers_savesupplier",
+      "pages_suppliers_totalitems",
+      "pages_suppliers_totalpages",
+      "pages_suppliers_totalpurchased"
+    ],
+    "13": [
+      "app_pages_customer_details_vue",
+      "pages_customer_details_accounttypes",
+      "pages_customer_details_editbirthdate",
+      "pages_customer_details_editcompanyname",
+      "pages_customer_details_editemail",
+      "pages_customer_details_editname",
+      "pages_customer_details_editphone",
+      "pages_customer_details_edittaxid",
+      "pages_customer_details_edittier",
+      "pages_customer_details_edittype",
+      "pages_customer_details_initeditform",
+      "pages_customer_details_pendingorders",
+      "pages_customer_details_savesettings",
+      "pages_customer_details_tiers"
+    ],
+    "14": [
+      "app_pages_customers_vue",
+      "pages_customers_actionerror",
+      "pages_customers_closedrawer",
+      "pages_customers_draweropen",
+      "pages_customers_filteredcustomers",
+      "pages_customers_issaving",
+      "pages_customers_meta",
+      "pages_customers_nextpage",
+      "pages_customers_openaddcustomer",
+      "pages_customers_openeditcustomer",
+      "pages_customers_prevpage",
+      "pages_customers_savecustomer",
+      "pages_customers_totalitems",
+      "pages_customers_totalpages"
+    ],
+    "15": [
+      "app_components_products_productdrawer_vue",
+      "products_productdrawer_addlocation",
+      "products_productdrawer_closedrawer",
+      "products_productdrawer_fileinput",
+      "products_productdrawer_hidecategorydropdown",
+      "products_productdrawer_if",
+      "products_productdrawer_parsed",
+      "products_productdrawer_removelocation",
+      "products_productdrawer_saveproduct",
+      "products_productdrawer_selectedcategorynames",
+      "products_productdrawer_selectedlocationnames",
+      "products_productdrawer_togglecategory",
+      "products_productdrawer_trimmed"
+    ],
+    "16": [
+      "app_pages_categories_vue",
+      "pages_categories_draweropen",
+      "pages_categories_handledelete",
+      "pages_categories_handledeletefromdrawer",
+      "pages_categories_handleedit",
+      "pages_categories_issaving",
+      "pages_categories_nextpage",
+      "pages_categories_openadddrawer",
+      "pages_categories_prevpage",
+      "pages_categories_totalitems",
+      "pages_categories_totalpages",
+      "pages_categories_totalproducts"
+    ],
+    "17": [
+      "app_components_pos_poscartitem_vue",
+      "pos_poscartitem_decrement",
+      "pos_poscartitem_increment",
+      "pos_poscartitem_istaxable",
+      "pos_poscartitem_linetotal",
+      "pos_poscartitem_min",
+      "pos_poscartitem_oninput",
+      "pos_poscartitem_step",
+      "pos_poscartitem_taxamount",
+      "pos_poscartitem_taxes",
+      "pos_poscartitem_taxlabel"
+    ],
+    "18": [
+      "app_pages_purchase_orders_vue",
+      "pages_purchase_orders_confirmpo",
+      "pages_purchase_orders_createbill",
+      "pages_purchase_orders_receiptstatusclass",
+      "pages_purchase_orders_receiptstatustext",
+      "pages_purchase_orders_receivepo",
+      "pages_purchase_orders_showtoastmessage",
+      "pages_purchase_orders_stateclass",
+      "pages_purchase_orders_statetext",
+      "pages_purchase_orders_totalitems",
+      "pages_purchase_orders_totalpages"
+    ],
+    "19": [
+      "products_save_post_getorcreateattribute",
+      "products_save_post_getorcreateattributevalue",
+      "products_save_post_getvariantidfromtemplate",
+      "products_save_post_match",
+      "products_save_post_matchedvariantform",
+      "products_save_post_odoowrite",
+      "products_save_post_productvalues",
+      "products_save_post_safesearchread",
+      "products_save_post_updateodoostock",
+      "products_save_post_valueids",
+      "server_api_products_save_post_ts"
+    ],
+    "20": [
+      "products_all_get_categorymap",
+      "products_all_get_completeproducts",
+      "products_all_get_locationmap",
+      "products_all_get_page",
+      "products_all_get_productfields",
+      "products_all_get_productids",
+      "products_all_get_productstocklocations",
+      "products_all_get_query",
+      "products_all_get_taxmap",
+      "server_api_products_all_get_ts"
+    ],
+    "21": [
+      "app_components_purchase_vendorbillselector_vue",
+      "purchase_vendorbillselector_clean",
+      "purchase_vendorbillselector_clear",
+      "purchase_vendorbillselector_isloadinglines",
+      "purchase_vendorbillselector_issearching",
+      "purchase_vendorbillselector_paymentstateclass",
+      "purchase_vendorbillselector_paymentstatelabel",
+      "purchase_vendorbillselector_select",
+      "purchase_vendorbillselector_showdropdown"
+    ],
+    "22": [
+      "app_components_ui_sheet_index_ts",
+      "app_components_ui_sheet_sheet_vue",
+      "app_components_ui_sheet_sheetclose_vue",
+      "app_components_ui_sheet_sheetcontent_vue",
+      "app_components_ui_sheet_sheetdescription_vue",
+      "app_components_ui_sheet_sheetfooter_vue",
+      "app_components_ui_sheet_sheetheader_vue",
+      "app_components_ui_sheet_sheettitle_vue",
+      "app_components_ui_sheet_sheettrigger_vue"
+    ],
+    "23": [
+      "app_components_ui_card_card_vue",
+      "app_components_ui_card_cardaction_vue",
+      "app_components_ui_card_cardcontent_vue",
+      "app_components_ui_card_carddescription_vue",
+      "app_components_ui_card_cardfooter_vue",
+      "app_components_ui_card_cardheader_vue",
+      "app_components_ui_card_cardtitle_vue",
+      "app_components_ui_card_index_ts"
+    ],
+    "24": [
+      "app_lib_navlinks_ts",
+      "lib_navlinks_groupednav",
+      "lib_navlinks_isactive",
+      "lib_navlinks_isgroupactive",
+      "lib_navlinks_naventry",
+      "lib_navlinks_navgroup",
+      "lib_navlinks_navitem",
+      "lib_navlinks_navlinks"
+    ],
+    "25": [
+      "orders_detail_get_normalizeline",
+      "orders_detail_get_normalizeorder",
+      "orders_detail_get_normalizepayment",
+      "orders_detail_get_orderid",
+      "orders_detail_get_query",
+      "orders_detail_get_tofloat",
+      "orders_detail_get_totuple",
+      "server_api_orders_detail_get_ts"
+    ],
+    "26": [
+      "pos_categories_get_categorycountmap",
+      "pos_categories_get_completecategories",
+      "pos_categories_get_domain",
+      "pos_categories_get_fields",
+      "pos_categories_get_query",
+      "pos_categories_get_searchquery",
+      "pos_categories_get_totalproducts",
+      "server_api_pos_categories_get_ts"
+    ],
+    "27": [
+      "app_types_customer_ts",
+      "types_customer_addressdetails",
+      "types_customer_customer",
+      "types_customer_customerapiresponse",
+      "types_customer_customerdetailresponse",
+      "types_customer_customermeta",
+      "types_customer_customerorder"
+    ],
+    "28": [
+      "pos_master_data_get_categorycountmap",
+      "pos_master_data_get_limit",
+      "pos_master_data_get_locationmap",
+      "pos_master_data_get_page",
+      "pos_master_data_get_query",
+      "pos_master_data_get_taxmap",
+      "server_api_pos_master_data_get_ts"
+    ],
+    "29": [
+      "products_search_get_data",
+      "products_search_get_domain",
+      "products_search_get_productids",
+      "products_search_get_quantitiesbyproduct",
+      "products_search_get_query",
+      "products_search_get_searchquery",
+      "server_api_products_search_get_ts"
+    ],
+    "30": [
+      "app_types_purchaseorder_ts",
+      "types_purchaseorder_picking",
+      "types_purchaseorder_pickingmoveline",
+      "types_purchaseorder_poline",
+      "types_purchaseorder_purchaseorder",
+      "types_purchaseorder_purchaseorderapiresponse",
+      "types_purchaseorder_purchaseorderdetail"
+    ],
+    "31": [
+      "app_components_pos_possearchbar_vue",
+      "pos_possearchbar_clear",
+      "pos_possearchbar_handlescan",
+      "pos_possearchbar_localvalue",
+      "pos_possearchbar_oninput",
+      "pos_possearchbar_togglescanner"
+    ],
+    "32": [
+      "app_composables_usecolortheme_ts",
+      "composables_usecolortheme_currenttheme",
+      "composables_usecolortheme_themename",
+      "composables_usecolortheme_themeoption",
+      "composables_usecolortheme_themeoptions",
+      "composables_usecolortheme_usecolortheme"
+    ],
+    "33": [
+      "app_pages_warehouse_vue",
+      "pages_warehouse_locations",
+      "pages_warehouse_movements",
+      "pages_warehouse_opencreateloctaion",
+      "pages_warehouse_opentransfer",
+      "pages_warehouse_stocklevels"
+    ],
+    "34": [
+      "server_api_warehouse_dashboard_get_ts",
+      "warehouse_dashboard_get_inventory_value_out_of_stock_total_quantity_incoming_shipments",
+      "warehouse_dashboard_get_kpis",
+      "warehouse_dashboard_get_locations",
+      "warehouse_dashboard_get_movement",
+      "warehouse_dashboard_get_query"
+    ],
+    "35": [
+      "app_types_vendorbill_ts",
+      "types_vendorbill_vendorbill",
+      "types_vendorbill_vendorbillapiresponse",
+      "types_vendorbill_vendorbilldetail",
+      "types_vendorbill_vendorbillline",
+      "types_vendorbill_vendorbillpayment"
+    ],
+    "36": [
+      "server_utils_client_ts",
+      "server_utils_odooclient_ts",
+      "server_utils_trycatch_ts",
+      "utils_client_connecttoodoo",
+      "utils_odooclient_getodooclient",
+      "utils_trycatch_trycatch"
+    ],
+    "37": [
+      "app_composables_useauth_ts",
+      "composables_useauth_useauth",
+      "stores_auth_ts",
+      "stores_auth_useauthstore",
+      "stores_auth_usersession"
+    ],
+    "38": [
+      "kpi_dashboard_get_date_from_date_to",
+      "kpi_dashboard_get_kpis",
+      "kpi_dashboard_get_now",
+      "kpi_dashboard_get_total_revenue_total_expenses_low_stock_count_total_customers",
+      "server_api_kpi_dashboard_get_ts"
+    ],
+    "39": [
+      "products_stock_post_locationmap",
+      "products_stock_post_qtymap",
+      "products_stock_post_stocklocationsmap",
+      "products_stock_post_stockmap",
+      "server_api_products_stock_post_ts"
+    ],
+    "40": [
+      "app_composables_useposhotkeys_ts",
+      "composables_useposhotkeys_useposhotkeys",
+      "composables_useposhotkeys_useposhotkeysoptions",
+      "stores_pos_cart_ts",
+      "stores_pos_cart_useposcartstore"
+    ],
+    "41": [
+      "app_types_product_ts",
+      "types_product_internalcategory",
+      "types_product_poscategory",
+      "types_product_product",
+      "types_product_tax"
+    ],
+    "42": [
+      "app_types_purchase_ts",
+      "types_purchase_polineinput",
+      "types_purchase_productresult",
+      "types_purchase_supplier",
+      "types_purchase_vendorbillresult"
+    ],
+    "43": [
+      "app_utils_permissions_ts",
+      "utils_permissions_appnamemap",
+      "utils_permissions_grouptranslations",
+      "utils_permissions_translategroup"
+    ],
+    "44": [
+      "company_profile_get_countries",
+      "company_profile_get_partner",
+      "company_profile_get_states",
+      "server_api_company_profile_get_ts"
+    ],
+    "45": [
+      "orders_index_get_limit",
+      "orders_index_get_page",
+      "orders_index_get_query",
+      "server_api_orders_index_get_ts"
+    ],
+    "46": [
+      "auth_login_post_allowedcompanies",
+      "auth_login_post_client",
+      "auth_login_post_userpermissions",
+      "server_api_auth_login_post_ts"
+    ],
+    "47": [
+      "app_components_warehouse_stocklevelstable_vue",
+      "warehouse_stocklevelstable_endrange",
+      "warehouse_stocklevelstable_setpage",
+      "warehouse_stocklevelstable_startrange"
+    ],
+    "48": [
+      "server_api_warehouse_transfer_batch_post_ts",
+      "warehouse_transfer_batch_post_movelines",
+      "warehouse_transfer_batch_post_pickingtypes",
+      "warehouse_transfer_batch_post_productdata"
+    ],
+    "49": [
+      "app_components_ui_badge_badge_vue",
+      "app_components_ui_badge_index_ts",
+      "badge_index_badgevariants"
+    ],
+    "50": [
+      "app_components_ui_button_button_vue",
+      "app_components_ui_button_index_ts",
+      "button_index_buttonvariants"
+    ],
+    "51": [
+      "app_types_supplier_ts",
+      "types_supplier_supplier",
+      "types_supplier_supplierapiresponse"
+    ],
+    "52": [
+      "app_components_customers_customerstable_vue",
+      "customers_customerstable_enditem",
+      "customers_customerstable_startitem"
+    ],
+    "53": [
+      "orders_status_post_state",
+      "orders_status_post_validstates",
+      "server_api_orders_status_post_ts"
+    ],
+    "54": [
+      "pos_order_post_positionalparams",
+      "pos_order_post_sanitizedpayload",
+      "server_api_pos_order_post_ts"
+    ],
+    "55": [
+      "purchase_orders_detail_get_poid",
+      "purchase_orders_detail_get_query",
+      "server_api_purchase_orders_detail_get_ts"
+    ],
+    "56": [
+      "company_profile_post_companyvals",
+      "company_profile_post_partnervals",
+      "server_api_company_profile_post_ts"
+    ],
+    "57": [
+      "customers_detail_get_customerid",
+      "customers_detail_get_query",
+      "server_api_customers_detail_get_ts"
+    ],
+    "58": [
+      "customers_index_get_paramspayload",
+      "customers_index_get_query",
+      "server_api_customers_index_get_ts"
+    ],
+    "59": [
+      "pos_cash_movement_post_reason",
+      "pos_cash_movement_post_sessionid",
+      "server_api_pos_cash_movement_post_ts"
+    ],
+    "60": [
+      "categories_save_post_categoryvalues",
+      "categories_save_post_match",
+      "server_api_pos_categories_save_post_ts"
+    ],
+    "61": [
+      "pos_session_control_post_action",
+      "pos_session_control_post_configid",
+      "server_api_pos_session_control_post_ts"
+    ],
+    "62": [
+      "pos_session_summary_get_query",
+      "pos_session_summary_get_sessionid",
+      "server_api_pos_session_summary_get_ts"
+    ],
+    "63": [
+      "pos_status_get_configid",
+      "pos_status_get_query",
+      "server_api_pos_status_get_ts"
+    ],
+    "64": [
+      "purchase_orders_index_get_paramspayload",
+      "purchase_orders_index_get_query",
+      "server_api_purchase_orders_index_get_ts"
+    ],
+    "65": [
+      "reports_index_get_now",
+      "reports_index_get_type_date_from_date_to_filters",
+      "server_api_reports_index_get_ts"
+    ],
+    "66": [
+      "server_api_stock_movements_index_get_ts",
+      "stock_movements_index_get_params",
+      "stock_movements_index_get_query"
+    ],
+    "67": [
+      "server_api_suppliers_detail_get_ts",
+      "suppliers_detail_get_query",
+      "suppliers_detail_get_supplierid"
+    ],
+    "68": [
+      "server_api_warehouse_create_post_ts",
+      "warehouse_create_post_odoopayload",
+      "warehouse_create_post_typemapping"
+    ],
+    "69": [
+      "server_api_suppliers_index_get_ts",
+      "suppliers_index_get_paramspayload",
+      "suppliers_index_get_query"
+    ],
+    "70": [
+      "pos_tsconfig_files",
+      "pos_tsconfig_references",
+      "tsconfig_json"
+    ],
+    "71": [
+      "types_auth_d_ts",
+      "types_auth_d_user",
+      "types_auth_d_usersession"
+    ],
+    "72": [
+      "app_utils_weightbarcode_ts",
+      "utils_weightbarcode_parseweightbarcode",
+      "utils_weightbarcode_tryweightbarcodesearch"
+    ],
+    "73": [
+      "server_api_vendor_bills_detail_get_ts",
+      "vendor_bills_detail_get_billid",
+      "vendor_bills_detail_get_query"
+    ],
+    "74": [
+      "server_api_vendor_bills_index_get_ts",
+      "vendor_bills_index_get_paramspayload",
+      "vendor_bills_index_get_query"
+    ],
+    "75": [
+      "app_components_pos_possalesworkspace_vue",
+      "pos_possalesworkspace_if"
+    ],
+    "76": [
+      "app_components_reports_reporttable_vue",
+      "reports_reporttable_exporttoexcel"
+    ],
+    "77": [
+      "app_components_ui_input_index_ts",
+      "app_components_ui_input_input_vue"
+    ],
+    "78": [
+      "app_components_ui_label_index_ts",
+      "app_components_ui_label_label_vue"
+    ],
+    "79": [
+      "app_components_ui_skeleton_index_ts",
+      "app_components_ui_skeleton_skeleton_vue"
+    ],
+    "80": [
+      "app_components_warehouse_createlocationmodal_vue",
+      "warehouse_createlocationmodal_if"
+    ],
+    "81": [
+      "app_composables_usebarcodescanner_ts",
+      "composables_usebarcodescanner_usebarcodescanner"
+    ],
+    "82": [
+      "app_middleware_auth_global_ts",
+      "middleware_auth_global_usercookie"
+    ],
+    "83": [
+      "app_components_app_sidebar_vue",
+      "app_sidebar_isgroupactive"
+    ],
+    "84": [
+      "app_components_categories_categorydrawer_vue",
+      "categories_categorydrawer_reader"
+    ],
+    "85": [
+      "customers_save_post_partnervals",
+      "server_api_customers_save_post_ts"
+    ],
+    "86": [
+      "app_lib_trycatch_ts",
+      "lib_trycatch_trycatch"
+    ],
+    "87": [
+      "app_lib_utils_ts",
+      "lib_utils_cn"
+    ],
+    "88": [
+      "orders_payments_post_sanitizedpayments",
+      "server_api_orders_payments_post_ts"
+    ],
+    "89": [
+      "nuxt_config_ts",
+      "pos_nuxt_config_onwarn"
+    ],
+    "90": [
+      "pos_register_post_name",
+      "server_api_pos_register_post_ts"
+    ],
+    "91": [
+      "app_components_purchase_createpurchaseordermodal_vue",
+      "purchase_createpurchaseordermodal_if"
+    ],
+    "92": [
+      "server_api_suppliers_save_post_ts",
+      "suppliers_save_post_partnervals"
+    ],
+    "93": [
+      "server_api_user_profile_post_ts",
+      "user_profile_post_uservals"
+    ],
+    "94": [
+      "server_api_products_archive_post_ts"
+    ],
+    "95": [
+      "server_api_products_delete_delete_ts"
+    ],
+    "96": [
+      "server_api_user_profile_get_ts"
+    ],
+    "97": [
+      "server_api_taxes_default_get_ts"
+    ],
+    "98": [
+      "server_api_purchase_orders_confirm_post_ts"
+    ],
+    "99": [
+      "server_api_purchase_orders_index_post_ts"
+    ],
+    "100": [
+      "server_api_purchase_orders_receive_post_ts"
+    ],
+    "101": [
+      "server_api_purchase_orders_create_bill_post_ts"
+    ],
+    "102": [
+      "server_api_vendor_bills_index_post_ts"
+    ],
+    "103": [
+      "server_api_vendor_bills_payment_post_ts"
+    ],
+    "104": [
+      "server_api_vendor_bills_status_post_ts"
+    ],
+    "105": [
+      "server_api_warehouse_locations_get_ts"
+    ],
+    "106": [
+      "server_api_pos_registers_get_ts"
+    ],
+    "107": [
+      "server_api_pos_categories_delete_delete_ts"
+    ],
+    "108": [
+      "server_api_orders_remove_item_post_ts"
+    ],
+    "109": [
+      "app_app_vue"
+    ],
+    "110": [
+      "app_layouts_default_vue"
+    ],
+    "111": [
+      "app_components_products_productstable_vue"
+    ],
+    "112": [
+      "app_components_ui_chart_chartstyle_vue"
+    ],
+    "113": [
+      "app_components_ui_sheet_sheetoverlay_vue"
+    ],
+    "114": [
+      "app_components_purchase_productlineseditor_vue"
+    ],
+    "115": [
+      "app_components_purchase_suppliersearchselect_vue"
+    ],
+    "116": [
+      "app_components_categories_categoriestable_vue"
+    ],
+    "117": [
+      "app_components_suppliers_suppliertoolbar_vue"
+    ],
+    "118": [
+      "app_components_suppliers_supplierdrawer_vue"
+    ],
+    "119": [
+      "app_components_suppliers_supplierstable_vue"
+    ],
+    "120": [
+      "app_components_suppliers_supplierkpicards_vue"
+    ],
+    "121": [
+      "app_components_warehouse_kpicards_vue"
+    ],
+    "122": [
+      "app_components_warehouse_locationslist_vue"
+    ],
+    "123": [
+      "app_components_warehouse_recentmovements_vue"
+    ],
+    "124": [
+      "app_components_warehouse_stocktransfermodal_vue"
+    ],
+    "125": [
+      "app_components_pos_posvaultmodal_vue"
+    ],
+    "126": [
+      "app_components_pos_poscartpanel_vue"
+    ],
+    "127": [
+      "app_components_pos_posproductgrid_vue"
+    ],
+    "128": [
+      "app_components_pos_posproductdetailsheet_vue"
+    ],
+    "129": [
+      "app_components_pos_poshotkeyhelp_vue"
+    ],
+    "130": [
+      "app_components_pos_poscategoryfilter_vue"
+    ],
+    "131": [
+      "app_components_pos_barcodescanner_vue"
+    ],
+    "132": [
+      "app_components_pos_posterminalcard_vue"
+    ],
+    "133": [
+      "app_components_pos_posterminallist_vue"
+    ],
+    "134": [
+      "app_components_pos_posproductcard_vue"
+    ],
+    "135": [
+      "app_components_pos_posactiveconsole_vue"
+    ],
+    "136": [
+      "app_components_pos_possessionpanel_vue"
+    ],
+    "137": [
+      "app_components_pos_posregisterform_vue"
+    ],
+    "138": [
+      "app_components_pos_posclosesessionmodal_vue"
+    ],
+    "139": [
+      "app_components_customers_customerfilters_vue"
+    ],
+    "140": [
+      "app_components_customers_customerdrawer_vue"
+    ],
+    "141": [
+      "app_components_customers_customertoolbar_vue"
+    ],
+    "142": [
+      "app_components_customers_customerkpicards_vue"
+    ],
+    "143": [
+      "app_components_reports_salesreport_vue"
+    ],
+    "144": [
+      "app_components_reports_basereport_vue"
+    ],
+    "145": [
+      "app_components_reports_reportfilters_vue"
+    ],
+    "146": [
+      "app_components_reports_popularproductsreport_vue"
+    ],
+    "147": [
+      "app_components_reports_shiftreport_vue"
+    ],
+    "148": [
+      "app_components_reports_expensesreport_vue"
+    ],
+    "149": [
+      "app_components_reports_damagedstockreport_vue"
+    ],
+    "150": [
+      "app_components_reports_itemsreport_vue"
+    ],
+    "151": [
+      "app_components_reports_customergroupsreport_vue"
+    ],
+    "152": [
+      "app_components_reports_purchasessalesreport_vue"
+    ],
+    "153": [
+      "app_components_reports_salespersonreport_vue"
+    ],
+    "154": [
+      "app_components_reports_reportchart_vue"
+    ],
+    "155": [
+      "app_components_reports_productsalesreport_vue"
+    ],
+    "156": [
+      "app_components_reports_stockreport_vue"
+    ],
+    "157": [
+      "app_components_reports_taxreport_vue"
+    ],
+    "158": [
+      "app_components_reports_productpurchasesreport_vue"
+    ],
+    "159": [
+      "app_components_reports_reportsidebar_vue"
+    ],
+    "160": [
+      "app_components_reports_purchasesreport_vue"
+    ],
+    "161": [
+      "app_components_reports_profitlossreport_vue"
+    ],
+    "162": [
+      "app_components_reports_supplierscustomersreport_vue"
+    ],
+    "163": [
+      "app_components_reports_activitylogreport_vue"
+    ],
+    "164": [
+      "app_pages_stock_movements_vue"
+    ],
+    "165": [
+      "app_pages_accounting_vue"
+    ],
+    "166": [
+      "app_pages_user_profile_vue"
+    ],
+    "167": [
+      "app_pages_index_vue"
+    ],
+    "168": [
+      "app_pages_login_vue"
+    ],
+    "169": [
+      "app_pages_reports_vue"
+    ],
+    "170": [
+      "app_pages_supplier_details_vue"
+    ],
+    "171": [
+      "app_pages_pos_vue"
+    ],
+    "172": [
+      "app_pages_pos_sales_vue"
+    ],
+    "173": [
+      "app_plugins_ssr_width_ts"
+    ]
+  },
+  "cohesion": {
+    "0": 0.043478260869565216,
+    "1": 0.09090909090909091,
+    "2": 0.09956709956709957,
+    "3": 0.09523809523809523,
+    "4": 0.09523809523809523,
+    "5": 0.09523809523809523,
+    "6": 0.12631578947368421,
+    "7": 0.14035087719298245,
+    "8": 0.1111111111111111,
+    "9": 0.13333333333333333,
+    "10": 0.1523809523809524,
+    "11": 0.13333333333333333,
+    "12": 0.13333333333333333,
+    "13": 0.14285714285714285,
+    "14": 0.14285714285714285,
+    "15": 0.15384615384615385,
+    "16": 0.18181818181818182,
+    "17": 0.18181818181818182,
+    "18": 0.18181818181818182,
+    "19": 0.2727272727272727,
+    "20": 0.2,
+    "21": 0.2222222222222222,
+    "22": 0.2222222222222222,
+    "23": 0.25,
+    "24": 0.25,
+    "25": 0.4642857142857143,
+    "26": 0.25,
+    "27": 0.2857142857142857,
+    "28": 0.2857142857142857,
+    "29": 0.2857142857142857,
+    "30": 0.2857142857142857,
+    "31": 0.3333333333333333,
+    "32": 0.3333333333333333,
+    "33": 0.3333333333333333,
+    "34": 0.3333333333333333,
+    "35": 0.3333333333333333,
+    "36": 0.5333333333333333,
+    "37": 0.6,
+    "38": 0.4,
+    "39": 0.4,
+    "40": 0.4,
+    "41": 0.4,
+    "42": 0.4,
+    "43": 0.5,
+    "44": 0.5,
+    "45": 0.5,
+    "46": 0.5,
+    "47": 0.5,
+    "48": 0.5,
+    "49": 0.6666666666666666,
+    "50": 0.6666666666666666,
+    "51": 0.6666666666666666,
+    "52": 0.6666666666666666,
+    "53": 0.6666666666666666,
+    "54": 0.6666666666666666,
+    "55": 0.6666666666666666,
+    "56": 0.6666666666666666,
+    "57": 0.6666666666666666,
+    "58": 0.6666666666666666,
+    "59": 0.6666666666666666,
+    "60": 0.6666666666666666,
+    "61": 0.6666666666666666,
+    "62": 0.6666666666666666,
+    "63": 0.6666666666666666,
+    "64": 0.6666666666666666,
+    "65": 0.6666666666666666,
+    "66": 0.6666666666666666,
+    "67": 0.6666666666666666,
+    "68": 0.6666666666666666,
+    "69": 0.6666666666666666,
+    "70": 0.6666666666666666,
+    "71": 0.6666666666666666,
+    "72": 1.0,
+    "73": 0.6666666666666666,
+    "74": 0.6666666666666666,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0,
+    "94": 1.0,
+    "95": 1.0,
+    "96": 1.0,
+    "97": 1.0,
+    "98": 1.0,
+    "99": 1.0,
+    "100": 1.0,
+    "101": 1.0,
+    "102": 1.0,
+    "103": 1.0,
+    "104": 1.0,
+    "105": 1.0,
+    "106": 1.0,
+    "107": 1.0,
+    "108": 1.0,
+    "109": 1.0,
+    "110": 1.0,
+    "111": 1.0,
+    "112": 1.0,
+    "113": 1.0,
+    "114": 1.0,
+    "115": 1.0,
+    "116": 1.0,
+    "117": 1.0,
+    "118": 1.0,
+    "119": 1.0,
+    "120": 1.0,
+    "121": 1.0,
+    "122": 1.0,
+    "123": 1.0,
+    "124": 1.0,
+    "125": 1.0,
+    "126": 1.0,
+    "127": 1.0,
+    "128": 1.0,
+    "129": 1.0,
+    "130": 1.0,
+    "131": 1.0,
+    "132": 1.0,
+    "133": 1.0,
+    "134": 1.0,
+    "135": 1.0,
+    "136": 1.0,
+    "137": 1.0,
+    "138": 1.0,
+    "139": 1.0,
+    "140": 1.0,
+    "141": 1.0,
+    "142": 1.0,
+    "143": 1.0,
+    "144": 1.0,
+    "145": 1.0,
+    "146": 1.0,
+    "147": 1.0,
+    "148": 1.0,
+    "149": 1.0,
+    "150": 1.0,
+    "151": 1.0,
+    "152": 1.0,
+    "153": 1.0,
+    "154": 1.0,
+    "155": 1.0,
+    "156": 1.0,
+    "157": 1.0,
+    "158": 1.0,
+    "159": 1.0,
+    "160": 1.0,
+    "161": 1.0,
+    "162": 1.0,
+    "163": 1.0,
+    "164": 1.0,
+    "165": 1.0,
+    "166": 1.0,
+    "167": 1.0,
+    "168": 1.0,
+    "169": 1.0,
+    "170": 1.0,
+    "171": 1.0,
+    "172": 1.0,
+    "173": 1.0
+  },
+  "gods": [
+    {
+      "id": "pos_components_tailwind",
+      "label": "tailwind",
+      "degree": 6
+    },
+    {
+      "id": "pos_components_aliases",
+      "label": "aliases",
+      "degree": 6
+    },
+    {
+      "id": "pos_package_scripts",
+      "label": "scripts",
+      "degree": 6
+    },
+    {
+      "id": "products_save_post_safesearchread",
+      "label": "safeSearchRead()",
+      "degree": 5
+    },
+    {
+      "id": "pages_cashier_loadmasterdata",
+      "label": "loadMasterData()",
+      "degree": 5
+    },
+    {
+      "id": "orders_detail_get_totuple",
+      "label": "toTuple()",
+      "degree": 4
+    },
+    {
+      "id": "orders_detail_get_tofloat",
+      "label": "toFloat()",
+      "degree": 4
+    },
+    {
+      "id": "orders_orderdetaildrawer_fetchdetail",
+      "label": "fetchDetail()",
+      "degree": 4
+    },
+    {
+      "id": "orders_orderdetaildrawer_showtoast",
+      "label": "showToast()",
+      "degree": 4
+    },
+    {
+      "id": "products_save_post_updateodoostock",
+      "label": "updateOdooStock()",
+      "degree": 3
+    }
+  ],
+  "surprises": [
+    {
+      "source": "usePosHotkeys()",
+      "target": "usePosCartStore",
+      "source_files": [
+        "app/composables/usePosHotkeys.ts",
+        "stores/pos-cart.ts"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "useAuth()",
+      "target": "useAuthStore",
+      "source_files": [
+        "app/composables/useAuth.ts",
+        "stores/auth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "getOdooClient()",
+      "target": "connectToOdoo()",
+      "source_files": [
+        "server/utils/odooClient.ts",
+        "server/utils/client.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `dependencies` connect `Community 5` to `Community 8`?",
+      "why": "High betweenness centrality (0.002) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `$schema`, `style`, `font` to the rest of the system?",
+      "why": "386 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.043478260869565216 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09956709956709957 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 3` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 4` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

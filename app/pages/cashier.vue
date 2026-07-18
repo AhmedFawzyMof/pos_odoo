@@ -271,6 +271,17 @@ async function lookupExactBarcode(barcode: string, quantity?: number) {
     if (res.success && res.products.data.length > 0) {
       const product = res.products.data[0];
       handleAddToCart(product, undefined, quantity);
+      searchQuery.value = "";
+      if (showWeightOnly.value) {
+        showWeightOnly.value = false;
+        currentPage.value = 1;
+        allProducts.value = [];
+        loadMasterData(1);
+      }
+      nextTick(() => {
+        const input = document.querySelector<HTMLInputElement>('[placeholder*="بحث"]');
+        input?.focus();
+      });
     } else {
       showFeedbackToast("المنتج غير موجود", "error");
     }

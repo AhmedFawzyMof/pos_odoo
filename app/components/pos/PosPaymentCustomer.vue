@@ -43,11 +43,8 @@ function selectCustomer(customer: Customer) {
   cart.customerName = customer.name || "";
   cart.customerPhone = customer.phone || "";
   const c = customer as any;
-  const addr = c.addressDetails || c;
-  cart.customerAddress = addr.fullAddress
-    || [addr.street, addr.street2, addr.city, addr.state, addr.zip, addr.country]
-        .filter(Boolean).join(", ")
-    || "";
+  const addr = c.address;
+  cart.customerAddress = addr;
   show.value = false;
 }
 
@@ -110,19 +107,38 @@ fetchCustomers();
       class="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
     >
       <div class="flex items-center gap-2">
-        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <svg
+          class="w-4 h-4 text-purple-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
         </svg>
         <span>العميل</span>
       </div>
       <div class="flex items-center gap-2">
-        <span v-if="cart.customerId && !show" class="text-xs text-purple-600 font-medium">
+        <span
+          v-if="cart.customerId && !show"
+          class="text-xs text-purple-600 font-medium"
+        >
           {{ customers.find((c) => c.id === cart.customerId)?.name }}
         </span>
-        <button v-if="cart.customerId && !show" @click.stop="clearCustomer" class="text-red-400 hover:text-red-600 cursor-pointer">
+        <button
+          v-if="cart.customerId && !show"
+          @click.stop="clearCustomer"
+          class="text-red-400 hover:text-red-600 cursor-pointer"
+        >
           <X class="w-3.5 h-3.5" />
         </button>
-        <span v-else class="text-xs text-slate-400">{{ show ? "إخفاء" : "اختيار" }}</span>
+        <span v-else class="text-xs text-slate-400">{{
+          show ? "إخفاء" : "اختيار"
+        }}</span>
       </div>
     </button>
     <div v-if="show" class="px-4 pb-4 space-y-3">
@@ -141,7 +157,10 @@ fetchCustomers();
           <Plus class="w-5 h-5" />
         </button>
       </div>
-      <div v-if="loadingCustomers" class="text-center text-xs text-slate-400 py-4">
+      <div
+        v-if="loadingCustomers"
+        class="text-center text-xs text-slate-400 py-4"
+      >
         جاري التحميل...
       </div>
       <div v-else-if="customers.length === 0" class="text-center py-4">
@@ -165,10 +184,12 @@ fetchCustomers();
               : 'hover:bg-slate-100 text-slate-700',
           ]"
         >
-            <div class="flex items-center justify-between w-full">
-              <span>{{ customer.name }}</span>
-              <span class="text-slate-400 text-[10px]" dir="ltr">{{ customer.phone }}</span>
-            </div>
+          <div class="flex items-center justify-between w-full">
+            <span>{{ customer.name }}</span>
+            <span class="text-slate-400 text-[10px]" dir="ltr">{{
+              customer.phone
+            }}</span>
+          </div>
         </button>
       </div>
     </div>

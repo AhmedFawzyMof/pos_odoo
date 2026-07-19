@@ -192,7 +192,7 @@ export function useReceiptPrint() {
 
     const customerHtml = params.lastOrderCustomerName
       ? `
-    <div style="text-align:center;font-size:${fontSize}px">
+    <div style="text-align:start;font-size:${fontSize}px">
       ${params.lastOrderCustomerName ? `<div style="font-weight:bold;color:${primaryColor}">${params.lastOrderCustomerName}</div>` : ""}
       ${params.lastOrderCustomerAddress ? `<div style="color:${secondaryColor}">${params.lastOrderCustomerAddress}</div>` : ""}
       ${params.lastOrderCustomerPhone ? `<div style="color:${secondaryColor}">${params.lastOrderCustomerPhone}</div>` : ""}
@@ -367,5 +367,10 @@ export function useReceiptPrint() {
     };
   }
 
-  return { receiptConfig, receiptConfigLoading, fetchReceiptConfig, printReceipt };
+  return {
+    receiptConfig,
+    receiptConfigLoading,
+    fetchReceiptConfig,
+    printReceipt,
+  };
 }

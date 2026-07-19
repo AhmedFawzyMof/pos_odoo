@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import BaseReport from "./BaseReport.vue";
-defineProps<{ dateFrom: string; dateTo: string }>();
+defineProps<{ dateFrom: string; dateTo: string; refreshKey?: number }>();
 const emit = defineEmits<{ loading: [v: boolean] }>();
 
 const baseRef = ref<InstanceType<typeof BaseReport>>();
@@ -11,5 +11,5 @@ defineExpose({
 });
 </script>
 <template>
-  <BaseReport ref="baseRef" report-type="salesperson" :date-from :date-to @loading="emit('loading', $event)" />
+  <BaseReport ref="baseRef" report-type="salesperson" :date-from :date-to :refresh-key @loading="emit('loading', $event)" />
 </template>

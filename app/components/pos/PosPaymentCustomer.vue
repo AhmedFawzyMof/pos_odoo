@@ -40,11 +40,22 @@ function onCustomerSearch(val: string) {
 
 function selectCustomer(customer: Customer) {
   cart.customerId = customer.id;
+  cart.customerName = customer.name || "";
+  cart.customerPhone = customer.phone || "";
+  const c = customer as any;
+  const addr = c.addressDetails || c;
+  cart.customerAddress = addr.fullAddress
+    || [addr.street, addr.street2, addr.city, addr.state, addr.zip, addr.country]
+        .filter(Boolean).join(", ")
+    || "";
   show.value = false;
 }
 
 function clearCustomer() {
   cart.customerId = null;
+  cart.customerName = "";
+  cart.customerPhone = "";
+  cart.customerAddress = "";
 }
 
 async function saveCustomer(payload: Record<string, any>) {

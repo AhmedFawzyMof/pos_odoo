@@ -220,7 +220,7 @@ async function printOrder(order: POSOrder) {
           sum + (l.price_unit * l.qty * l.discount) / 100,
         0,
       ),
-      lastOrderServiceFee: 0,
+      lastOrderServiceFee: order.service_fee || 0,
       lastOrderGrandTotal: order.amount_total,
     });
   } catch {
@@ -440,6 +440,7 @@ const statusIcons: Record<string, any> = {
                   <th class="px-6 py-4 font-bold text-label-md">الوقت</th>
                   <th class="px-6 py-4 font-bold text-label-md">العميل</th>
                   <th class="px-6 py-4 font-bold text-label-md">الإجمالي</th>
+                  <th class="px-6 py-4 font-bold text-label-md">المدفوع</th>
                   <th class="px-6 py-4 font-bold text-label-md">الحالة</th>
                   <th class="px-6 py-4 font-bold text-label-md">الوردية</th>
                   <th class="px-6 py-4 font-bold text-label-md">الإجراءات</th>
@@ -478,6 +479,11 @@ const statusIcons: Record<string, any> = {
                   </td>
                   <td class="px-6 py-5 font-bold text-primary">
                     {{ Number(order.amount_total).toLocaleString("en-US") }}
+                    ج.م
+                  </td>
+                  <td class="px-6 py-5 font-bold"
+                      :class="order.amount_paid >= order.amount_total ? 'text-success' : 'text-error'">
+                    {{ Number(order.amount_paid).toLocaleString("en-US") }}
                     ج.م
                   </td>
                   <td class="px-6 py-5">
@@ -544,7 +550,7 @@ const statusIcons: Record<string, any> = {
                 <!-- Empty State -->
                 <tr v-if="ordersList.length === 0 && status !== 'pending'">
                   <td
-                    colspan="7"
+                    colspan="8"
                     class="p-16 text-center text-on-white-variant"
                   >
                     <AlertCircle
@@ -559,7 +565,7 @@ const statusIcons: Record<string, any> = {
 
                 <!-- Loading rows -->
                 <tr v-if="status === 'pending' && ordersList.length > 0">
-                  <td colspan="7" class="p-8 text-center">
+                  <td colspan="8" class="p-8 text-center">
                     <LoaderCircle
                       class="w-6 h-6 animate-spin inline-block text-primary"
                     />

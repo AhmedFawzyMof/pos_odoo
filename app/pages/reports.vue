@@ -33,8 +33,8 @@ if (import.meta.client) {
 }
 
 const now = new Date();
-const defaultDateFrom = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 const defaultDateTo = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+const defaultDateFrom = defaultDateTo;
 
 const activeReport = ref("profit_loss");
 const dateFrom = ref(defaultDateFrom);

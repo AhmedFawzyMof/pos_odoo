@@ -48,6 +48,16 @@
 
       <div :style="renderDivider" class="my-2"></div>
 
+      <!-- Customer -->
+      <template v-if="customerName">
+        <div :style="{ fontSize: baseFontSize + 'px' }" class="text-center">
+          <div v-if="customerName" class="font-bold" :style="{ color: cfg.colors?.primary }">{{ customerName }}</div>
+          <div v-if="customerAddress" :style="{ color: cfg.colors?.secondary }">{{ customerAddress }}</div>
+          <div v-if="customerPhone" :style="{ color: cfg.colors?.secondary }">{{ customerPhone }}</div>
+        </div>
+        <div :style="renderDivider" class="my-2"></div>
+      </template>
+
       <!-- Items -->
       <template v-if="cfg.items?.enabled">
         <table class="w-full border-collapse" :style="{ fontSize: baseFontSize + 'px' }">
@@ -132,6 +142,9 @@ const props = defineProps<{
   discountAmount: number;
   serviceFeeAmount: number;
   grandTotal: number;
+  customerName?: string;
+  customerPhone?: string;
+  customerAddress?: string;
   receiptConfig: any;
 }>();
 

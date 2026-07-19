@@ -148,6 +148,11 @@ const demoData = computed(() => {
     orderName: "فاتورة #1234",
     date: new Date().toLocaleDateString("ar-EG"),
     time: new Date().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }),
+    partner: {
+      name: "أحمد مختار",
+      phone: "01234567890",
+      contact_address: "شارع النيل، القاهرة",
+    },
     items: [
       { name: "منتج 1", qty: 2, price: 50.00 },
       { name: "منتج 2", qty: 1, price: 75.50 },

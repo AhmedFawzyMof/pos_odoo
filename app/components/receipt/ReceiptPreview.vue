@@ -93,6 +93,16 @@ const renderBorderStyle = computed(() => {
 
       <div :style="renderDivider" class="my-2"></div>
 
+      <!-- Customer -->
+      <template v-if="demo.partner">
+        <div :style="{ fontSize: baseFontSize + 'px' }" class="text-center">
+          <div v-if="demo.partner.name" class="font-bold" :style="{ color: cfg.colors?.primary }">{{ demo.partner.name }}</div>
+          <div v-if="demo.partner.contact_address" :style="{ color: cfg.colors?.secondary }">{{ demo.partner.contact_address }}</div>
+          <div v-if="demo.partner.phone" :style="{ color: cfg.colors?.secondary }">{{ demo.partner.phone }}</div>
+        </div>
+        <div :style="renderDivider" class="my-2"></div>
+      </template>
+
       <!-- Items -->
       <template v-if="cfg.items?.enabled">
         <table class="w-full border-collapse" :style="{ fontSize: baseFontSize + 'px' }">

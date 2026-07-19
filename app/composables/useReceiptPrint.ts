@@ -103,6 +103,9 @@ export function useReceiptPrint() {
     lastOrderDiscount: number;
     lastOrderServiceFee: number;
     lastOrderGrandTotal: number;
+    lastOrderCustomerName?: string;
+    lastOrderCustomerPhone?: string;
+    lastOrderCustomerAddress?: string;
   }) {
     const cfg = receiptConfig.value?.receipt || DEFAULT_RECEIPT_CONFIG;
     const company = receiptConfig.value?.company || {};
@@ -186,6 +189,17 @@ export function useReceiptPrint() {
     }
     ${divider}
   `;
+
+    const customerHtml = params.lastOrderCustomerName
+      ? `
+    <div style="text-align:center;font-size:${fontSize}px">
+      ${params.lastOrderCustomerName ? `<div style="font-weight:bold;color:${primaryColor}">${params.lastOrderCustomerName}</div>` : ""}
+      ${params.lastOrderCustomerAddress ? `<div style="color:${secondaryColor}">${params.lastOrderCustomerAddress}</div>` : ""}
+      ${params.lastOrderCustomerPhone ? `<div style="color:${secondaryColor}">${params.lastOrderCustomerPhone}</div>` : ""}
+    </div>
+    ${divider}
+  `
+      : "";
 
     const itemsHtml = cfg.items?.enabled
       ? `
@@ -321,6 +335,7 @@ export function useReceiptPrint() {
       <div style="${borderCss}">
         ${headerHtml}
         ${titleHtml}
+        ${customerHtml}
         ${itemsHtml}
         ${totalsHtml}
         ${paymentsHtml}

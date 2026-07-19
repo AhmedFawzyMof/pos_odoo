@@ -21,7 +21,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: "session_id is required" });
   }
 
-  const odoo = await getAdminOdooClient();
+  const session = await requireUserSession(event);
+  const companyId = (session as any)?.currentCompanyId;
+  const odoo = await getAdminOdooClient(companyId || undefined);
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("pos.reports.api", "get_report_data", [
       ["close_session", null, null, { session_id: sessionId }],

@@ -5,7 +5,7 @@ import BaseReport from "./BaseReport.vue";
 import SessionSummaryModal from "./SessionSummaryModal.vue";
 import { usePermissions } from "~/composables/usePermissions";
 
-defineProps<{ dateFrom: string; dateTo: string }>();
+defineProps<{ dateFrom: string; dateTo: string; refreshKey?: number }>();
 const emit = defineEmits<{ loading: [v: boolean] }>();
 
 const baseRef = ref<InstanceType<typeof BaseReport>>();
@@ -151,7 +151,7 @@ onMounted(() => {
     </div>
 
     <!-- Shift Report -->
-    <BaseReport ref="baseRef" report-type="shift" :date-from :date-to @loading="emit('loading', $event)" />
+    <BaseReport ref="baseRef" report-type="shift" :date-from :date-to :refresh-key @loading="emit('loading', $event)" />
 
     <!-- Session Summary Modal -->
     <SessionSummaryModal

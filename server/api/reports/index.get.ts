@@ -14,14 +14,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const now = new Date();
-  const defaultDateFrom =
-    date_from ||
-    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
-  const defaultDateTo =
-    date_to ||
-    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const defaultDateFrom = date_from || todayStr;
+  const defaultDateTo = date_to || todayStr;
 
-  const odoo = await getAdminOdooClient();
+  // Pass the user's active company to Odoo for proper data isolation
+  const session = await requireUserSession(event);
+  const companyId = (session as any)?.currentCompanyId;
+  const odoo = await getAdminOdooClient(companyId || undefined);
   await requirePermission(event, 'pos_user')
 
   const [rpcErr, data] = await tryCatch(

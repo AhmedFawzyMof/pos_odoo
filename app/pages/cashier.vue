@@ -136,6 +136,7 @@ const { selectedCartIndex } = usePosHotkeys({
   preselectMethodId: hotkeyPreselectMethodId,
   autoExpandSection: hotkeyAutoExpandSection,
   onCheckout: handleCheckout,
+  onToggleWeight: handleWeightToggle,
 });
 
 const hasMore = computed(() => currentPage.value < totalPages.value);
@@ -233,7 +234,7 @@ async function fetchSearchSuggestions(val: string) {
     const query: Record<string, any> = {
       config_id: configId.value,
       page: 1,
-      limit: 10,
+      limit: 50,
       search: val,
     };
     if (selectedLocationId.value) query.location_id = selectedLocationId.value;

@@ -11,6 +11,7 @@ interface UsePosHotkeysOptions {
   preselectMethodId: Ref<number | null>;
   autoExpandSection: Ref<"discount" | "customer" | null>;
   onCheckout: () => void;
+  onToggleWeight?: () => void;
 }
 
 export function usePosHotkeys(options: UsePosHotkeysOptions) {
@@ -22,6 +23,7 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
     preselectMethodId,
     autoExpandSection,
     onCheckout,
+    onToggleWeight,
   } = options;
 
   const cart = usePosCartStore();
@@ -69,18 +71,6 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
     return index;
   }
 
-  function showComingSoonToast() {
-    const toast = document.createElement("div");
-    toast.className =
-      "fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-amber-100 border border-amber-300 text-amber-800 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300";
-    toast.textContent = "قريباً — موقف الطلبات قيد التطوير";
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      setTimeout(() => toast.remove(), 300);
-    }, 2500);
-  }
-
   function onKeyDown(e: KeyboardEvent) {
     const key = e.key;
     const target = e.target as HTMLElement;
@@ -126,7 +116,7 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
       case "F5": {
         e.preventDefault();
         if (!enabled.value || isInputFocused()) return;
-        showComingSoonToast();
+        onToggleWeight?.();
         break;
       }
       case "F12": {

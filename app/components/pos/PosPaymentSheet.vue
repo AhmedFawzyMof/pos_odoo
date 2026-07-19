@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import {
   X,
   RefreshCw,
@@ -55,6 +55,9 @@ const lastOrderSubtotal = ref(0);
 const lastOrderDiscount = ref(0);
 const lastOrderServiceFee = ref(0);
 const lastOrderGrandTotal = ref(0);
+const lastOrderCustomerName = ref("");
+const lastOrderCustomerPhone = ref("");
+const lastOrderCustomerAddress = ref("");
 
 const isFullyPaid = computed(
   () => {
@@ -194,7 +197,25 @@ async function handleSubmit() {
       lastOrderDiscount.value = cart.discountAmount;
       lastOrderServiceFee.value = cart.serviceFeeAmount;
       lastOrderGrandTotal.value = cart.grandTotal;
+      lastOrderCustomerName.value = cart.customerName;
+      lastOrderCustomerPhone.value = cart.customerPhone;
+      lastOrderCustomerAddress.value = cart.customerAddress;
       cart.clearCart();
+
+      await nextTick();
+      await printReceipt({
+        orderName: orderName.value,
+        lastOrderItems: lastOrderItems.value,
+        lastOrderPayments: lastOrderPayments.value,
+        lastOrderSubtotal: lastOrderSubtotal.value,
+        lastOrderDiscount: lastOrderDiscount.value,
+        lastOrderServiceFee: lastOrderServiceFee.value,
+        lastOrderGrandTotal: lastOrderGrandTotal.value,
+        lastOrderCustomerName: lastOrderCustomerName.value,
+        lastOrderCustomerPhone: lastOrderCustomerPhone.value,
+        lastOrderCustomerAddress: lastOrderCustomerAddress.value,
+      });
+      closeCompleted();
     }
   } catch (error: any) {
     errorMessage.value = error.statusMessage || "فشل إنشاء الطلب";
@@ -283,6 +304,9 @@ async function handlePrintReceipt() {
             :discount-amount="lastOrderDiscount"
             :service-fee-amount="lastOrderServiceFee"
             :grand-total="lastOrderGrandTotal"
+            :customer-name="lastOrderCustomerName"
+            :customer-phone="lastOrderCustomerPhone"
+            :customer-address="lastOrderCustomerAddress"
             :receipt-config="receiptConfig"
           />
 

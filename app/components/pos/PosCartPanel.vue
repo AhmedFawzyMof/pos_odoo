@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import { ShoppingCart, Trash2, Receipt } from "@lucide/vue";
 import Skeleton from "@/components/ui/skeleton/Skeleton.vue";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,30 @@ const cart = usePosCartStore();
 const { formatNumber } = useNumberFormat();
 
 const isEmpty = computed(() => cart.items.length === 0);
+
+const cartListRef = ref<HTMLElement | null>(null);
+const isAtBottom = ref(true);
+
+function handleScroll() {
+  const el = cartListRef.value;
+  if (!el) return;
+  isAtBottom.value = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
+}
+
+watch(
+  () => cart.items,
+  () => {
+    if (isAtBottom.value) {
+      nextTick(() => {
+        const el = cartListRef.value;
+        if (el) {
+          el.scrollTop = el.scrollHeight;
+        }
+      });
+    }
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -52,7 +76,7 @@ const isEmpty = computed(() => cart.items.length === 0);
       </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto px-4 py-2 space-y-0">
+    <div ref="cartListRef" class="flex-1 overflow-y-auto px-4 py-2 space-y-0" @scroll.passive="handleScroll">
       <div
         v-if="isEmpty && !loading"
         class="flex flex-col items-center justify-center h-full text-muted-foreground"

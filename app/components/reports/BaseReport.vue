@@ -45,32 +45,17 @@ const totalUnpaid = computed(() => {
   }, 0);
 });
 
-const isDiscountKpi = (label: string) => {
-  return label.includes("خصم") || label.includes("discount") || label.includes("Discount");
-};
-
-const discountKpi = computed(() => {
-  if (!reportData.value?.summary?.length) return null;
-  return reportData.value.summary.find((k: any) => 
-    k.label?.includes("خصم") || k.label?.includes("discount") || k.label?.includes("Discount")
-  ) || null;
-});
-
-const totalDiscountsWithUnpaid = computed(() => {
-  if (!discountKpi.value) return null;
-  const discountValue = Number(discountKpi.value.value || 0);
-  return discountValue + totalUnpaid.value;
-});
-
 async function fetchData() {
   pending.value = true;
   error.value = null;
   try {
     const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     const params: Record<string, any> = {
       type: props.reportType,
-      date_from: props.dateFrom || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`,
-      date_to: props.dateTo || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`,
+      date_from: props.dateFrom || todayStr,
+      date_to: props.dateTo || todayStr,
+      _t: Date.now(),
     };
     if (props.locationId) {
       params.location_id = props.locationId;
@@ -202,11 +187,7 @@ defineExpose({ refresh, handleExport });
             >
               {{ typeof kpi.value === 'object' ? JSON.stringify(kpi.value) : kpi.value }}
             </h3>
-            <!-- Show unpaid amount in discounts KPI -->
-            <p v-if="reportType === 'sales' && isDiscountKpi(kpi.label) && totalUnpaid > 0" 
-               class="text-xs text-error font-bold mt-1">
-              + {{ totalUnpaid.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} ج.م غير مدفوع
-            </p>
+
           </div>
         </div>
 

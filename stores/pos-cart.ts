@@ -6,6 +6,9 @@ export const usePosCartStore = defineStore("pos-cart", () => {
   const items = ref<CartItem[]>([]);
   const note = ref("");
   const customerId = ref<number | null>(null);
+  const customerName = ref("");
+  const customerPhone = ref("");
+  const customerAddress = ref("");
   const selectedLocationId = ref<number | null>(null);
   const selectedLocationName = ref("");
 
@@ -167,6 +170,9 @@ export const usePosCartStore = defineStore("pos-cart", () => {
     items.value = [];
     note.value = "";
     customerId.value = null;
+    customerName.value = "";
+    customerPhone.value = "";
+    customerAddress.value = "";
     resetOrderAdjustments();
   }
 
@@ -174,6 +180,9 @@ export const usePosCartStore = defineStore("pos-cart", () => {
     items,
     note,
     customerId,
+    customerName,
+    customerPhone,
+    customerAddress,
     selectedLocationId,
     selectedLocationName,
     itemCount,

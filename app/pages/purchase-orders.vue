@@ -17,6 +17,7 @@ import CreatePurchaseOrderModal from "~/components/purchase/CreatePurchaseOrderM
 import EditPurchaseOrderModal from "~/components/purchase/EditPurchaseOrderModal.vue";
 import ReceivePurchaseOrderModal from "~/components/purchase/ReceivePurchaseOrderModal.vue";
 import { usePermissions } from "~/composables/usePermissions";
+import { formatDate } from "~/lib/dateUtils";
 
 const route = useRoute();
 const { canViewPage, can, isPurchaseUser, isStockUser } = usePermissions();
@@ -238,16 +239,6 @@ const stateClass = (state: string) => {
   if (state === "cancel") return "bg-red-100 text-red-800";
   return "bg-slate-100 text-slate-600";
 };
-
-function formatDate(d: string): string {
-  if (!d) return "";
-  const date = new Date(d);
-  return date.toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-}
 
 function buildPOReceiptHtml(params: {
   name: string;

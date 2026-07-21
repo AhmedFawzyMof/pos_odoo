@@ -133,6 +133,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { formatDate, formatTime } from "~/lib/dateUtils";
 
 const props = defineProps<{
   orderName: string;
@@ -154,11 +155,8 @@ const currency = computed(() => cfg.value.totals?.currency || "ج.م");
 const baseFontSize = computed(() => cfg.value.fontSize || 12);
 
 const now = new Date();
-const dateStr = now.toLocaleDateString("ar-EG");
-const timeStr = now.toLocaleTimeString("ar-EG", {
-  hour: "2-digit",
-  minute: "2-digit",
-});
+const dateStr = formatDate(now);
+const timeStr = formatTime(now);
 
 const renderedStyle = computed(() => {
   const c = cfg.value;

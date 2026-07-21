@@ -8,6 +8,7 @@ import type {
   CustomerOrder,
 } from "~/types/customer";
 import { usePermissions } from "~/composables/usePermissions";
+import { formatDate } from "~/lib/dateUtils";
 
 const { canViewPage } = usePermissions();
 
@@ -267,7 +268,7 @@ watch(
           <h4 class="text-headline-md font-bold text-on-white">
             {{
               stats.lastVisit
-                ? new Date(stats.lastVisit).toLocaleDateString("ar-EG")
+                ? formatDate(stats.lastVisit)
                 : "لا يوجد"
             }}
           </h4>
@@ -430,7 +431,7 @@ watch(
               >
                 <td class="p-4 font-bold">{{ ord.name }}</td>
                 <td class="p-4 text-on-white-variant">
-                  {{ new Date(ord.date).toLocaleDateString("ar-EG") }}
+                  {{ formatDate(ord.date) }}
                 </td>
                 <td class="p-4">
                   <span

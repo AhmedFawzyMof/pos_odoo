@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const page = Math.max(1, parseInt((query.page as string) || "1", 10));
   const limit = Math.max(
     1,
-    Math.min(100, parseInt((query.limit as string) || "20", 10)),
+    Math.min(300, parseInt((query.limit as string) || "28", 10)),
   );
   const search = (query.search as string) || "";
   const status = (query.status as string) || "";

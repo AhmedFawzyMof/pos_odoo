@@ -37,6 +37,7 @@ interface StockMovement {
   sku: string;
   type: string;
   typeLabel: string;
+  origin: string;
   fromLocation: string;
   toLocation: string;
   qty: number;
@@ -110,6 +111,16 @@ const productName = computed(() => {
 
 const paginatedMovements = movements;
 
+function originBadgeClass(origin?: string): Record<string, boolean> {
+  const o = origin || '';
+  return {
+    'bg-sky-100 text-sky-700': o.includes('طلب بيع'),
+    'bg-amber-100 text-amber-700': o.includes('أمر شراء'),
+    'bg-purple-100 text-purple-700': o.includes('جرد'),
+    'bg-slate-100 text-slate-600': !o.includes('طلب بيع') && !o.includes('أمر شراء') && !o.includes('جرد'),
+  };
+}
+
 const setPage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) currentPage.value = page;
 };
@@ -160,6 +171,7 @@ const triggerExport = async () => {
       المنتج: m.productName,
       "كود SKU": m.sku,
       "نوع الحركة": m.typeLabel,
+      المصدر: m.origin,
       "من موقع": m.fromLocation,
       "إلى موقع": m.toLocation,
       الكمية: m.qty,
@@ -351,6 +363,7 @@ const triggerExport = async () => {
               <th class="px-6 py-4 font-bold text-label-md">التاريخ والوقت</th>
               <th class="px-6 py-4 font-bold text-label-md">المنتج</th>
               <th class="px-6 py-4 font-bold text-label-md">نوع الحركة</th>
+              <th class="px-6 py-4 font-bold text-label-md">المصدر</th>
               <th class="px-6 py-4 font-bold text-label-md">من موقع</th>
               <th class="px-6 py-4 font-bold text-label-md">إلى موقع</th>
               <th class="px-6 py-4 font-bold text-label-md">الكمية</th>
@@ -417,6 +430,16 @@ const triggerExport = async () => {
                 </span>
               </td>
 
+              <!-- Source / Origin -->
+              <td class="px-6 py-4 text-on-white-variant text-label-md">
+                <span
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold"
+                  :class="originBadgeClass(mv.origin)"
+                >
+                  {{ mv.origin }}
+                </span>
+              </td>
+
               <!-- From Location -->
               <td
                 class="px-6 py-4 text-on-white-variant text-label-md font-mono"
@@ -453,7 +476,7 @@ const triggerExport = async () => {
               </td>
             </tr>
             <tr v-if="status === 'pending' && !paginatedMovements.length">
-              <td colspan="9" class="p-12 text-center text-on-white-variant">
+              <td colspan="10" class="p-12 text-center text-on-white-variant">
                 <RefreshCw
                   class="w-9 h-9 block mb-2 animate-spin text-primary mx-auto"
                 />
@@ -461,7 +484,7 @@ const triggerExport = async () => {
               </td>
             </tr>
             <tr v-else-if="paginatedMovements.length === 0">
-              <td colspan="9" class="p-12 text-center text-on-white-variant">
+              <td colspan="10" class="p-12 text-center text-on-white-variant">
                 <FileX2 class="w-9 h-9 block mb-2 text-outline mx-auto" />
                 لا توجد حركات مخزون تطابق البحث المختار.
               </td>

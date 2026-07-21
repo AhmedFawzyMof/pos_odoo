@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import { formatDate, formatTime } from "~/lib/dateUtils";
 
 export const DEFAULT_RECEIPT_CONFIG = {
   titleAr: "فاتورة بيع",
@@ -150,11 +151,8 @@ export function useReceiptPrint() {
     const titleAr = cfg.titleAr || "فاتورة بيع";
 
     const now = new Date();
-    const dateStr = now.toLocaleDateString("ar-EG");
-    const timeStr = now.toLocaleTimeString("ar-EG", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const dateStr = formatDate(now);
+    const timeStr = formatTime(now);
 
     const divider = showDivider
       ? `<div style="border-top:1px ${dividerStyle} #000;margin:8px 0"></div>`

@@ -22,6 +22,7 @@ import {
 import type { POSOrder, OrderListResponse } from "~/types/pos";
 import { usePermissions } from "~/composables/usePermissions";
 import { useReceiptPrint } from "~/composables/useReceiptPrint";
+import { formatDate, formatDateLong, formatDateWithTime } from "~/lib/dateUtils";
 
 const route = useRoute();
 const { canViewPage, can } = usePermissions();
@@ -42,6 +43,11 @@ const statusFilter = ref("");
 const sessionSearch = ref("");
 const debouncedSearchQuery = ref("");
 const debouncedSessionSearch = ref("");
+const todayDateStr = new Date().toISOString().slice(0, 10);
+const dateFrom = ref(todayDateStr);
+const dateTo = ref(todayDateStr);
+const debouncedDateFrom = ref(todayDateStr);
+const debouncedDateTo = ref(todayDateStr);
 const currentPage = ref(1);
 
 let searchTimeout: ReturnType<typeof setTimeout>;
@@ -61,7 +67,26 @@ watch(sessionSearch, (val) => {
     currentPage.value = 1;
   }, 400);
 });
-const limit = 20;
+
+let dateFromTimeout: ReturnType<typeof setTimeout>;
+watch(dateFrom, (val) => {
+  clearTimeout(dateFromTimeout);
+  dateFromTimeout = setTimeout(() => {
+    debouncedDateFrom.value = val;
+    currentPage.value = 1;
+  }, 400);
+});
+
+let dateToTimeout: ReturnType<typeof setTimeout>;
+watch(dateTo, (val) => {
+  clearTimeout(dateToTimeout);
+  dateToTimeout = setTimeout(() => {
+    debouncedDateTo.value = val;
+    currentPage.value = 1;
+  }, 400);
+});
+
+const limit = ref(28);
 
 const showToast = ref(false);
 const toastMessage = ref("");
@@ -70,14 +95,7 @@ const selectedOrderId = ref<number | null>(null);
 const drawerOpen = ref(false);
 const openInEditMode = ref(false);
 
-const todayStr = computed(() => {
-  const d = new Date();
-  return d.toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-});
+const todayStr = computed(() => formatDateLong(new Date()));
 
 const {
   data: apiResponse,
@@ -92,12 +110,16 @@ const {
     search: debouncedSearchQuery,
     status: statusFilter,
     session_id: debouncedSessionSearch,
+    date_from: debouncedDateFrom,
+    date_to: debouncedDateTo,
   },
   watch: [
     currentPage,
     debouncedSearchQuery,
     statusFilter,
     debouncedSessionSearch,
+    debouncedDateFrom,
+    debouncedDateTo,
   ],
   transform: (response) => {
     if (!response.data) response.data = [];
@@ -110,10 +132,10 @@ const totalItems = computed(() => apiResponse.value?.totalItems || 0);
 const totalPages = computed(() => apiResponse.value?.totalPages || 1);
 
 const startItem = computed(() =>
-  ordersList.value.length ? (currentPage.value - 1) * limit + 1 : 0,
+  ordersList.value.length ? (currentPage.value - 1) * limit.value + 1 : 0,
 );
 const endItem = computed(() =>
-  Math.min(currentPage.value * limit, totalItems.value),
+  Math.min(currentPage.value * limit.value, totalItems.value),
 );
 
 const totalSales = computed(() =>
@@ -239,11 +261,7 @@ function showToastMessage(message: string, type: "success" | "error") {
 
 const formatTime = (dateStr: string) => {
   if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  return d.toLocaleTimeString("ar-EG", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return formatDateWithTime(dateStr);
 };
 
 const statusLabels: Record<string, string> = {
@@ -251,6 +269,7 @@ const statusLabels: Record<string, string> = {
   paid: "مدفوع",
   done: "منتهي",
   cancelled: "ملغي",
+  cancel: "ملغي",
   invoiced: "مفوتر",
   refund: "مرتجع",
 };
@@ -260,6 +279,7 @@ const statusColors: Record<string, string> = {
   paid: "bg-primary/10 text-primary",
   done: "bg-tertiary-container/30 text-tertiary",
   cancelled: "bg-error-container text-error",
+  cancel: "bg-error-container text-error",
   invoiced: "bg-secondary-fixed text-on-secondary-fixed",
   refund: "bg-amber-100 text-amber-700",
 };
@@ -269,6 +289,7 @@ const statusIcons: Record<string, any> = {
   paid: CheckCircle,
   done: CheckCircle,
   cancelled: XCircle,
+  cancel: XCircle,
   invoiced: CheckCircle,
   refund: RotateCcw,
 };
@@ -403,9 +424,23 @@ const statusIcons: Record<string, any> = {
                 <option value="paid">مدفوع</option>
                 <option value="done">منتهي</option>
                 <option value="cancelled">ملغي</option>
+                <option value="cancel">ملغي</option>
                 <option value="invoiced">مفوتر</option>
                 <option value="refund">مرتجع</option>
               </select>
+              <div class="flex items-center gap-1">
+                <input
+                  v-model="dateFrom"
+                  type="date"
+                  class="bg-white text-on-white border border-outline-variant rounded-xl px-3 py-2 w-[140px] focus:ring-2 focus:ring-primary outline-none"
+                />
+                <span class="text-on-white-variant text-sm">إلى</span>
+                <input
+                  v-model="dateTo"
+                  type="date"
+                  class="bg-white text-on-white border border-outline-variant rounded-xl px-3 py-2 w-[140px] focus:ring-2 focus:ring-primary outline-none"
+                />
+              </div>
               <div class="relative">
                 <Search
                   class="absolute right-3 top-1/2 -translate-y-1/2 text-on-white-variant w-5 h-5"
@@ -582,9 +617,20 @@ const statusIcons: Record<string, any> = {
           <div
             class="p-4 border-t border-outline-variant flex items-center justify-between bg-white-low"
           >
-            <p class="text-label-md text-on-white-variant">
-              عرض {{ startItem }}-{{ endItem }} من أصل {{ totalItems }} طلب
-            </p>
+            <div class="flex items-center gap-3">
+              <p class="text-label-md text-on-white-variant">
+                عرض {{ startItem }}-{{ endItem }} من أصل {{ totalItems }} طلب
+              </p>
+              <select
+                v-model="limit"
+                class="bg-white text-on-white border border-outline-variant rounded-xl px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+              >
+                <option :value="28">28</option>
+                <option :value="100">100</option>
+                <option :value="200">200</option>
+                <option :value="300">300</option>
+              </select>
+            </div>
             <div class="flex gap-2" v-if="totalPages > 1">
               <button
                 @click="prevPage"

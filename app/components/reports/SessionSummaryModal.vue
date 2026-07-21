@@ -14,6 +14,7 @@ import {
 } from "@lucide/vue";
 import type { SessionSummary, SessionDetail, SessionDetailProduct } from "~/types/pos";
 import { useSessionPrint } from "~/composables/useSessionPrint";
+import { formatDate, formatTime, formatDateTime } from "~/lib/dateUtils";
 
 const props = defineProps<{
   open: boolean;
@@ -92,25 +93,6 @@ watch(
 
 function fmt(amount: number): string {
   return amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function formatDate(d: string): string {
-  if (!d) return "";
-  return new Date(d).toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-}
-
-function formatTime(d: string): string {
-  if (!d) return "";
-  return new Date(d).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" });
-}
-
-function formatDateTime(d: string): string {
-  if (!d) return "";
-  return `${formatDate(d)} ${formatTime(d)}`;
 }
 
 function getCashPayment() {

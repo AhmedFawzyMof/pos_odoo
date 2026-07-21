@@ -8,6 +8,7 @@ import {
 import { usePermissions } from "~/composables/usePermissions";
 import ReceiptPreview from "~/components/receipt/ReceiptPreview.vue";
 import ReceiptConfigForm from "~/components/receipt/ReceiptConfigForm.vue";
+import { formatDate, formatTime } from "~/lib/dateUtils";
 
 const route = useRoute();
 const { canViewPage } = usePermissions();
@@ -146,8 +147,8 @@ function updateConfig(val: any) {
 const demoData = computed(() => {
   return {
     orderName: "فاتورة #1234",
-    date: new Date().toLocaleDateString("ar-EG"),
-    time: new Date().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }),
+    date: formatDate(new Date()),
+    time: formatTime(new Date()),
     partner: {
       name: "أحمد مختار",
       phone: "01234567890",

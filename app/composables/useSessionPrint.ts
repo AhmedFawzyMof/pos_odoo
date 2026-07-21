@@ -1,28 +1,8 @@
 import type { SessionSummary, SessionDetail, SessionDetailProduct } from "~/types/pos";
+import { formatDate, formatTime, formatDateTime } from "~/lib/dateUtils";
 
 function fmt(amount: number): string {
   return amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function formatDate(d: string): string {
-  if (!d) return "";
-  const date = new Date(d);
-  return date.toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-}
-
-function formatTime(d: string): string {
-  if (!d) return "";
-  const date = new Date(d);
-  return date.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" });
-}
-
-function formatDateTime(d: string): string {
-  if (!d) return "";
-  return `${formatDate(d)} ${formatTime(d)}`;
 }
 
 function getAllProducts(detail: SessionDetail | null): SessionDetailProduct[] {

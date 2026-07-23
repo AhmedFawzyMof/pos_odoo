@@ -13,7 +13,7 @@ const cart = usePosCartStore();
 
 const show = ref(false);
 const discountType = ref<"fixed" | "percent">("fixed");
-const discountValue = ref(0);
+const discountValue = ref(cart.discountAmount || 0);
 
 watch(
   () => props.autoExpand,

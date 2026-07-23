@@ -8,9 +8,11 @@ interface UsePosHotkeysOptions {
   sessionId: Ref<number | null>;
   showPaymentSheet: Ref<boolean>;
   showCloseSessionModal: Ref<boolean>;
-  preselectMethodId: Ref<number | null>;
-  autoExpandSection: Ref<"discount" | "customer" | null>;
-  onCheckout: () => void;
+  preselectMethodId?: Ref<number | null>;
+  autoExpandSection?: Ref<"discount" | "customer" | null>;
+  onCheckout?: () => void;
+  onCashPayment?: () => void;
+  onShowDiscount?: () => void;
   onToggleWeight?: () => void;
 }
 
@@ -20,11 +22,14 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
     sessionId,
     showPaymentSheet,
     showCloseSessionModal,
-    preselectMethodId,
-    autoExpandSection,
     onCheckout,
+    onCashPayment,
+    onShowDiscount,
     onToggleWeight,
   } = options;
+
+  const preselectMethodId = options.preselectMethodId ?? ref<number | null>(null);
+  const autoExpandSection = options.autoExpandSection ?? ref<"discount" | "customer" | null>(null);
 
   const cart = usePosCartStore();
 
@@ -60,7 +65,7 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
 
   function openCheckout() {
     if (!showPaymentSheet.value) {
-      onCheckout();
+      onCheckout?.();
     }
   }
 
@@ -82,35 +87,47 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
       case "F1": {
         e.preventDefault();
         if (!canUseGlobalHotkeys()) return;
-        const method = findPaymentMethod("cash");
-        if (method) {
-          openCheckout();
-          preselectMethodId.value = method.id;
+        if (onCashPayment) {
+          onCashPayment();
+        } else {
+          const method = findPaymentMethod("cash");
+          if (method) {
+            openCheckout();
+            preselectMethodId.value = method.id;
+          }
         }
         break;
       }
       case "F2": {
         e.preventDefault();
         if (!canUseGlobalHotkeys()) return;
-        const method = findPaymentMethod("card");
-        if (method) {
-          openCheckout();
-          preselectMethodId.value = method.id;
+        if (!onCashPayment) {
+          const method = findPaymentMethod("card");
+          if (method) {
+            openCheckout();
+            preselectMethodId.value = method.id;
+          }
         }
         break;
       }
       case "F3": {
         e.preventDefault();
         if (!canUseGlobalHotkeys()) return;
-        openCheckout();
-        autoExpandSection.value = "discount";
+        if (onShowDiscount) {
+          onShowDiscount();
+        } else {
+          openCheckout();
+          autoExpandSection.value = "discount";
+        }
         break;
       }
       case "F4": {
         e.preventDefault();
         if (!canUseGlobalHotkeys()) return;
-        openCheckout();
-        autoExpandSection.value = "customer";
+        if (!onShowDiscount) {
+          openCheckout();
+          autoExpandSection.value = "customer";
+        }
         break;
       }
       case "F5": {
@@ -151,10 +168,13 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
         e.preventDefault();
         const item = cart.items[selectedCartIndex.value];
         if (item) {
-          const step = item.product.to_weight ? 0.01 : 1;
+          const isWeight = item.product.to_weight;
+          const newQty = isWeight
+            ? Math.round((item.quantity + 1) * 10000) / 10000
+            : item.quantity + 1;
           cart.updateQuantity(
             item.product.id,
-            Math.round((item.quantity + step) * 100) / 100,
+            newQty,
           );
         }
         break;
@@ -165,9 +185,11 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
         e.preventDefault();
         const item = cart.items[selectedCartIndex.value];
         if (item) {
-          const step = item.product.to_weight ? 0.01 : 1;
-          const min = item.product.to_weight ? 0.01 : 1;
-          const newQty = Math.round((item.quantity - step) * 100) / 100;
+          const isWeight = item.product.to_weight;
+          const min = isWeight ? 0.01 : 1;
+          const newQty = isWeight
+            ? Math.round((item.quantity - 1) * 10000) / 10000
+            : item.quantity - 1;
           if (newQty >= min) {
             cart.updateQuantity(item.product.id, newQty);
           }

@@ -21,7 +21,6 @@ watch(() => props.item.quantity, (newQty) => {
   localQty.value = newQty;
 });
 const isWeight = computed(() => props.item.product.to_weight);
-const step = computed(() => (isWeight.value ? 0.01 : 1));
 const min = computed(() => (isWeight.value ? 0.01 : 1));
 
 const lineTotal = computed(() => {
@@ -46,24 +45,38 @@ const taxAmount = computed(() => {
   return taxes.value.reduce((sum, tax) => sum + base * (tax.amount / 100), 0);
 });
 
+function emitQty(val: number) {
+  const v = isWeight.value ? val : Math.round(val);
+  if (v >= min.value) emit("updateQuantity", v);
+}
+
 function increment() {
-  localQty.value = Math.round((localQty.value + step.value) * 100) / 100;
-  emit("updateQuantity", localQty.value);
+  const next = isWeight.value
+    ? Math.round((localQty.value + 1) * 10000) / 10000
+    : localQty.value + 1;
+  localQty.value = next;
+  emitQty(next);
 }
 
 function decrement() {
   if (localQty.value > min.value) {
-    localQty.value = Math.round((localQty.value - step.value) * 100) / 100;
-    emit("updateQuantity", localQty.value);
+    const next = isWeight.value
+      ? Math.round((localQty.value - 1) * 10000) / 10000
+      : localQty.value - 1;
+    localQty.value = next;
+    emitQty(next);
   }
 }
 
-function onInput(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const val = parseFloat(target.value);
-  if (!isNaN(val) && val >= min.value) {
-    localQty.value = Math.round(val * 100) / 100;
-    emit("updateQuantity", localQty.value);
+function onBlur() {
+  const num = isWeight.value
+    ? Number(localQty.value)
+    : Math.round(Number(localQty.value));
+  if (isNaN(num) || num < min.value) {
+    localQty.value = props.item.quantity;
+  } else {
+    localQty.value = num;
+    emitQty(num);
   }
 }
 </script>
@@ -95,15 +108,13 @@ function onInput(e: Event) {
           <Minus class="w-3.5 h-3.5" />
         </button>
         <input
-          v-if="isWeight"
           type="number"
-          :value="localQty"
-          @input="onInput"
-          step="0.01"
-          min="0.01"
+          v-model="localQty"
+          @blur="onBlur"
+          :step="isWeight ? 0.01 : 1"
+          :min="min"
           class="w-16 text-sm font-bold tabular-nums text-center bg-transparent border border-outline-variant/50 rounded-md px-1 py-0.5"
         />
-        <span v-else class="text-sm font-bold tabular-nums w-6 text-center">{{ localQty }}</span>
         <button
           @click="increment"
           class="h-7 w-7 rounded-full border border-outline-variant/50 flex items-center justify-center hover:bg-muted/70 transition-colors cursor-pointer shrink-0"

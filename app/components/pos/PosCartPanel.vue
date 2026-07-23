@@ -1,24 +1,43 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
-import { ShoppingCart, Trash2, Receipt } from "@lucide/vue";
+import {
+  ShoppingCart,
+  Trash2,
+  Banknote,
+  Percent,
+  CreditCard,
+  MessageSquareText,
+  Users,
+} from "@lucide/vue";
 import Skeleton from "@/components/ui/skeleton/Skeleton.vue";
 import { Button } from "@/components/ui/button";
 import PosCartItem from "./PosCartItem.vue";
 import { usePosCartStore } from "~~/stores/pos-cart";
 import { useNumberFormat } from "~/composables/useNumberFormat";
 
-const props = withDefaults(defineProps<{
-  bordered?: boolean;
-  selectedIndex?: number;
-  loading?: boolean;
-}>(), {
-  bordered: true,
-  selectedIndex: -1,
-  loading: false,
-});
+const props = withDefaults(
+  defineProps<{
+    bordered?: boolean;
+    selectedIndex?: number;
+    loading?: boolean;
+    hasSession?: boolean;
+    processing?: boolean;
+  }>(),
+  {
+    bordered: true,
+    selectedIndex: -1,
+    loading: false,
+    hasSession: true,
+    processing: false,
+  },
+);
 
 const emit = defineEmits<{
-  checkout: [];
+  payCash: [];
+  showPaymentMethods: [];
+  showNotes: [];
+  showDiscount: [];
+  openClients: [];
   selectItem: [index: number];
 }>();
 
@@ -54,14 +73,29 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col flex-1 min-h-0 bg-card" :class="bordered ? 'border-r border-outline-variant/40' : ''">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-outline-variant/20">
+  <div
+    class="flex flex-col flex-1 min-h-0 bg-card"
+    :class="bordered ? 'border-r border-outline-variant/40' : ''"
+  >
+    <div
+      class="flex items-center justify-between px-4 py-3 border-b border-outline-variant/20"
+    >
       <div class="flex items-center gap-2">
-        <ShoppingCart class="w-5 h-5 text-primary" />
-        <h3 class="font-bold text-sm">الفواتير</h3>
+        <div class="">
+          <span class="text-xs text-blue-500 font-bold">{{
+            cart.customerName
+          }}</span>
+          <Button
+            @click="emit('openClients')"
+            class="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors hover:bg-accent"
+          >
+            <Users class="w-5 h-5" />
+            <span class="font-bold text-sm">العملاء</span>
+          </Button>
+        </div>
         <span
           v-if="cart.itemCount > 0"
-          class="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none"
+          class="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-4.5 text-center leading-none"
         >
           {{ cart.itemCount }}
         </span>
@@ -76,12 +110,19 @@ watch(
       </button>
     </div>
 
-    <div ref="cartListRef" class="flex-1 overflow-y-auto px-4 py-2 space-y-0" @scroll.passive="handleScroll">
+    <div
+      ref="cartListRef"
+      class="flex-1 overflow-y-auto px-4 py-2 space-y-0"
+      @scroll.passive="handleScroll"
+    >
       <div
         v-if="isEmpty && !loading"
         class="flex flex-col items-center justify-center h-full text-muted-foreground"
       >
-        <span class="material-symbols-outlined text-5xl text-muted-foreground/30">shopping_cart</span>
+        <span
+          class="material-symbols-outlined text-5xl text-muted-foreground/30"
+          >shopping_cart</span
+        >
         <p class="text-sm mt-2">الفواتير فارغة</p>
         <p class="text-xs mt-1">اختر المنتجات من الكتالوج</p>
       </div>
@@ -106,7 +147,9 @@ watch(
         :is-selected="index === selectedIndex"
         class="cursor-pointer select-none"
         @click="emit('selectItem', index)"
-        @update-quantity="(q) => cart.updateQuantity(item.product.id, q, item.variant?.id)"
+        @update-quantity="
+          (q) => cart.updateQuantity(item.product.id, q, item.variant?.id)
+        "
         @remove="cart.removeItem(item.product.id, item.variant?.id)"
       />
     </div>
@@ -119,13 +162,36 @@ watch(
             {{ formatNumber(cart.subtotal) }} ج.م
           </span>
         </div>
-        <div v-if="cart.totalTax > 0" class="flex justify-between text-warning text-sm">
+        <div
+          v-if="cart.totalTax > 0"
+          class="flex justify-between text-warning text-sm"
+        >
           <span>الضريبة (14%)</span>
           <span class="tabular-nums font-medium">
             {{ formatNumber(cart.totalTax) }} ج.م
           </span>
         </div>
-        <div class="flex justify-between text-base font-bold pt-1 border-t border-outline-variant/20">
+        <div
+          v-if="cart.discountAmount > 0"
+          class="flex justify-between text-red-500 text-sm"
+        >
+          <span>الخصم</span>
+          <span class="tabular-nums font-medium">
+            -{{ formatNumber(cart.discountAmount) }} ج.م
+          </span>
+        </div>
+        <div
+          v-if="cart.serviceFeeAmount > 0"
+          class="flex justify-between text-amber-600 text-sm"
+        >
+          <span>رسوم إضافية</span>
+          <span class="tabular-nums font-medium">
+            +{{ formatNumber(cart.serviceFeeAmount) }} ج.م
+          </span>
+        </div>
+        <div
+          class="flex justify-between text-base font-bold pt-1 border-t border-outline-variant/20"
+        >
           <span>الإجمالي</span>
           <span class="tabular-nums text-primary">
             {{ formatNumber(cart.grandTotal) }} ج.م
@@ -133,15 +199,64 @@ watch(
         </div>
       </div>
 
-      <Button
-        class="w-full gap-2 cursor-pointer"
-        :disabled="isEmpty"
-        size="lg"
-        @click="emit('checkout')"
-      >
-        <Receipt class="w-4 h-4" />
-        إتمام الطلب
-      </Button>
+      <div class="flex flex-col md:flex-row items-center gap-2">
+        <Button
+          class="w-full md:flex-1 md:w-auto gap-2 cursor-pointer"
+          :disabled="isEmpty || !hasSession || processing"
+          size="default"
+          @click="emit('payCash')"
+        >
+          <Banknote class="w-4 h-4" />
+          {{ processing ? "جاري..." : "نقدي" }}
+        </Button>
+        <Button
+          class="w-full md:flex-1 md:w-auto gap-2 cursor-pointer"
+          :disabled="isEmpty"
+          size="default"
+          @click="emit('showPaymentMethods')"
+        >
+          <CreditCard class="w-4 h-4" />
+          طرق الدفع
+        </Button>
+        <Button
+          variant="outline"
+          class="w-full md:flex-1 md:w-auto gap-2 cursor-pointer"
+          :disabled="isEmpty"
+          size="default"
+          @click="emit('showNotes')"
+        >
+          <MessageSquareText class="w-4 h-4" />
+          ملاحظات
+          <span
+            v-if="cart.note"
+            class="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+          >
+            !
+          </span>
+        </Button>
+        <Button
+          variant="outline"
+          class="w-full md:flex-1 md:w-auto gap-2 cursor-pointer"
+          :class="
+            cart.orderDiscount > 0
+              ? 'border-red-300 text-red-600 hover:bg-red-50'
+              : ''
+          "
+          :disabled="isEmpty"
+          size="default"
+          @click="emit('showDiscount')"
+        >
+          <Percent class="w-4 h-4" />
+          <span>خصم</span>
+          <span v-if="cart.orderDiscount > 0" class="text-xs font-bold">
+            ({{
+              cart.orderDiscountType === "percent"
+                ? `${cart.orderDiscount}%`
+                : `${formatNumber(cart.orderDiscount)} ج.م`
+            }})
+          </span>
+        </Button>
+      </div>
     </div>
   </div>
 </template>

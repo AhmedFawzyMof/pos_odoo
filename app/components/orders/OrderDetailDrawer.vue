@@ -23,13 +23,13 @@ import type {
   OrderPayment,
   PaymentMethod,
 } from "~/types/pos";
-import { usePermissions } from '~/composables/usePermissions'
-import { formatDateWithTime } from '~/lib/dateUtils'
-import { useReceiptPrint } from '~/composables/useReceiptPrint'
-import { useNumberFormat } from '~/composables/useNumberFormat'
-const { can } = usePermissions()
-const { fetchReceiptConfig, printReceipt } = useReceiptPrint()
-const { formatNumber } = useNumberFormat()
+import { usePermissions } from "~/composables/usePermissions";
+import { formatDateWithTime } from "~/lib/dateUtils";
+import { useReceiptPrint } from "~/composables/useReceiptPrint";
+import { useNumberFormat } from "~/composables/useNumberFormat";
+const { can } = usePermissions();
+const { fetchReceiptConfig, printReceipt } = useReceiptPrint();
+const { formatNumber } = useNumberFormat();
 
 interface EditableLine {
   _key: number;
@@ -165,7 +165,10 @@ const editServiceFeeAmount = computed(() => {
 const editGrandTotal = computed(() =>
   Math.max(
     0,
-    editSubtotal.value + (order.value?.amount_tax || 0) + editServiceFeeAmount.value - editDiscountAmount.value,
+    editSubtotal.value +
+      (order.value?.amount_tax || 0) +
+      editServiceFeeAmount.value -
+      editDiscountAmount.value,
   ),
 );
 
@@ -175,11 +178,14 @@ const hasChanges = computed(() => {
   const origFee = Number(order.value.service_fee || 0);
   if (orderDiscount.value !== origDiscount) return true;
   if (serviceFee.value !== origFee) return true;
+  if (orderDiscountType.value !== (order.value.order_discount_type || "fixed"))
+    return true;
+  if (serviceFeeType.value !== (order.value.service_fee_type || "fixed"))
+    return true;
   if (
-    orderDiscountType.value !== (order.value.order_discount_type || "fixed")
-  ) return true;
-  if (serviceFeeType.value !== (order.value.service_fee_type || "fixed")) return true;
-  if ((editingCustomerId.value || null) !== (order.value.partner_id?.[0] || null)) return true;
+    (editingCustomerId.value || null) !== (order.value.partner_id?.[0] || null)
+  )
+    return true;
   if (orderNote.value !== (order.value.note || "")) return true;
   for (const line of editingLines.value) {
     const orig = lines.value.find((l) => l.id === line.id);
@@ -193,7 +199,7 @@ const hasChanges = computed(() => {
   return false;
 });
 
-const canEditPrice = computed(() => can.value('order.editPrice'));
+const canEditPrice = computed(() => can.value("order.editPrice"));
 
 watch(
   () => props.isOpen,
@@ -220,6 +226,7 @@ async function fetchDetail(orderId: number) {
     });
     if (data.success) {
       order.value = data.order;
+      console.log(order.value);
       lines.value = data.lines || [];
       payments.value = data.payments || [];
       const methods = data.payment_methods || [];
@@ -257,9 +264,11 @@ function enterEditMode() {
     _isNew: false,
   }));
   orderDiscount.value = Number(order.value.order_discount || 0);
-  orderDiscountType.value = (order.value.order_discount_type as "fixed" | "percent") || "fixed";
+  orderDiscountType.value =
+    (order.value.order_discount_type as "fixed" | "percent") || "fixed";
   serviceFee.value = Number(order.value.service_fee || 0);
-  serviceFeeType.value = (order.value.service_fee_type as "fixed" | "percent") || "fixed";
+  serviceFeeType.value =
+    (order.value.service_fee_type as "fixed" | "percent") || "fixed";
   editingCustomerId.value = order.value.partner_id?.[0] || null;
   editingCustomerName.value = order.value.partner_id?.[1] || "";
   orderNote.value = order.value.note || "";
@@ -451,12 +460,13 @@ function handlePrintReceipt() {
       discount: l.discount,
     })),
     lastOrderPayments: payments.value.map((p) => ({
-      methodName: p.payment_method_id?.[1] || `#${p.payment_method_id?.[0] || ""}`,
+      methodName:
+        p.payment_method_id?.[1] || `#${p.payment_method_id?.[0] || ""}`,
       amount: p.amount,
     })),
     lastOrderSubtotal: totalFromLines.value,
     lastOrderDiscount: lines.value.reduce(
-      (sum, l) => sum + ((l.price_unit * l.qty * l.discount) / 100),
+      (sum, l) => sum + (l.price_unit * l.qty * l.discount) / 100,
       0,
     ),
     lastOrderServiceFee: 0,
@@ -594,7 +604,12 @@ const formatDate = (dateStr: string) => {
         </div>
         <div class="flex items-center gap-2">
           <button
-            v-if="!editMode && order?.state !== 'cancelled' && order?.state !== 'refund' && can('order.editPayment')"
+            v-if="
+              !editMode &&
+              order?.state !== 'cancelled' &&
+              order?.state !== 'refund' &&
+              can('order.editPayment')
+            "
             @click="enterEditMode"
             class="p-2 rounded-full hover:bg-white-highest transition-colors cursor-pointer text-primary"
             title="تعديل الطلب"
@@ -659,7 +674,11 @@ const formatDate = (dateStr: string) => {
                 </option>
               </select>
               <button
-                v-if="selectedStatus !== order.state && can('order.void') && !editMode"
+                v-if="
+                  selectedStatus !== order.state &&
+                  can('order.void') &&
+                  !editMode
+                "
                 @click="changeStatus"
                 :disabled="saving"
                 class="px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/95 transition-all cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
@@ -698,7 +717,10 @@ const formatDate = (dateStr: string) => {
               العميل
             </p>
             <p class="text-body-md font-bold">
-              {{ editingCustomerName || (order.partner_id ? order.partner_id[1] : "عميل نقدي") }}
+              {{
+                editingCustomerName ||
+                (order.partner_id ? order.partner_id[1] : "عميل نقدي")
+              }}
             </p>
           </div>
           <div>
@@ -740,7 +762,11 @@ const formatDate = (dateStr: string) => {
                     class="hover:bg-white-low/50"
                   >
                     <td class="px-3 py-3 text-body-md font-bold text-on-white">
-                      {{ line.product_id ? line.product_id[1] : `#${line.product_id?.[0] || ""}` }}
+                      {{
+                        line.product_id
+                          ? line.product_id[1]
+                          : `#${line.product_id?.[0] || ""}`
+                      }}
                     </td>
                     <td class="px-3 py-3 text-body-md">{{ line.qty }}</td>
                     <td class="px-3 py-3 text-body-md">
@@ -809,14 +835,22 @@ const formatDate = (dateStr: string) => {
                       line._deleted ? 'opacity-40 line-through bg-error/5' : '',
                     ]"
                   >
-                    <td class="px-2 py-2 text-body-md font-bold text-on-white whitespace-nowrap">
+                    <td
+                      class="px-2 py-2 text-body-md font-bold text-on-white whitespace-nowrap"
+                    >
                       <div class="flex items-center gap-1.5">
-                        <span v-if="line._isNew" class="w-1.5 h-1.5 rounded-full bg-success shrink-0" />
+                        <span
+                          v-if="line._isNew"
+                          class="w-1.5 h-1.5 rounded-full bg-success shrink-0"
+                        />
                         <span>{{ line.product_id[1] }}</span>
                       </div>
                     </td>
                     <td class="px-2 py-2">
-                      <div class="flex items-center gap-1" v-if="!line._deleted">
+                      <div
+                        class="flex items-center gap-1"
+                        v-if="!line._deleted"
+                      >
                         <button
                           @click="subQty(line)"
                           class="w-7 h-7 flex items-center justify-center rounded-md border border-outline-variant hover:bg-white-highest transition-colors cursor-pointer text-on-white-variant"
@@ -860,11 +894,22 @@ const formatDate = (dateStr: string) => {
                           step="0.1"
                           class="w-16 h-7 px-1.5 pl-5 bg-white border border-outline-variant rounded-md text-body-md outline-none focus:border-primary tabular-nums"
                         />
-                        <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-on-white-variant">%</span>
+                        <span
+                          class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-on-white-variant"
+                          >%</span
+                        >
                       </div>
                     </td>
-                    <td class="px-2 py-2 text-body-md font-bold text-primary tabular-nums">
-                      {{ (line.price_unit * line.qty * (1 - line.discount / 100)).toFixed(2) }}
+                    <td
+                      class="px-2 py-2 text-body-md font-bold text-primary tabular-nums"
+                    >
+                      {{
+                        (
+                          line.price_unit *
+                          line.qty *
+                          (1 - line.discount / 100)
+                        ).toFixed(2)
+                      }}
                     </td>
                     <td class="px-2 py-2">
                       <button
@@ -898,11 +943,18 @@ const formatDate = (dateStr: string) => {
                   <Plus class="w-4 h-4" />
                   <span>إضافة منتج</span>
                 </div>
-                <span class="text-xs text-on-white-variant">{{ showProductSearch ? "إخفاء" : "إضافة" }}</span>
+                <span class="text-xs text-on-white-variant">{{
+                  showProductSearch ? "إخفاء" : "إضافة"
+                }}</span>
               </button>
-              <div v-if="showProductSearch" class="bg-white-low border border-outline-variant rounded-xl p-3 space-y-2">
+              <div
+                v-if="showProductSearch"
+                class="bg-white-low border border-outline-variant rounded-xl p-3 space-y-2"
+              >
                 <div class="relative">
-                  <Search class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-white-variant" />
+                  <Search
+                    class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-white-variant"
+                  />
                   <input
                     v-model="productSearchQuery"
                     @input="handleProductSearch(productSearchQuery)"
@@ -911,10 +963,16 @@ const formatDate = (dateStr: string) => {
                     class="w-full h-10 pr-10 bg-white border border-outline-variant rounded-lg px-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
                   />
                 </div>
-                <div v-if="productSearchLoading" class="text-center text-xs text-on-white-variant py-3">
+                <div
+                  v-if="productSearchLoading"
+                  class="text-center text-xs text-on-white-variant py-3"
+                >
                   جاري البحث...
                 </div>
-                <div v-else-if="productSearchResults.length > 0" class="max-h-48 overflow-y-auto space-y-1">
+                <div
+                  v-else-if="productSearchResults.length > 0"
+                  class="max-h-48 overflow-y-auto space-y-1"
+                >
                   <button
                     v-for="prod in productSearchResults"
                     :key="prod.id"
@@ -922,10 +980,15 @@ const formatDate = (dateStr: string) => {
                     class="w-full text-right px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary/5 text-on-white transition-colors cursor-pointer flex items-center justify-between"
                   >
                     <span>{{ prod.name }}</span>
-                    <span class="text-xs text-on-white-variant tabular-nums">{{ prod.list_price.toFixed(2) }} ج.م</span>
+                    <span class="text-xs text-on-white-variant tabular-nums"
+                      >{{ prod.list_price.toFixed(2) }} ج.م</span
+                    >
                   </button>
                 </div>
-                <div v-else-if="productSearchQuery && !productSearchLoading" class="text-center text-xs text-on-white-variant py-3">
+                <div
+                  v-else-if="productSearchQuery && !productSearchLoading"
+                  class="text-center text-xs text-on-white-variant py-3"
+                >
                   لا توجد نتائج
                 </div>
               </div>
@@ -941,7 +1004,9 @@ const formatDate = (dateStr: string) => {
             </h5>
 
             <!-- Discount Editor -->
-            <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
+            <div
+              class="bg-white border border-outline-variant rounded-xl overflow-hidden"
+            >
               <button
                 @click="showDiscountEditor = !showDiscountEditor"
                 class="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-on-white hover:bg-white-low transition-colors cursor-pointer"
@@ -951,10 +1016,19 @@ const formatDate = (dateStr: string) => {
                   <span>خصم على الفاتورة</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span v-if="orderDiscount > 0" class="text-xs text-error font-bold">
-                    {{ orderDiscountType === 'percent' ? `${orderDiscount}%` : `${orderDiscount} ج.م` }}
+                  <span
+                    v-if="orderDiscount > 0"
+                    class="text-xs text-error font-bold"
+                  >
+                    {{
+                      orderDiscountType === "percent"
+                        ? `${orderDiscount}%`
+                        : `${orderDiscount} ج.م`
+                    }}
                   </span>
-                  <span class="text-xs text-on-white-variant">{{ showDiscountEditor ? "إخفاء" : "تعديل" }}</span>
+                  <span class="text-xs text-on-white-variant">{{
+                    showDiscountEditor ? "إخفاء" : "تعديل"
+                  }}</span>
                 </div>
               </button>
               <div v-if="showDiscountEditor" class="px-4 pb-4 space-y-3">
@@ -991,18 +1065,25 @@ const formatDate = (dateStr: string) => {
                     :placeholder="orderDiscountType === 'fixed' ? '0.00' : '0'"
                     class="w-full h-10 bg-white border border-outline-variant rounded-lg px-3 text-sm focus:ring-2 focus:ring-error focus:outline-none tabular-nums"
                   />
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-white-variant">
+                  <span
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-white-variant"
+                  >
                     {{ orderDiscountType === "fixed" ? "ج.م" : "%" }}
                   </span>
                 </div>
-                <div v-if="editDiscountAmount > 0" class="text-left text-xs text-error font-bold">
+                <div
+                  v-if="editDiscountAmount > 0"
+                  class="text-left text-xs text-error font-bold"
+                >
                   قيمة الخصم: {{ editDiscountAmount.toFixed(2) }} ج.م
                 </div>
               </div>
             </div>
 
             <!-- Service Fee Editor -->
-            <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
+            <div
+              class="bg-white border border-outline-variant rounded-xl overflow-hidden"
+            >
               <button
                 @click="showServiceFeeEditor = !showServiceFeeEditor"
                 class="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-on-white hover:bg-white-low transition-colors cursor-pointer"
@@ -1012,10 +1093,19 @@ const formatDate = (dateStr: string) => {
                   <span>رسوم إضافية</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span v-if="serviceFee > 0" class="text-xs text-amber-600 font-bold">
-                    {{ serviceFeeType === 'percent' ? `${serviceFee}%` : `${serviceFee} ج.م` }}
+                  <span
+                    v-if="serviceFee > 0"
+                    class="text-xs text-amber-600 font-bold"
+                  >
+                    {{
+                      serviceFeeType === "percent"
+                        ? `${serviceFee}%`
+                        : `${serviceFee} ج.م`
+                    }}
                   </span>
-                  <span class="text-xs text-on-white-variant">{{ showServiceFeeEditor ? "إخفاء" : "تعديل" }}</span>
+                  <span class="text-xs text-on-white-variant">{{
+                    showServiceFeeEditor ? "إخفاء" : "تعديل"
+                  }}</span>
                 </div>
               </button>
               <div v-if="showServiceFeeEditor" class="px-4 pb-4 space-y-3">
@@ -1052,18 +1142,25 @@ const formatDate = (dateStr: string) => {
                     :placeholder="serviceFeeType === 'fixed' ? '0.00' : '0'"
                     class="w-full h-10 bg-white border border-outline-variant rounded-lg px-3 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none tabular-nums"
                   />
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-white-variant">
+                  <span
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-white-variant"
+                  >
                     {{ serviceFeeType === "fixed" ? "ج.م" : "%" }}
                   </span>
                 </div>
-                <div v-if="editServiceFeeAmount > 0" class="text-left text-xs text-amber-600 font-bold">
+                <div
+                  v-if="editServiceFeeAmount > 0"
+                  class="text-left text-xs text-amber-600 font-bold"
+                >
                   قيمة الرسوم: {{ editServiceFeeAmount.toFixed(2) }} ج.م
                 </div>
               </div>
             </div>
 
             <!-- Customer Editor -->
-            <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
+            <div
+              class="bg-white border border-outline-variant rounded-xl overflow-hidden"
+            >
               <button
                 @click="showCustomerEditor = !showCustomerEditor"
                 class="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-on-white hover:bg-white-low transition-colors cursor-pointer"
@@ -1073,8 +1170,12 @@ const formatDate = (dateStr: string) => {
                   <span>العميل</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="text-xs text-purple-600 font-medium">{{ editingCustomerName || "عميل نقدي" }}</span>
-                  <span class="text-xs text-on-white-variant">{{ showCustomerEditor ? "إخفاء" : "تعديل" }}</span>
+                  <span class="text-xs text-purple-600 font-medium">{{
+                    editingCustomerName || "عميل نقدي"
+                  }}</span>
+                  <span class="text-xs text-on-white-variant">{{
+                    showCustomerEditor ? "إخفاء" : "تعديل"
+                  }}</span>
                 </div>
               </button>
               <div v-if="showCustomerEditor" class="px-4 pb-4">
@@ -1086,7 +1187,10 @@ const formatDate = (dateStr: string) => {
                   />
                   <button
                     v-if="editingCustomerName"
-                    @click="editingCustomerName = ''; editingCustomerId = null"
+                    @click="
+                      editingCustomerName = '';
+                      editingCustomerId = null;
+                    "
                     class="shrink-0 px-3 h-10 bg-white-low text-on-white-variant rounded-lg hover:bg-outline-variant transition-colors text-xs font-bold cursor-pointer"
                   >
                     إلغاء
@@ -1099,7 +1203,9 @@ const formatDate = (dateStr: string) => {
             </div>
 
             <!-- Note Editor -->
-            <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
+            <div
+              class="bg-white border border-outline-variant rounded-xl overflow-hidden"
+            >
               <button
                 @click="showNoteEditor = !showNoteEditor"
                 class="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-on-white hover:bg-white-low transition-colors cursor-pointer"
@@ -1108,7 +1214,9 @@ const formatDate = (dateStr: string) => {
                   <MessageSquareText class="w-4 h-4 text-blue-500" />
                   <span>ملاحظات</span>
                 </div>
-                <span class="text-xs text-on-white-variant">{{ showNoteEditor ? "إخفاء" : "تعديل" }}</span>
+                <span class="text-xs text-on-white-variant">{{
+                  showNoteEditor ? "إخفاء" : "تعديل"
+                }}</span>
               </button>
               <div v-if="showNoteEditor" class="px-4 pb-4">
                 <textarea
@@ -1305,16 +1413,47 @@ const formatDate = (dateStr: string) => {
           <div class="flex justify-between text-body-md">
             <span class="text-on-white-variant">المجموع الفرعي</span>
             <span class="font-bold tabular-nums">
-              {{ editMode ? editSubtotal.toFixed(2) : totalFromLines.toFixed(2) }} ج.م
+              {{
+                editMode ? editSubtotal.toFixed(2) : totalFromLines.toFixed(2)
+              }}
+              ج.م
             </span>
           </div>
-          <div v-if="editMode && editDiscountAmount > 0" class="flex justify-between text-body-md text-error">
+          <div
+            v-if="editMode && editDiscountAmount > 0"
+            class="flex justify-between text-body-md text-error"
+          >
             <span>الخصم</span>
-            <span class="font-bold tabular-nums">-{{ editDiscountAmount.toFixed(2) }} ج.م</span>
+            <span class="font-bold tabular-nums"
+              >-{{ editDiscountAmount.toFixed(2) }} ج.م</span
+            >
           </div>
-          <div v-if="editMode && editServiceFeeAmount > 0" class="flex justify-between text-body-md text-amber-600">
+          <div
+            v-else-if="!editMode && (order.order_discount || 0) > 0"
+            class="flex justify-between text-body-md text-error"
+          >
+            <span>الخصم</span>
+            <span class="font-bold tabular-nums"
+              >-{{ Number(order.order_discount || 0).toFixed(2) }} ج.م</span
+            >
+          </div>
+          <div
+            v-if="editMode && editServiceFeeAmount > 0"
+            class="flex justify-between text-body-md text-amber-600"
+          >
             <span>رسوم إضافية</span>
-            <span class="font-bold tabular-nums">+{{ editServiceFeeAmount.toFixed(2) }} ج.م</span>
+            <span class="font-bold tabular-nums"
+              >+{{ editServiceFeeAmount.toFixed(2) }} ج.م</span
+            >
+          </div>
+          <div
+            v-else-if="!editMode && (order.service_fee || 0) > 0"
+            class="flex justify-between text-body-md text-amber-600"
+          >
+            <span>رسوم إضافية</span>
+            <span class="font-bold tabular-nums"
+              >+{{ Number(order.service_fee || 0).toFixed(2) }} ج.م</span
+            >
           </div>
           <div class="flex justify-between text-body-md">
             <span class="text-on-white-variant">الضريبة</span>
@@ -1327,7 +1466,12 @@ const formatDate = (dateStr: string) => {
           >
             <span>الإجمالي</span>
             <span class="tabular-nums">
-              {{ editMode ? editGrandTotal.toFixed(2) : Number(order.amount_total).toFixed(2) }} ج.م
+              {{
+                editMode
+                  ? editGrandTotal.toFixed(2)
+                  : Number(order.amount_total).toFixed(2)
+              }}
+              ج.م
             </span>
           </div>
           <div class="flex justify-between text-body-md">
@@ -1346,7 +1490,9 @@ const formatDate = (dateStr: string) => {
       </div>
 
       <!-- Footer -->
-      <div class="p-4 bg-white-high border-t border-outline-variant shrink-0 space-y-3">
+      <div
+        class="p-4 bg-white-high border-t border-outline-variant shrink-0 space-y-3"
+      >
         <template v-if="editMode">
           <div class="flex gap-3">
             <button

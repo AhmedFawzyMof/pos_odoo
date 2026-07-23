@@ -5,6 +5,10 @@ import {
   RefreshCw,
   AlertTriangle,
   Receipt,
+  Banknote,
+  User,
+  CreditCard,
+  Landmark,
 } from "@lucide/vue";
 import { usePosCartStore } from "~~/stores/pos-cart";
 import type { PaymentMethod, OrderResponse } from "~/types/pos";
@@ -20,8 +24,6 @@ const props = defineProps<{
   paymentMethods: PaymentMethod[];
   sessionId: number;
   configId: string;
-  preselectMethodId?: number | null;
-  autoExpandSection?: "discount" | "customer" | null;
 }>();
 
 const emit = defineEmits<{
@@ -35,12 +37,6 @@ const isSaving = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 const orderName = ref("");
-
-const orderNote = ref(cart.note);
-
-const localPaymentAllocations = ref<
-  { methodId: number; amount: number; received?: number }[]
->([]);
 
 const lastOrderItems = ref<
   {
@@ -59,37 +55,78 @@ const lastOrderCustomerName = ref("");
 const lastOrderCustomerPhone = ref("");
 const lastOrderCustomerAddress = ref("");
 
-const isFullyPaid = computed(
-  () => {
-    // If grandTotal is 0 or negative (100% discount), no payment needed
-    if (cart.grandTotal <= 0) return true;
-    // Otherwise require payments >= grandTotal and at least one payment
-    return (
-      localPaymentAllocations.value.reduce((s, p) => s + p.amount, 0) >=
-        cart.grandTotal &&
-      localPaymentAllocations.value.length > 0
-    );
-  },
+const allocations = ref<
+  { methodId: number; methodName: string; amount: number }[]
+>([]);
+const activeMethodId = ref<number | null>(null);
+const calculatorValue = ref("");
+const showCalculator = ref(false);
+
+const filteredMethods = computed(() => {
+  const names = ["نقدي", "حساب العميل", "بطاقة", "تحويل بنكي"];
+  const normalize = (s: string) =>
+    s.replace(/ة/g, "ه").replace(/[أإآ]/g, "ا").trim();
+  return names
+    .map((name) =>
+      props.paymentMethods.find((m) => normalize(m.name) === normalize(name)),
+    )
+    .filter(Boolean) as PaymentMethod[];
+});
+
+const totalPaid = computed(() =>
+  allocations.value.reduce((s, a) => s + a.amount, 0),
 );
+
+const balance = computed(() => cart.grandTotal - totalPaid.value);
+
+const balanceInfo = computed(() => {
+  if (allocations.value.length === 0) return null;
+  if (balance.value > 0.01) {
+    return {
+      text: `المطلوب من العميل: ${formatNumber(balance.value)} ج.م`,
+      class: "bg-red-50 text-red-600",
+    };
+  }
+  if (balance.value < -0.01) {
+    return {
+      text: `المتبقي للعميل: ${formatNumber(Math.abs(balance.value))} ج.م`,
+      class: "bg-emerald-50 text-emerald-600",
+    };
+  }
+  return {
+    text: "المبلغ كامل",
+    class: "bg-emerald-50 text-emerald-600",
+  };
+});
+
+const isFullyPaid = computed(
+  () =>
+    totalPaid.value >= cart.grandTotal - 0.01 &&
+    allocations.value.length > 0,
+);
+
+const methodIcons: Record<string, any> = {
+  نقدي: Banknote,
+  "حساب العميل": User,
+  بطاقه: CreditCard,
+  "تحويل بنكي": Landmark,
+};
+
+function getMethodIcon(method: PaymentMethod) {
+  return methodIcons[method.name] || CreditCard;
+}
 
 watch(
   () => props.open,
   (isOpen) => {
     if (!isOpen) return;
     fetchReceiptConfig();
-    orderNote.value = cart.note;
-    localPaymentAllocations.value = [];
-    if (props.preselectMethodId) {
-      const method = props.paymentMethods.find(
-        (m) => m.id === props.preselectMethodId,
-      );
-      if (method) {
-        localPaymentAllocations.value.push({
-          methodId: method.id,
-          amount: Math.max(0, cart.grandTotal),
-        });
-      }
-    }
+    allocations.value = [];
+    activeMethodId.value = null;
+    showCalculator.value = false;
+    calculatorValue.value = "";
+    errorMessage.value = "";
+    successMessage.value = "";
   },
 );
 
@@ -99,6 +136,97 @@ function closeModal() {
   successMessage.value = "";
   orderName.value = "";
   emit("update:open", false);
+}
+
+function selectMethod(methodId: number) {
+  if (activeMethodId.value === methodId) {
+    showCalculator.value = false;
+    activeMethodId.value = null;
+    return;
+  }
+  activeMethodId.value = methodId;
+  const existing = allocations.value.find((a) => a.methodId === methodId);
+  calculatorValue.value = existing ? String(existing.amount) : "";
+  showCalculator.value = true;
+}
+
+function editAllocation(methodId: number) {
+  selectMethod(methodId);
+}
+
+function removeAllocation(methodId: number) {
+  allocations.value = allocations.value.filter((a) => a.methodId !== methodId);
+  if (activeMethodId.value === methodId) {
+    showCalculator.value = false;
+    activeMethodId.value = null;
+  }
+}
+
+function pressDigit(d: string) {
+  const cur = calculatorValue.value;
+  if (cur === "0") {
+    calculatorValue.value = d;
+  } else {
+    calculatorValue.value += d;
+  }
+}
+
+function pressDecimal() {
+  if (!calculatorValue.value.includes(".")) {
+    calculatorValue.value += ".";
+  }
+}
+
+function pressBackspace() {
+  calculatorValue.value = calculatorValue.value.slice(0, -1) || "0";
+}
+
+function pressClear() {
+  calculatorValue.value = "0";
+}
+
+function confirmAmount() {
+  if (!activeMethodId.value) return;
+  const amount = Math.max(0, parseFloat(calculatorValue.value) || 0);
+  const method = filteredMethods.value.find(
+    (m) => m.id === activeMethodId.value,
+  );
+  if (!method) return;
+
+  const existing = allocations.value.find(
+    (a) => a.methodId === activeMethodId.value,
+  );
+  if (existing) {
+    existing.amount = amount;
+  } else {
+    allocations.value.push({
+      methodId: method.id,
+      methodName: method.name,
+      amount,
+    });
+  }
+  showCalculator.value = false;
+  activeMethodId.value = null;
+}
+
+function handleCalcPress(key: string) {
+  switch (key) {
+    case "⌫":
+      pressBackspace();
+      break;
+    case "C":
+      pressClear();
+      break;
+    case "تأكيد":
+      confirmAmount();
+      break;
+    case ".":
+      pressDecimal();
+      break;
+    default:
+      pressDigit(key);
+      break;
+  }
 }
 
 async function handleSubmit() {
@@ -115,15 +243,6 @@ async function handleSubmit() {
     return;
   }
 
-  // Check that all payment allocations have valid amounts (> 0) only if grandTotal > 0
-  if (cart.grandTotal > 0) {
-    const hasZeroAmountPayment = localPaymentAllocations.value.some((p) => p.amount <= 0);
-    if (hasZeroAmountPayment) {
-      errorMessage.value = "جميع طرق الدفع يجب أن يكون لها مبلغ أكبر من صفر";
-      return;
-    }
-  }
-
   if (!props.sessionId) {
     errorMessage.value = "رقم الجلسة غير متاح، يرجى فتح وردية أولاً";
     return;
@@ -131,26 +250,29 @@ async function handleSubmit() {
 
   isSaving.value = true;
 
-  // Filter out any 0-amount payments and validate total
-  const validPayments = localPaymentAllocations.value
-    .filter((p) => p.amount > 0)
-    .map((p) => {
-      const method = props.paymentMethods.find((m) => m.id === p.methodId);
-      return {
-        method_id: p.methodId,
-        method_name: method?.name || "",
-        amount: p.amount,
-      };
-    });
+  const validPayments = allocations.value
+    .filter((a) => a.amount > 0)
+    .map((a) => ({
+      method_id: a.methodId,
+      method_name: a.methodName,
+      amount: a.amount,
+    }));
 
-  const totalPaid = validPayments.reduce((s, p) => s + p.amount, 0);
-  if (totalPaid < cart.grandTotal - 0.01) {
+  const totalPaidVal = validPayments.reduce((s, p) => s + p.amount, 0);
+  if (totalPaidVal < cart.grandTotal - 0.01) {
     errorMessage.value = "مبلغ الدفع أقل من الإجمالي";
     isSaving.value = false;
     return;
   }
 
-  const payments = validPayments;
+  // if overpaid, cap last payment to match grandTotal exactly
+  let cappedPayments = validPayments;
+  if (totalPaidVal > cart.grandTotal + 0.01) {
+    const diff = totalPaidVal - cart.grandTotal;
+    cappedPayments = [...validPayments];
+    const last = cappedPayments[cappedPayments.length - 1];
+    last.amount = Math.max(0, +(last.amount - diff).toFixed(2));
+  }
 
   try {
     const res = await $fetch<OrderResponse>("/api/pos/order", {
@@ -164,8 +286,8 @@ async function handleSubmit() {
           discount: item.discount || 0,
           taxes_id: item.product.taxes?.map((t) => t.id) || [],
         })),
-        payments,
-        note: orderNote.value,
+        payments: cappedPayments,
+        note: cart.note,
         order_discount: cart.orderDiscount,
         order_discount_type: cart.orderDiscountType,
         service_fee: cart.serviceFee,
@@ -189,7 +311,7 @@ async function handleSubmit() {
         price: item.price,
         discount: item.discount || 0,
       }));
-      lastOrderPayments.value = payments.map((p) => ({
+      lastOrderPayments.value = cappedPayments.map((p) => ({
         methodName: p.method_name,
         amount: p.amount,
       }));
@@ -242,7 +364,6 @@ async function handlePrintReceipt() {
     lastOrderGrandTotal: lastOrderGrandTotal.value,
   });
 }
-
 </script>
 
 <template>
@@ -259,131 +380,276 @@ async function handlePrintReceipt() {
       class="fixed inset-0 z-50 bg-white flex flex-col font-sans text-slate-800"
       dir="rtl"
     >
-        <!-- Header -->
-        <div
-          class="p-6 pb-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between shrink-0"
-        >
-          <div class="flex items-center gap-3">
-            <div class="bg-primary/10 p-2 rounded-lg">
-              <Receipt class="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-slate-900">إتمام الطلب</h3>
-              <p class="text-xs text-slate-500">
-                {{ cart.itemCount }} منتج - الإجمالي
-                {{ formatNumber(cart.grandTotal) }}
-                ج.م
-              </p>
-            </div>
+      <!-- Header -->
+      <div
+        class="p-6 pb-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between shrink-0"
+      >
+        <div class="flex items-center gap-3">
+          <div class="bg-primary/10 p-2 rounded-lg">
+            <Receipt class="w-6 h-6 text-primary" />
           </div>
-          <button
-            @click="closeModal"
-            class="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400 hover:text-slate-600"
-          >
-            <X class="w-6 h-6" />
-          </button>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">إتمام الطلب</h3>
+            <p class="text-xs text-slate-500">
+              {{ cart.itemCount }} منتج - الإجمالي
+              {{ formatNumber(cart.grandTotal) }}
+              ج.م
+            </p>
+          </div>
+        </div>
+        <button
+          @click="closeModal"
+          class="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+        >
+          <X class="w-6 h-6" />
+        </button>
+      </div>
+
+      <div
+        class="flex-1 overflow-y-auto p-6 space-y-5 text-right max-w-7xl mx-auto w-full"
+      >
+        <!-- Error -->
+        <div
+          v-if="errorMessage"
+          class="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-semibold flex items-center gap-2"
+        >
+          <AlertTriangle class="w-4 h-4 shrink-0" />
+          {{ errorMessage }}
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 space-y-5 text-right max-w-7xl mx-auto w-full">
-          <!-- Error -->
-          <div
-            v-if="errorMessage"
-            class="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-semibold flex items-center gap-2"
-          >
-            <AlertTriangle class="w-4 h-4 shrink-0" />
-            {{ errorMessage }}
-          </div>
+        <!-- Success -->
+        <PosPaymentSuccess
+          v-if="successMessage"
+          :order-name="orderName"
+          :items="lastOrderItems"
+          :payments="lastOrderPayments"
+          :subtotal="lastOrderSubtotal"
+          :discount-amount="lastOrderDiscount"
+          :service-fee-amount="lastOrderServiceFee"
+          :grand-total="lastOrderGrandTotal"
+          :customer-name="lastOrderCustomerName"
+          :customer-phone="lastOrderCustomerPhone"
+          :customer-address="lastOrderCustomerAddress"
+          :receipt-config="receiptConfig"
+        />
 
-          <!-- Success -->
-          <PosPaymentSuccess
-            v-if="successMessage"
-            :order-name="orderName"
-            :items="lastOrderItems"
-            :payments="lastOrderPayments"
-            :subtotal="lastOrderSubtotal"
-            :discount-amount="lastOrderDiscount"
-            :service-fee-amount="lastOrderServiceFee"
-            :grand-total="lastOrderGrandTotal"
-            :customer-name="lastOrderCustomerName"
-            :customer-phone="lastOrderCustomerPhone"
-            :customer-address="lastOrderCustomerAddress"
-            :receipt-config="receiptConfig"
-          />
-
+        <template v-if="!successMessage">
           <!-- Order Summary -->
           <PosPaymentOrderSummary
-            v-if="!successMessage"
             :subtotal="cart.subtotal"
             :discount-amount="cart.discountAmount"
             :service-fee-amount="cart.serviceFeeAmount"
             :grand-total="cart.grandTotal"
           />
 
-          <!-- Order Actions -->
-          <template v-if="!successMessage">
-            <div class="space-y-3">
-              <PosPaymentDiscount :auto-expand="autoExpandSection === 'discount'" />
-              <PosPaymentServiceFee />
-              <PosPaymentCustomer :auto-expand="autoExpandSection === 'customer'" />
-              <PosPaymentNote v-model:note="orderNote" />
+          <!-- Service Fee -->
+          <PosPaymentServiceFee />
+
+          <!-- Payment Methods -->
+          <div class="space-y-4">
+            <h4 class="text-sm font-bold text-slate-700">طرق الدفع</h4>
+
+            <!-- 4 method buttons -->
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                v-for="method in filteredMethods"
+                :key="method.id"
+                @click="selectMethod(method.id)"
+                :class="[
+                  'flex flex-col items-center gap-2 p-5 rounded-2xl border-2 transition-all cursor-pointer',
+                  activeMethodId === method.id
+                    ? 'border-primary bg-primary/5'
+                    : allocations.some((a) => a.methodId === method.id)
+                      ? 'border-emerald-400 bg-emerald-50'
+                      : 'border-slate-200 hover:border-primary/40 hover:bg-slate-50',
+                ]"
+              >
+                <component
+                  :is="getMethodIcon(method)"
+                  class="w-7 h-7"
+                  :class="
+                    allocations.some((a) => a.methodId === method.id)
+                      ? 'text-emerald-600'
+                      : 'text-slate-600'
+                  "
+                />
+                <span
+                  class="text-sm font-bold"
+                  :class="
+                    allocations.some((a) => a.methodId === method.id)
+                      ? 'text-emerald-700'
+                      : 'text-slate-700'
+                  "
+                  >{{ method.name }}</span
+                >
+              </button>
             </div>
 
-            <!-- Payment Methods -->
-            <PosPaymentMethods
-              v-model:allocations="localPaymentAllocations"
-              :payment-methods="paymentMethods"
-              :grand-total="cart.grandTotal"
-            />
+            <!-- Calculator -->
+            <div
+              v-if="showCalculator"
+              class="bg-slate-50 rounded-2xl p-4 space-y-3"
+            >
+              <div
+                class="text-left text-3xl font-bold tabular-nums text-slate-900 bg-white rounded-xl px-4 py-3 border border-slate-200"
+                dir="ltr"
+              >
+                {{ calculatorValue || "0" }}
+              </div>
+              <div class="grid grid-cols-4 gap-2">
+                <button
+                  v-for="key in ['7', '8', '9', '⌫']"
+                  :key="key"
+                  @click="handleCalcPress(key)"
+                  class="h-13 rounded-xl font-bold text-base cursor-pointer transition-colors bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95"
+                  :class="key === '⌫' ? 'text-amber-600' : ''"
+                >
+                  {{ key }}
+                </button>
+                <button
+                  v-for="key in ['4', '5', '6', 'C']"
+                  :key="key"
+                  @click="handleCalcPress(key)"
+                  class="h-13 rounded-xl font-bold text-base cursor-pointer transition-colors bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95"
+                  :class="key === 'C' ? 'text-red-500' : ''"
+                >
+                  {{ key }}
+                </button>
+                <button
+                  v-for="key in ['1', '2', '3', 'تأكيد']"
+                  :key="key"
+                  @click="handleCalcPress(key)"
+                  class="h-13 rounded-xl font-bold text-base cursor-pointer transition-colors active:scale-95"
+                  :class="
+                    key === 'تأكيد'
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-700'
+                  "
+                >
+                  {{ key }}
+                </button>
+                <button
+                  @click="handleCalcPress('0')"
+                  class="h-13 rounded-xl font-bold text-base cursor-pointer bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95"
+                >
+                  0
+                </button>
+                <button
+                  @click="handleCalcPress('00')"
+                  class="h-13 rounded-xl font-bold text-base cursor-pointer bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95"
+                >
+                  00
+                </button>
+                <button
+                  @click="handleCalcPress('.')"
+                  class="h-13 rounded-xl font-bold text-base cursor-pointer bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 active:scale-95"
+                >
+                  .
+                </button>
+                <div />
+              </div>
+            </div>
+
+            <!-- Allocations list -->
+            <div v-if="allocations.length > 0" class="space-y-2">
+              <div
+                v-for="alloc in allocations"
+                :key="alloc.methodId"
+                class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl"
+              >
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="removeAllocation(alloc.methodId)"
+                    class="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                    title="إزالة"
+                  >
+                    <X class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="editAllocation(alloc.methodId)"
+                    class="text-xs text-blue-500 hover:text-blue-700 transition-colors font-bold cursor-pointer"
+                  >
+                    تعديل
+                  </button>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold tabular-nums text-slate-900">
+                    {{ formatNumber(alloc.amount) }} ج.م
+                  </span>
+                  <component
+                    :is="
+                      getMethodIcon(
+                        filteredMethods.find((m) => m.id === alloc.methodId)!,
+                      )
+                    "
+                    class="w-4 h-4 text-slate-500"
+                  />
+                  <span class="text-sm text-slate-600">{{
+                    alloc.methodName
+                  }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Balance -->
+            <div
+              v-if="balanceInfo"
+              class="text-center font-bold p-3 rounded-xl text-sm"
+              :class="balanceInfo.class"
+            >
+              {{ balanceInfo.text }}
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Footer -->
+      <div
+        class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0"
+      >
+        <div v-if="!successMessage" class="text-xs text-slate-400">
+          {{ allocations.length }} وسيلة دفع
+        </div>
+        <div v-else />
+
+        <div class="flex items-center gap-3">
+          <template v-if="!successMessage">
+            <button
+              type="button"
+              @click="closeModal"
+              class="h-11 px-5 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-lg text-xs cursor-pointer"
+            >
+              إلغاء
+            </button>
+            <button
+              type="button"
+              @click="handleSubmit"
+              :disabled="isSaving || !isFullyPaid"
+              class="h-11 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-2 disabled:opacity-40 cursor-pointer"
+            >
+              <RefreshCw v-if="isSaving" class="w-4 h-4 animate-spin" />
+              <span>{{ isSaving ? "جاري..." : "تأكيد الدفع" }}</span>
+            </button>
+          </template>
+          <template v-else>
+            <button
+              type="button"
+              @click="handlePrintReceipt"
+              class="h-11 px-5 bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-700 font-bold rounded-lg text-xs transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Receipt class="w-4 h-4" />
+              طباعة
+            </button>
+            <button
+              type="button"
+              @click="closeCompleted"
+              class="h-11 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all cursor-pointer"
+            >
+              تم
+            </button>
           </template>
         </div>
-
-        <!-- Footer -->
-        <div
-          class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0"
-        >
-          <div v-if="!successMessage" class="text-xs text-slate-400">
-            {{ localPaymentAllocations.length }} وسيلة دفع
-          </div>
-          <div v-else />
-
-          <div class="flex items-center gap-3">
-            <template v-if="!successMessage">
-              <button
-                type="button"
-                @click="closeModal"
-                class="h-11 px-5 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-lg text-xs cursor-pointer"
-              >
-                إلغاء
-              </button>
-              <button
-                type="button"
-                @click="handleSubmit"
-                :disabled="isSaving || !isFullyPaid"
-                class="h-11 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-2 disabled:opacity-40 cursor-pointer"
-              >
-                <RefreshCw v-if="isSaving" class="w-4 h-4 animate-spin" />
-                <span>{{ isSaving ? "جاري..." : "تأكيد الدفع" }}</span>
-              </button>
-            </template>
-            <template v-else>
-              <button
-                type="button"
-                @click="handlePrintReceipt"
-                class="h-11 px-5 bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-700 font-bold rounded-lg text-xs transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Receipt class="w-4 h-4" />
-                طباعة
-              </button>
-              <button
-                type="button"
-                @click="closeCompleted"
-                class="h-11 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all cursor-pointer"
-              >
-                تم
-              </button>
-            </template>
-          </div>
-        </div>
+      </div>
     </div>
   </Transition>
 </template>

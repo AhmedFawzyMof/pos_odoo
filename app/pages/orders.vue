@@ -475,6 +475,8 @@ const statusIcons: Record<string, any> = {
                   <th class="px-6 py-4 font-bold text-label-md">الوقت</th>
                   <th class="px-6 py-4 font-bold text-label-md">العميل</th>
                   <th class="px-6 py-4 font-bold text-label-md">الإجمالي</th>
+                  <th class="px-6 py-4 font-bold text-label-md">الخصم</th>
+                  <th class="px-6 py-4 font-bold text-label-md">رسوم الخدمة</th>
                   <th class="px-6 py-4 font-bold text-label-md">المدفوع</th>
                   <th class="px-6 py-4 font-bold text-label-md">الحالة</th>
                   <th class="px-6 py-4 font-bold text-label-md">الوردية</th>
@@ -514,6 +516,14 @@ const statusIcons: Record<string, any> = {
                   </td>
                   <td class="px-6 py-5 font-bold text-primary">
                     {{ Number(order.amount_total).toLocaleString("en-US") }}
+                    ج.م
+                  </td>
+                  <td class="px-6 py-5 font-bold text-red-500">
+                    {{ Number(order.amount_discount || order.order_discount || 0).toLocaleString("en-US") }}
+                    ج.م
+                  </td>
+                  <td class="px-6 py-5 font-bold text-amber-600">
+                    {{ Number(order.service_fee || 0).toLocaleString("en-US") }}
                     ج.م
                   </td>
                   <td class="px-6 py-5 font-bold"
@@ -585,7 +595,7 @@ const statusIcons: Record<string, any> = {
                 <!-- Empty State -->
                 <tr v-if="ordersList.length === 0 && status !== 'pending'">
                   <td
-                    colspan="8"
+                    colspan="10"
                     class="p-16 text-center text-on-white-variant"
                   >
                     <AlertCircle
@@ -600,7 +610,7 @@ const statusIcons: Record<string, any> = {
 
                 <!-- Loading rows -->
                 <tr v-if="status === 'pending' && ordersList.length > 0">
-                  <td colspan="8" class="p-8 text-center">
+                  <td colspan="10" class="p-8 text-center">
                     <LoaderCircle
                       class="w-6 h-6 animate-spin inline-block text-primary"
                     />

@@ -12,6 +12,7 @@ import {
   Wallet,
   LogOut,
   Scale,
+  Printer,
 } from "@lucide/vue";
 import PosSearchBar from "~/components/pos/PosSearchBar.vue";
 import PosCategoryFilter from "~/components/pos/PosCategoryFilter.vue";
@@ -20,17 +21,23 @@ import PosCartPanel from "~/components/pos/PosCartPanel.vue";
 import PosProductDetailSheet from "~/components/pos/PosProductDetailSheet.vue";
 import PosVaultModal from "~/components/pos/PosVaultModal.vue";
 import PosPaymentSheet from "~/components/pos/PosPaymentSheet.vue";
+import PosPaymentDiscount from "~/components/pos/PosPaymentDiscount.vue";
+import PosPaymentCustomer from "~/components/pos/PosPaymentCustomer.vue";
+import PosPaymentSuccess from "~/components/pos/PosPaymentSuccess.vue";
 import PosCloseSessionModal from "~/components/pos/PosCloseSessionModal.vue";
 import PosHotkeyHelp from "~/components/pos/PosHotkeyHelp.vue";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { usePosCartStore } from "~~/stores/pos-cart";
 import { usePosHotkeys } from "~/composables/usePosHotkeys";
+import { useReceiptPrint } from "~/composables/useReceiptPrint";
+import PosSessionMonitor from "~/components/pos/PosSessionMonitor.vue";
 import type {
   POSProduct,
   POSProductVariant,
   POSCategory,
   PaymentMethod,
+  OrderResponse,
 } from "~/types/pos";
 import { usePermissions } from "~/composables/usePermissions";
 
@@ -91,8 +98,37 @@ const showProductsDrawer = ref(false);
 const showVaultModal = ref(false);
 const showCloseSessionModal = ref(false);
 const showPaymentSheet = ref(false);
-const hotkeyPreselectMethodId = ref<number | null>(null);
-const hotkeyAutoExpandSection = ref<"discount" | "customer" | null>(null);
+const showDiscountDialog = ref(false);
+const showNotesDialog = ref(false);
+const showCustomersDialog = ref(false);
+const showPaymentSuccess = ref(false);
+const isProcessingPayment = ref(false);
+
+interface LastOrderData {
+  orderName: string;
+  items: { product: { name: string }; quantity: number; price: number; discount: number }[];
+  payments: { methodName: string; amount: number }[];
+  subtotal: number;
+  discountAmount: number;
+  serviceFeeAmount: number;
+  grandTotal: number;
+  customerName: string;
+  customerPhone: string;
+  customerAddress: string;
+}
+
+const lastOrderData = ref<LastOrderData>({
+  orderName: "",
+  items: [],
+  payments: [],
+  subtotal: 0,
+  discountAmount: 0,
+  serviceFeeAmount: 0,
+  grandTotal: 0,
+  customerName: "",
+  customerPhone: "",
+  customerAddress: "",
+});
 
 const showToast = ref(false);
 const toastMessage = ref("");
@@ -110,13 +146,6 @@ function showFeedbackToast(
   }, 3000);
 }
 
-watch(showPaymentSheet, (open) => {
-  if (!open) {
-    hotkeyPreselectMethodId.value = null;
-    hotkeyAutoExpandSection.value = null;
-  }
-});
-
 const allProducts = ref<POSProduct[]>([]);
 const categories = ref<POSCategory[]>([]);
 const paymentMethods = ref<PaymentMethod[]>([]);
@@ -133,11 +162,12 @@ const { selectedCartIndex } = usePosHotkeys({
   sessionId,
   showPaymentSheet,
   showCloseSessionModal,
-  preselectMethodId: hotkeyPreselectMethodId,
-  autoExpandSection: hotkeyAutoExpandSection,
-  onCheckout: handleCheckout,
+  onCashPayment: handleCashPayment,
+  onShowDiscount: handleShowDiscount,
   onToggleWeight: handleWeightToggle,
 });
+
+const { receiptConfig, fetchReceiptConfig, printReceipt } = useReceiptPrint();
 
 const hasMore = computed(() => currentPage.value < totalPages.value);
 
@@ -185,7 +215,9 @@ async function loadMasterData(page = 1) {
       if (page === 1 && res.categories) {
         categories.value = res.categories;
       }
-      if (res.paymentMethods) paymentMethods.value = res.paymentMethods;
+      if (res.paymentMethods) {
+        paymentMethods.value = res.paymentMethods;
+      }
       if (res.locations) locations.value = res.locations;
       if (res.allowOutOfStockSale !== undefined) {
         allowOutOfStockSale.value = res.allowOutOfStockSale;
@@ -361,9 +393,7 @@ function handleAddToCart(
   variant?: POSProductVariant,
   qty?: number,
 ) {
-  const quantity =
-    qty ??
-    (variant ? (variant.to_weight ? 0.01 : 1) : product.to_weight ? 0.01 : 1);
+  const quantity = qty ?? 1;
   console.log("[POS] handleAddToCart", product, quantity);
   cart.addItem(product, variant, quantity);
 }
@@ -376,9 +406,132 @@ function handleAddToCartFromDetail(
   showProductDetail.value = false;
 }
 
-function handleCheckout() {
-  if (cart.items.length === 0) return;
+function handleShowDiscount() {
+  showDiscountDialog.value = true;
+}
+
+function handleShowPaymentMethods() {
   showPaymentSheet.value = true;
+}
+
+function handleShowNotes() {
+  showNotesDialog.value = true;
+}
+
+function handleOpenClients() {
+  showCustomersDialog.value = true;
+}
+
+async function handleCashPayment() {
+  if (cart.items.length === 0) return;
+  if (!sessionId.value) {
+    showFeedbackToast("يجب فتح وردية أولاً", "error");
+    return;
+  }
+  if (!cart.selectedLocationId) {
+    showFeedbackToast("يجب تحديد موقع التخزين", "error");
+    return;
+  }
+
+  const cashMethod = paymentMethods.value.find((m) => m.is_cash_count);
+  if (!cashMethod) {
+    showFeedbackToast("طريقة الدفع نقدي غير متوفرة", "error");
+    return;
+  }
+
+  isProcessingPayment.value = true;
+
+  try {
+    const res = await $fetch<OrderResponse>("/api/pos/order", {
+      method: "POST",
+      body: {
+        session_id: sessionId.value,
+        items: cart.items.map((item) => ({
+          product_id: item.variant?.id || item.product.id,
+          quantity: item.quantity,
+          price: item.price,
+          discount: item.discount || 0,
+          taxes_id: item.product.taxes?.map((t) => t.id) || [],
+        })),
+        payments: [
+          {
+            method_id: cashMethod.id,
+            method_name: cashMethod.name,
+            amount: cart.grandTotal,
+          },
+        ],
+        note: cart.note,
+        order_discount: cart.orderDiscount,
+        order_discount_type: cart.orderDiscountType,
+        service_fee: cart.serviceFee,
+        service_fee_type: cart.serviceFeeType,
+        customer_id: cart.customerId,
+        location_id: cart.selectedLocationId,
+        amount_tax: cart.totalTax,
+      },
+    });
+
+    if (res.success) {
+      lastOrderData.value = {
+        orderName: res.name,
+        items: cart.items.map((item) => ({
+          product: {
+            name: item.variant
+              ? `${item.product.display_name || item.product.name} (${item.variant.attribute_values?.map((v) => v.value_name).join("/") || item.variant.display_name})`
+              : item.product.display_name || item.product.name,
+          },
+          quantity: item.quantity,
+          price: item.price,
+          discount: item.discount || 0,
+        })),
+        payments: [
+          { methodName: cashMethod.name, amount: cart.grandTotal },
+        ],
+        subtotal: cart.subtotal,
+        discountAmount: cart.discountAmount,
+        serviceFeeAmount: cart.serviceFeeAmount,
+        grandTotal: cart.grandTotal,
+        customerName: cart.customerName,
+        customerPhone: cart.customerPhone,
+        customerAddress: cart.customerAddress,
+      };
+      cart.clearCart();
+      await fetchReceiptConfig();
+      showPaymentSuccess.value = true;
+      await nextTick();
+      await printReceipt({
+        orderName: lastOrderData.value.orderName,
+        lastOrderItems: lastOrderData.value.items,
+        lastOrderPayments: lastOrderData.value.payments,
+        lastOrderSubtotal: lastOrderData.value.subtotal,
+        lastOrderDiscount: lastOrderData.value.discountAmount,
+        lastOrderServiceFee: lastOrderData.value.serviceFeeAmount,
+        lastOrderGrandTotal: lastOrderData.value.grandTotal,
+        lastOrderCustomerName: lastOrderData.value.customerName,
+        lastOrderCustomerPhone: lastOrderData.value.customerPhone,
+        lastOrderCustomerAddress: lastOrderData.value.customerAddress,
+      });
+    }
+  } catch (error: any) {
+    showFeedbackToast(
+      error.statusMessage || "فشل إنشاء الطلب",
+      "error",
+    );
+  } finally {
+    isProcessingPayment.value = false;
+  }
+}
+
+async function handlePrintReceipt() {
+  await printReceipt({
+    orderName: lastOrderData.value.orderName,
+    lastOrderItems: lastOrderData.value.items,
+    lastOrderPayments: lastOrderData.value.payments,
+    lastOrderSubtotal: lastOrderData.value.subtotal,
+    lastOrderDiscount: lastOrderData.value.discountAmount,
+    lastOrderServiceFee: lastOrderData.value.serviceFeeAmount,
+    lastOrderGrandTotal: lastOrderData.value.grandTotal,
+  });
 }
 
 function handleOrderCompleted() {
@@ -394,6 +547,16 @@ function handleSessionClosed() {
   showCloseSessionModal.value = false;
   cart.clearCart();
   router.push(configId.value ? `/pos?config_id=${configId.value}` : "/pos");
+}
+
+function handleSessionExpired() {
+  if (!sessionId.value) return;
+  sessionId.value = null;
+  showPaymentSuccess.value = false;
+  showVaultModal.value = false;
+  showCloseSessionModal.value = false;
+  cart.clearCart();
+  showFeedbackToast("انتهت صلاحية الوردية، يرجى فتح وردية جديدة", "error");
 }
 
 watch(
@@ -431,6 +594,11 @@ watch(
     class="flex gap-0 overflow-hidden -m-6 h-[calc(100vh-4rem)] relative"
   >
     <PosHotkeyHelp />
+    <PosSessionMonitor
+      :config-id="configId"
+      :session-id="sessionId"
+      @session-expired="handleSessionExpired"
+    />
     <!-- Desktop left panel: search + categories + products (hidden on mobile) -->
     <div class="hidden lg:flex flex-1 flex-col min-w-0">
       <div
@@ -627,7 +795,13 @@ watch(
       <PosCartPanel
         :bordered="false"
         :selected-index="selectedCartIndex"
-        @checkout="handleCheckout"
+        :has-session="!!sessionId"
+        :processing="isProcessingPayment"
+        @pay-cash="handleCashPayment"
+        @show-payment-methods="handleShowPaymentMethods"
+        @show-notes="handleShowNotes"
+        @show-discount="handleShowDiscount"
+        @open-clients="handleOpenClients"
         @select-item="(i) => (selectedCartIndex = i)"
       />
 
@@ -767,16 +941,144 @@ watch(
       "
     />
 
-    <PosPaymentSheet
-      v-if="sessionId"
-      v-model:open="showPaymentSheet"
-      :payment-methods="paymentMethods"
-      :session-id="sessionId"
-      :config-id="configId"
-      :preselect-method-id="hotkeyPreselectMethodId"
-      :auto-expand-section="hotkeyAutoExpandSection"
-      @order-completed="handleOrderCompleted"
-    />
+    <!-- Discount Dialog -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <div
+          v-if="showDiscountDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center"
+        >
+          <div
+            class="fixed inset-0 bg-black/50"
+            @click="showDiscountDialog = false"
+          />
+          <div class="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 text-right">
+            <PosPaymentDiscount />
+            
+            <Button class="w-full mt-4 cursor-pointer" @click="showDiscountDialog = false">
+              تم
+            </Button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Notes Dialog -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <div
+          v-if="showNotesDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center"
+        >
+          <div
+            class="fixed inset-0 bg-black/50"
+            @click="showNotesDialog = false"
+          />
+          <div class="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 text-right">
+            <h3 class="text-base font-bold text-on-white mb-3">ملاحظات على الفاتورة</h3>
+            <textarea
+              v-model="cart.note"
+              rows="4"
+              placeholder="أضف ملاحظات..."
+              class="w-full bg-white border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none resize-none"
+            />
+            <Button class="w-full mt-4 cursor-pointer" @click="showNotesDialog = false">
+              تم
+            </Button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Customers Dialog -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <div
+          v-if="showCustomersDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center"
+        >
+          <div
+            class="fixed inset-0 bg-black/50"
+            @click="showCustomersDialog = false"
+          />
+          <div class="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 text-right">
+            <h3 class="text-base font-bold text-on-white mb-3">اختيار العميل</h3>
+            <PosPaymentCustomer auto-expand />
+            <Button class="w-full mt-4 cursor-pointer" @click="showCustomersDialog = false">
+              تم
+            </Button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Payment Success Screen -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <div
+          v-if="showPaymentSuccess"
+          class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white"
+          dir="rtl"
+        >
+          <div class="overflow-y-auto max-h-[80vh] p-6">
+            <PosPaymentSuccess
+              :order-name="lastOrderData.orderName"
+              :items="lastOrderData.items"
+              :payments="lastOrderData.payments"
+              :subtotal="lastOrderData.subtotal"
+              :discount-amount="lastOrderData.discountAmount"
+              :service-fee-amount="lastOrderData.serviceFeeAmount"
+              :grand-total="lastOrderData.grandTotal"
+              :customer-name="lastOrderData.customerName"
+              :customer-phone="lastOrderData.customerPhone"
+              :customer-address="lastOrderData.customerAddress"
+              :receipt-config="receiptConfig"
+            />
+          </div>
+          <div class="flex gap-3 p-4">
+            <Button
+              variant="outline"
+              class="gap-2 cursor-pointer"
+              @click="handlePrintReceipt"
+            >
+              <Printer class="w-4 h-4" />
+              طباعة
+            </Button>
+            <Button class="gap-2 cursor-pointer" @click="showPaymentSuccess = false">
+              تم
+            </Button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <PosVaultModal
       v-if="sessionId"
@@ -790,6 +1092,15 @@ watch(
       :session-id="sessionId"
       :config-id="configId"
       @session-closed="handleSessionClosed"
+    />
+
+    <PosPaymentSheet
+      v-if="sessionId"
+      v-model:open="showPaymentSheet"
+      :payment-methods="paymentMethods"
+      :session-id="sessionId"
+      :config-id="configId"
+      @order-completed="handleOrderCompleted"
     />
   </div>
   <div v-else class="flex items-center justify-center h-[calc(100vh-8rem)]">

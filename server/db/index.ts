@@ -113,10 +113,7 @@ function initSchema(database: Database.Database) {
     seedRoles(database)
   }
 
-  const typesCount = database.prepare('SELECT COUNT(*) as count FROM notification_types').get() as any
-  if (typesCount.count === 0) {
-    seedNotificationTypes(database)
-  }
+  seedNotificationTypes(database)
 }
 
 function seedRoles(database: Database.Database) {
@@ -141,9 +138,9 @@ function seedRoles(database: Database.Database) {
   tx()
 }
 
-function seedNotificationTypes(database: Database.Database) {
-  const insert = database.prepare(`
-    INSERT INTO notification_types (category, trigger_event, title, title_ar, description_ar, priority, audience)
+  function seedNotificationTypes(database: Database.Database) {
+    const insert = database.prepare(`
+    INSERT OR IGNORE INTO notification_types (category, trigger_event, title, title_ar, description_ar, priority, audience)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `)
   const types: [string, string, string, string, string, string, string][] = [
@@ -154,6 +151,7 @@ function seedNotificationTypes(database: Database.Database) {
     ['POS / Sales', 'cash_shortage', 'Cash Shortage / Overage Detected', 'عجز/زيادة في النقدية', 'Shift closed with a cash shortage or overage', 'high', 'Store Manager, Owner'],
     ['Accounting', 'credit_limit_reached', 'Supplier Credit Limit Reached', 'حد الائتمان للمورد تم الوصول إليه', 'Supplier has reached their credit limit', 'medium', 'Accountant'],
     ['Accounting', 'tax_reminder', 'Tax/VAT Payout Reminder', 'تذكير دفع الضرائب', 'Tax/VAT payout is due (e.g., end of month)', 'medium', 'Admin, Accountant'],
+    ['POS / Sales', 'callcenter_new_order', 'New Callcenter Order', 'طلب مركز اتصال جديد', 'A new order was created from the callcenter and needs attention', 'high', 'POS User, POS Manager, Admin'],
   ]
   const tx = database.transaction(() => {
     for (const [category, trigger, title, titleAr, desc, priority, audience] of types) {

@@ -11,6 +11,7 @@ import { usePermissions } from "~/composables/usePermissions";
 
 const route = useRoute();
 const { canViewPage } = usePermissions();
+const router = useRouter();
 
 if (import.meta.client) {
   if (!canViewPage(route.path)) {
@@ -21,7 +22,9 @@ if (import.meta.client) {
 const POS_CONFIG_KEY = "pos_config_id";
 const POS_NAME_KEY = "pos_config_name";
 
-const router = useRouter();
+const dbSwitchError = computed(() => {
+  return route.query.err === "no_config" ? "نظام نقاط البيع غير مكون لهذه القاعدة. الرجاء اختيار جهاز كاشير" : ""
+})
 
 let fetchRequestId = 0;
 
@@ -165,6 +168,15 @@ onMounted(loadFromStorage);
 
 <template>
   <div class="min-h-[calc(100vh-8rem)] p-6 max-w-6xl mx-auto space-y-6">
+    <Transition name="fade">
+      <div
+        v-if="dbSwitchError"
+        class="flex items-start gap-3 rounded-lg bg-destructive/10 p-4 text-sm text-destructive border border-destructive/20 mb-4"
+      >
+        <AlertCircle class="h-5 w-5 shrink-0" />
+        <p class="flex-1 leading-relaxed">{{ dbSwitchError }}</p>
+      </div>
+    </Transition>
     <Transition name="fade">
       <div
         v-if="error"

@@ -18,6 +18,7 @@ const { hasPermission } = usePermissions();
 const { currentDb, availableDatabases } = useDb();
 
 function switchDb(name: string) {
+  sessionStorage.setItem("_db_switch", "1");
   document.cookie = `odoo_db=${name}; path=/; max-age=${60 * 60 * 24 * 365}`;
   window.location.reload();
 }

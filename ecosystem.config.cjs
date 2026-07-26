@@ -16,6 +16,8 @@ module.exports = {
         NUXT_SESSION_MAX_AGE: 604800,
         ADMIN_ODOO_USER: "ziad@gmail.com",
         ADMIN_ODOO_PASS: "842002",
+        NODE_TLS_REJECT_UNAUTHORIZED: "0",
+        CALLCENTER_WEBHOOK_SECRET: "cc-wh-secret-dev-2024",
       },
     },
   ],

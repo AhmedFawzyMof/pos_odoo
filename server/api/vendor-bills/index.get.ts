@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     supplier_id: (query.supplier_id as string) || "",
   };
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'account_invoice')
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("vendor.bill.api", "get_vendor_bills", [[paramsPayload]]),

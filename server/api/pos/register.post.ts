@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_user')
 
   // --- CLEAN FIX HERE ---

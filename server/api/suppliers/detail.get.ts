@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "معرف المورد مطلوب" });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'purchase_user')
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("res.partner", "get_supplier_detail", [[supplierId]]),

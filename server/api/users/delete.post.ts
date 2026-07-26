@@ -5,7 +5,7 @@ import { tryCatch } from '~~/server/utils/tryCatch'
 import { getDb } from '~~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient()
+  const odoo = await getAdminOdooClient(event)
   await requirePermission(event, 'settings_access_rights')
 
   const body = await readBody(event)
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Mark as inactive in local SQLite
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
   db.prepare('UPDATE users SET active = 0, updated_at = datetime(\'now\') WHERE odoo_user_id = ?').run(Number(body.id))
 
   return { success: true, message: 'User deactivated' }

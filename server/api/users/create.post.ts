@@ -5,7 +5,7 @@ import { tryCatch } from '~~/server/utils/tryCatch'
 import { getDb } from '~~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient()
+  const odoo = await getAdminOdooClient(event)
   const session = await getUserSession(event)
   await requirePermission(event, 'settings_access_rights')
 
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Save to local SQLite
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
   const info = db.prepare(
     'INSERT INTO users (odoo_user_id, name, login, active) VALUES (?, ?, ?, ?)'
   ).run(Number(newId), body.name, body.login.trim(), body.active !== false ? 1 : 0)

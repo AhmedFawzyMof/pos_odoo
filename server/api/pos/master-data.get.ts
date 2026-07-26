@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
 
   const [rpcErr, rpcResult] = await tryCatch(
     odoo.execute_kw("pos.config", "get_pos_master_data_rpc", [

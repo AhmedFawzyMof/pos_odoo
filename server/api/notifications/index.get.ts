@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   const unreadOnly = (query.unread as string) === "true"
   const category = (query.category as string) || ""
 
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
 
   let where = "WHERE 1=1"
   const params: any[] = []

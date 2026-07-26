@@ -5,7 +5,7 @@ import { tryCatch } from '~~/server/utils/tryCatch'
 import { getDb } from '~~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient()
+  const odoo = await getAdminOdooClient(event)
   await requirePermission(event, 'settings_access_rights')
 
   const query = getQuery(event)
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   delete user.groups_id
 
   // Refresh Odoo groups cache in SQLite
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
   const localUser = db.prepare('SELECT id FROM users WHERE odoo_user_id = ?').get(Number(userId)) as any
   if (localUser && !groupErr && groups) {
     db.prepare('DELETE FROM user_odoo_groups WHERE user_id = ?').run(localUser.id)

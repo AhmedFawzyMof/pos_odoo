@@ -43,6 +43,8 @@ const statusFilter = ref("");
 const sessionSearch = ref("");
 const debouncedSearchQuery = ref("");
 const debouncedSessionSearch = ref("");
+const sourceFilter = ref("");
+const debouncedSource = ref("");
 const todayDateStr = new Date().toISOString().slice(0, 10);
 const dateFrom = ref(todayDateStr);
 const dateTo = ref(todayDateStr);
@@ -66,6 +68,11 @@ watch(sessionSearch, (val) => {
     debouncedSessionSearch.value = val;
     currentPage.value = 1;
   }, 400);
+});
+
+watch(sourceFilter, (val) => {
+  debouncedSource.value = val;
+  currentPage.value = 1;
 });
 
 let dateFromTimeout: ReturnType<typeof setTimeout>;
@@ -112,6 +119,7 @@ const {
     session_id: debouncedSessionSearch,
     date_from: debouncedDateFrom,
     date_to: debouncedDateTo,
+    source: debouncedSource,
   },
   watch: [
     currentPage,
@@ -120,6 +128,7 @@ const {
     debouncedSessionSearch,
     debouncedDateFrom,
     debouncedDateTo,
+    debouncedSource,
   ],
   transform: (response) => {
     if (!response.data) response.data = [];
@@ -452,6 +461,14 @@ const statusIcons: Record<string, any> = {
                   type="text"
                 />
               </div>
+              <select
+                v-model="sourceFilter"
+                class="bg-white text-on-white border border-outline-variant rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+              >
+                <option value="">جميع الطلبات</option>
+                <option value="pos">نقطة بيع</option>
+                <option value="callcenter">مركز الاتصال</option>
+              </select>
               <button
                 @click="refresh()"
                 class="bg-white-high text-on-white-variant p-2.5 rounded-xl hover:bg-outline-variant transition-colors cursor-pointer"
@@ -480,6 +497,7 @@ const statusIcons: Record<string, any> = {
                   <th class="px-6 py-4 font-bold text-label-md">المدفوع</th>
                   <th class="px-6 py-4 font-bold text-label-md">الحالة</th>
                   <th class="px-6 py-4 font-bold text-label-md">الوردية</th>
+                  <th class="px-6 py-4 font-bold text-label-md">المصدر</th>
                   <th class="px-6 py-4 font-bold text-label-md">الإجراءات</th>
                 </tr>
               </thead>
@@ -550,6 +568,16 @@ const statusIcons: Record<string, any> = {
                   </td>
                   <td class="px-6 py-5 text-on-white-variant">
                     {{ order.session_id?.[1] || "—" }}
+                  </td>
+                  <td class="px-6 py-5">
+                    <div
+                      class="flex items-center gap-1.5 px-3 py-1 rounded-full w-fit text-[12px] font-bold"
+                      :class="order.source === 'callcenter'
+                        ? 'bg-purple-100 text-purple-700'
+                        : 'bg-blue-100 text-blue-700'"
+                    >
+                      <span>{{ order.source === 'callcenter' ? 'مركز الاتصال' : 'نقطة بيع' }}</span>
+                    </div>
                   </td>
                   <td class="px-6 py-5" @click.stop>
                     <div class="flex items-center gap-2">

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'purchase_user')
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("purchase.order.api", "get_purchase_order_detail", [

@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   // Pass the user's active company to Odoo for proper data isolation
   const session = await requireUserSession(event);
   const companyId = (session as any)?.currentCompanyId;
-  const odoo = await getAdminOdooClient(companyId || undefined);
+  const odoo = await getAdminOdooClient(event, companyId || undefined);
   await requirePermission(event, 'pos_user')
 
   const [rpcErr, data] = await tryCatch(

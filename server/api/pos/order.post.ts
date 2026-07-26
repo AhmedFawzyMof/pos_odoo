@@ -3,6 +3,11 @@ import { getAdminOdooClient } from "~~/server/utils/odooClient";
 import { tryCatch } from "~~/server/utils/tryCatch";
 import { requirePermission } from '~~/server/utils/permissions'
 
+const POS_WEBHOOK_URLS: Record<string, string> = {
+  eldokanh_one: process.env.POS_WEBHOOK_URL_eldokanh_one || 'https://pos.eldokanh.com',
+  eldokanh_two: process.env.POS_WEBHOOK_URL_eldokanh_two || 'https://postwo.eldokanh.com',
+}
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const sessionId = Number(body?.session_id) || null;
@@ -13,7 +18,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_user')
 
   const sanitizedPayload = {
@@ -36,6 +41,7 @@ export default defineEventHandler(async (event) => {
     note: body.note || "",
     amount_tax: Number(body.amount_tax) || 0,
     target_location_id: body.location_id ? Number(body.location_id) : false,
+    source: "callcenter",
   };
 
   const positionalParams = [sessionId, sanitizedPayload];
@@ -58,10 +64,51 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const orderId = rpcResult.order_id
+  const orderName = rpcResult.order_name || rpcResult.name || ""
+
+  await tryCatch(sendWebhook(event, orderId, orderName))
+
   return {
     success: true,
-    order_id: rpcResult.order_id,
-    name: rpcResult.name || "",
+    order_id: orderId,
+    name: orderName,
     message: rpcResult.message || "Order registered successfully.",
   };
 });
+
+async function sendWebhook(event: any, orderId: number, orderName: string) {
+  const dbName = event.context.odooDb || process.env.DEFAULT_DB
+  const baseUrl = process.env.POS_WEBHOOK_URL || POS_WEBHOOK_URLS[dbName] || 'https://localhost:3000'
+  const secret = process.env.CALLCENTER_WEBHOOK_SECRET
+
+  if (!secret) {
+    console.log(`[webhook] CALLCENTER_WEBHOOK_SECRET not set, skipping`)
+    return
+  }
+
+  const url = `${baseUrl}/api/notifications/callcenter-webhook`
+  console.log(`[webhook] sending to ${url} for order ${orderName} (db=${dbName})`)
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-webhook-secret': secret,
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        order_name: orderName,
+        message: `Order ${orderName} created by callcenter`,
+      }),
+    })
+    console.log(`[webhook] response ${res.status} ${res.statusText}`)
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      console.log(`[webhook] body: ${text}`)
+    }
+  } catch (err: any) {
+    console.log(`[webhook] fetch failed: ${err.message}`)
+  }
+}

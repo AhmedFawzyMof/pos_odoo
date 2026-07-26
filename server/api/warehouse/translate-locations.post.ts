@@ -38,9 +38,9 @@ function translateName(name: string): string | null {
 
 export default defineEventHandler(async (event) => {
   try {
-    const db = getDb();
+    const db = getDb(event.context.odooDb);
 
-    const odoo = await getAdminOdooClient();
+    const odoo = await getAdminOdooClient(event);
 
     const [err, rawLocations] = await tryCatch(
       odoo.execute_kw("stock.location", "search_read", [

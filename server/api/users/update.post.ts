@@ -18,7 +18,7 @@ const MANAGED_ODOO_GROUP_NAMES = [
 ]
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient()
+  const odoo = await getAdminOdooClient(event)
   const session = await getUserSession(event)
   await requirePermission(event, 'settings_access_rights')
 
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Update local SQLite
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
   const localUser = db.prepare('SELECT id FROM users WHERE odoo_user_id = ?').get(Number(body.id)) as any
 
   if (localUser) {

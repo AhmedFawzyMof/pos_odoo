@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_manager')
 
   await odoo.execute_kw("pos.category", "unlink", [[body.id]]);

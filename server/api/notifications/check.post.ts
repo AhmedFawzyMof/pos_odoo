@@ -7,8 +7,8 @@ import { tryCatch } from "../../utils/tryCatch"
 export default defineEventHandler(async (event) => {
   await requirePermission(event, "settings_access_rights")
 
-  const db = getDb()
-  const odoo = await getAdminOdooClient()
+  const db = getDb(event.context.odooDb)
+  const odoo = await getAdminOdooClient(event)
 
   const types = db.prepare("SELECT * FROM notification_types WHERE is_active = 1").all() as any[]
 

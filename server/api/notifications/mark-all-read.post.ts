@@ -5,7 +5,7 @@ import { requirePermission } from "../../utils/permissions"
 export default defineEventHandler(async (event) => {
   await requirePermission(event, "settings_access_rights")
 
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
   const result = db.prepare("UPDATE notifications SET is_read = 1 WHERE is_read = 0").run()
 
   return { success: true, updated: result.changes }

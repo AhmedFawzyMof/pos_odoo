@@ -6,7 +6,7 @@ import { requirePermission } from '~~/server/utils/permissions'
 export default defineEventHandler(async (event) => {
   await requirePermission(event, 'pos_user')
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
 
   const [err, sessions] = await tryCatch(
     odoo.execute_kw("pos.session", "search_read", [

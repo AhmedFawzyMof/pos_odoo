@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     type: (query.type as string) || "الكل",
   };
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_user')
 
   const [rpcErr, result] = await tryCatch(

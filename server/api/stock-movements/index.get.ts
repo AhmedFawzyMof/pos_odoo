@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     productId: (query.productId as string) || "",
   };
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'stock_user')
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("stock.move.line", "get_frontend_ledger", [

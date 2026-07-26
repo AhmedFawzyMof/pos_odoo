@@ -4,7 +4,7 @@ import { requirePermission } from '~~/server/utils/permissions'
 import { tryCatch } from '~~/server/utils/tryCatch'
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient()
+  const odoo = await getAdminOdooClient(event)
   await requirePermission(event, 'settings_access_rights')
 
   const [groupErr, groups] = await tryCatch(

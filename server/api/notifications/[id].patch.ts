@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "is_read field is required (boolean or number)" })
   }
 
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
   const result = db.prepare("UPDATE notifications SET is_read = ? WHERE id = ?").run(isRead ? 1 : 0, id)
 
   if (result.changes === 0) {

@@ -4,7 +4,7 @@ import { tryCatch } from "~~/server/utils/tryCatch";
 import { requireAnyPermission } from '~~/server/utils/permissions'
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requireAnyPermission(event, ['account_invoice', 'account_manager'])
   const body = await readBody(event);
   if (!body?.bill_id || !body?.status) {

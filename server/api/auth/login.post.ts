@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  const client = connectToOdoo(body.username, body.password);
+  const client = connectToOdoo(body.username, body.password, undefined, event.context.odooDb);
 
   const [err, uid] = await tryCatch(client.connect());
 
@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
   const primaryCompanyId = userDetailsList[0].company_id[0];
 
   // Sync user to local SQLite
-  const db = getDb();
+  const db = getDb(event.context.odooDb);
   let localUser = db.prepare('SELECT * FROM users WHERE odoo_user_id = ?').get(Number(uid)) as any;
 
   if (!localUser) {

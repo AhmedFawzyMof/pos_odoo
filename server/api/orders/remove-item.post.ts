@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requireAnyPermission(event, ['pos_manager', 'settings_access_rights'])
 
   const [rpcErr, result] = await tryCatch(

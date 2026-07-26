@@ -2,36 +2,51 @@ import Database from 'better-sqlite3'
 import path from 'path'
 import fs from 'fs'
 
-let db: Database.Database | null = null
+const dbs = new Map<string, Database.Database>()
 
-export function getDb(): Database.Database {
-  if (db) return db
+function sanitizeDbName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9_-]/g, '_')
+}
 
-  const dbPath = process.env.DB_PATH || path.join(process.cwd(), 'pos-app.db')
+export function getDb(odooDbName?: string): Database.Database {
+  const key = odooDbName || 'default'
+  if (dbs.has(key)) return dbs.get(key)!
+
+  const fileName = key === 'default'
+    ? 'pos-app.db'
+    : `pos-app-${sanitizeDbName(key)}.db`
+
+  const dbPath = process.env.DB_PATH
+    ? path.join(path.dirname(process.env.DB_PATH), fileName)
+    : path.join(process.cwd(), fileName)
+
   const dir = path.dirname(dbPath)
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true })
   }
 
-  db = new Database(dbPath)
-  db.pragma('journal_mode = WAL')
-  db.pragma('foreign_keys = ON')
+  const database = new Database(dbPath)
+  database.pragma('journal_mode = WAL')
+  database.pragma('foreign_keys = ON')
 
-  const integrity = db.pragma('integrity_check', { simple: true }) as string
+  const integrity = database.pragma('integrity_check', { simple: true }) as string
   if (integrity !== 'ok') {
-    console.warn('Database corruption detected, recreating database...')
-    db.close()
-    db = null
+    console.warn(`Database corruption detected for ${key}, recreating...`)
+    database.close()
     fs.unlinkSync(dbPath)
     try { fs.unlinkSync(dbPath + '-wal') } catch {}
     try { fs.unlinkSync(dbPath + '-shm') } catch {}
-    db = new Database(dbPath)
-    db.pragma('journal_mode = WAL')
-    db.pragma('foreign_keys = ON')
+    const newDb = new Database(dbPath)
+    newDb.pragma('journal_mode = WAL')
+    newDb.pragma('foreign_keys = ON')
+    initSchema(newDb)
+    dbs.set(key, newDb)
+    return newDb
   }
 
-  initSchema(db)
-  return db
+  initSchema(database)
+  dbs.set(key, database)
+  return database
 }
 
 function initSchema(database: Database.Database) {
@@ -164,8 +179,8 @@ function seedNotificationTypes(database: Database.Database) {
 }
 
 export function closeDb() {
-  if (db) {
-    db.close()
-    db = null
+  for (const [key, database] of dbs) {
+    database.close()
   }
+  dbs.clear()
 }

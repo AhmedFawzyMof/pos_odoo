@@ -10,25 +10,32 @@ import { Menu, LogOut, ChevronDown } from "@lucide/vue";
 import { groupedNav } from "~/lib/navlinks";
 import type { NavGroup } from "~/lib/navlinks";
 import { usePermissions } from "~/composables/usePermissions";
+import { useDb } from "~/composables/useDb";
 
 const route = useRoute();
 const { logout, user, username } = useAuth();
 const { hasPermission } = usePermissions();
+const { currentDb, availableDatabases } = useDb();
+
+function switchDb(name: string) {
+  document.cookie = `odoo_db=${name}; path=/; max-age=${60 * 60 * 24 * 365}`;
+  window.location.reload();
+}
 
 function canSeeLink(link: { requiredPermission?: string }): boolean {
-  if (!link.requiredPermission) return true
-  return hasPermission(link.requiredPermission)
+  if (!link.requiredPermission) return true;
+  return hasPermission(link.requiredPermission);
 }
 
 const filteredNav = computed(() =>
   groupedNav.filter((entry) => {
     if ("children" in entry) {
-      const visibleChildren = entry.children.filter(canSeeLink)
-      return visibleChildren.length > 0
+      const visibleChildren = entry.children.filter(canSeeLink);
+      return visibleChildren.length > 0;
     }
-    return canSeeLink(entry)
+    return canSeeLink(entry);
   }),
-)
+);
 
 const expanded = ref<Record<string, boolean>>(
   Object.fromEntries(
@@ -99,10 +106,37 @@ const isGroupActive = (group: NavGroup) =>
         </div>
       </div>
 
+      <!-- Database Selector -->
+      <div class="px-4 pt-4 pb-2 border-b border-border">
+        <label class="text-xs text-muted-foreground block mb-1.5 pr-1"
+          >قاعدة البيانات</label
+        >
+        <select
+          :value="currentDb"
+          @change="switchDb(($event.target as HTMLSelectElement).value)"
+          class="w-full px-3 py-2 rounded-xl text-sm bg-muted/60 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer appearance-none"
+        >
+          <option
+            v-for="db in availableDatabases"
+            :key="db"
+            :value="db"
+            :selected="db === currentDb"
+          >
+            <span class="text-foreground" v-if="db === 'eldokanh_one'">
+              الفرع الثاني
+            </span>
+            <span class="text-foreground" v-else>الفرع الرئيسي</span>
+          </option>
+        </select>
+      </div>
+
       <!-- Navigation Links -->
       <div class="flex-1 overflow-y-auto px-4 py-6">
         <nav class="space-y-1">
-          <template v-for="entry in filteredNav" :key="'children' in entry ? entry.name : entry.path">
+          <template
+            v-for="entry in filteredNav"
+            :key="'children' in entry ? entry.name : entry.path"
+          >
             <!-- Group -->
             <div v-if="'children' in entry" class="space-y-0.5">
               <button
@@ -111,10 +145,7 @@ const isGroupActive = (group: NavGroup) =>
                 @click="toggleGroup(entry.name)"
               >
                 <span class="w-5 h-5 flex items-center justify-center shrink-0">
-                  <component
-                    :is="entry.icon"
-                    class="w-5 h-5"
-                  />
+                  <component :is="entry.icon" class="w-5 h-5" />
                 </span>
                 <span class="flex-1 text-right">{{ entry.name }}</span>
                 <ChevronDown
@@ -138,7 +169,9 @@ const isGroupActive = (group: NavGroup) =>
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted/80',
                       ]"
                     >
-                      <span class="w-5 h-5 flex items-center justify-center shrink-0">
+                      <span
+                        class="w-5 h-5 flex items-center justify-center shrink-0"
+                      >
                         <component
                           :is="child.icon"
                           class="w-4 h-4 transition-transform duration-200 group-hover:scale-110"

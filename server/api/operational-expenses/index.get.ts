@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     state: (query.state as string) || "",
   };
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'purchase_user')
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("operational.expense.api", "get_operational_expenses", [[paramsPayload]]),

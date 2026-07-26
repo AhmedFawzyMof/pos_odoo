@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const categoryId = query.categoryId ? parseInt(query.categoryId as string, 10) : null;
   const negativeStock = query.negativeStock === "true";
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_user')
 
   const baseDomain: any[] = [["id", "not in", [1, 2, 3]]];

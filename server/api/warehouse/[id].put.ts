@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "معرف الموقع مطلوب" });
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'stock_manager');
 
   const vals: Record<string, any> = {};

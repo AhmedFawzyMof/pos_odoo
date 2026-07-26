@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await requireUserSession(event);
   const companyId = (session as any)?.currentCompanyId;
-  const odoo = await getAdminOdooClient(companyId || undefined);
+  const odoo = await getAdminOdooClient(event, companyId || undefined);
   await requirePermission(event, 'pos_user')
 
   const [rpcErr, rpcResult] = await tryCatch(

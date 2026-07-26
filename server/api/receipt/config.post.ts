@@ -5,7 +5,7 @@ import { requirePermission } from '~~/server/utils/permissions'
 import { getDb } from "~~/server/db";
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_manager')
 
   const session = await getUserSession(event);
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event);
 
-  const db = getDb();
+  const db = getDb(event.context.odooDb);
   db.prepare(
     `INSERT OR REPLACE INTO receipt_configs (company_id, config, updated_at) VALUES (?, ?, datetime('now'))`
   ).run(companyId, JSON.stringify(body));

@@ -16,8 +16,9 @@ export default defineEventHandler(async (event) => {
   const sessionSearch = (query.session_id as string) || "";
   const dateFrom = (query.date_from as string) || "";
   const dateTo = (query.date_to as string) || "";
+  const source = (query.source as string) || "";
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_user')
 
   const [rpcErr, result] = await tryCatch(
@@ -31,6 +32,7 @@ export default defineEventHandler(async (event) => {
         session_id: sessionSearch || false,
         date_from: dateFrom || false,
         date_to: dateTo || false,
+        source: source || false,
       },
     ]),
   );

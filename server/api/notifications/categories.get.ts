@@ -4,7 +4,7 @@ import { requirePermission } from "../../utils/permissions"
 
 export default defineEventHandler(async (event) => {
   await requirePermission(event, "settings_access_rights")
-  const db = getDb()
+  const db = getDb(event.context.odooDb)
   const rows = db.prepare("SELECT DISTINCT category FROM notifications ORDER BY category").all() as { category: string }[]
   return rows.map((r) => r.category)
 })

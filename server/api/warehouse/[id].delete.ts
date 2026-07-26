@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   await requirePermission(event, "stock_manager");
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
 
   const [err, result] = await tryCatch(
     odoo.execute_kw("warehouse.location.api", "delete_location", [[Number(id)]]),

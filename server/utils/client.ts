@@ -4,10 +4,11 @@ export const connectToOdoo = (
   username: string,
   password: string,
   companyId?: number,
+  db?: string,
 ) => {
   const odoo = new Odoo({
     baseUrl: process.env.DEFAULT_URL!,
-    db: process.env.DEFAULT_DB!,
+    db: db || process.env.DEFAULT_DB!,
     username,
     password,
   });

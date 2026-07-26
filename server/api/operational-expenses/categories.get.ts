@@ -4,7 +4,7 @@ import { tryCatch } from "~~/server/utils/tryCatch";
 import { requirePermission } from '~~/server/utils/permissions'
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'purchase_user')
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("operational.expense.api", "get_expense_categories", [[]]),

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     return { success: true, stockMap: {} };
   }
 
-  const odoo = await getAdminOdooClient();
+  const odoo = await getAdminOdooClient(event);
   await requirePermission(event, 'pos_user')
 
   const [templates, locations] = await Promise.all([

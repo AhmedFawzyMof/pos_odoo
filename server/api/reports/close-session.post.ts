@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await requireUserSession(event);
   const companyId = (session as any)?.currentCompanyId;
-  const odoo = await getAdminOdooClient(companyId || undefined);
+  const odoo = await getAdminOdooClient(event, companyId || undefined);
   const [rpcErr, result] = await tryCatch(
     odoo.execute_kw("pos.reports.api", "get_report_data", [
       ["close_session", null, null, { session_id: sessionId }],

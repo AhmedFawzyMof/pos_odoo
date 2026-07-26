@@ -253,6 +253,9 @@ async function printOrder(order: POSOrder) {
       ),
       lastOrderServiceFee: order.service_fee || 0,
       lastOrderGrandTotal: order.amount_total,
+      lastOrderCustomerName: data.order.partner_id?.[1] || "",
+      lastOrderCustomerPhone: data.order.partner_phone || "",
+      lastOrderCustomerAddress: data.order.partner_address || "",
     });
   } catch {
     // Silently fail

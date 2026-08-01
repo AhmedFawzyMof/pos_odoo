@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
         ? [[6, 0, body.pos_categ_ids.map(Number)]]
         : [],
       barcode: body.barcode || false,
-      type: ["consu", "service"].includes(body.type) ? body.type : "consu",
+      type: ["consu", "service", "combo"].includes(body.type) ? body.type : "consu",
       list_price: isNaN(Number(body.list_price))
         ? 0.0
         : Number(body.list_price),
@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
       taxes_id: body.taxes_id?.length
         ? [[6, 0, body.taxes_id.map(Number)]]
         : [[5, 0, 0]],
-      is_storable: true,
+      is_storable: isEditMode ? undefined : true,
     };
 
     if (body.image_1920 !== undefined) {

@@ -4,10 +4,20 @@ async function odooWrite(
   ids: number[],
   values: object,
 ): Promise<boolean> {
-  return await odoo.execute_kw(model, "write", [[ids, values], {}]);
+  try {
+    return await odoo.execute_kw(model, "write", [[ids, values], {}]);
+  } catch (e: any) {
+    const safe = { ...values };
+    delete safe.image_1920;
+    console.error(
+      "[odooWrite] FAILED",
+      JSON.stringify({ model, ids, values: safe, fault: e.faultString || e.message }),
+    );
+    throw e;
+  }
 }
-import { requirePermission } from '~~/server/utils/permissions'
-import { tryCatch } from '~~/server/utils/tryCatch'
+import { requirePermission } from "~~/server/utils/permissions";
+import { tryCatch } from "~~/server/utils/tryCatch";
 
 async function safeSearchRead(
   odoo: any,
@@ -24,10 +34,11 @@ async function safeSearchRead(
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const odoo = await getAdminOdooClient();
-  await requirePermission(event, 'pos_manager')
+  await requirePermission(event, "pos_manager");
 
   try {
     const isEditMode = !!body.id;
+    console.log("[products/save] isEditMode:", isEditMode, "id:", body.id, "name:", body.name);
 
     // ── Barcode uniqueness check ────────────────────────────────────────
     const submittedBarcode = body.barcode?.trim();
@@ -42,6 +53,9 @@ export default defineEventHandler(async (event) => {
       );
       if (!barcodeErr && barcodeResults?.length > 0) {
         if (!isEditMode) {
+          console.log(
+            `Barcode "${submittedBarcode}" already exists for another product.`,
+          );
           throw createError({
             statusCode: 400,
             statusMessage: `الباركود "${submittedBarcode}" مستخدم بالفعل لمنتج آخر`,
@@ -50,9 +64,14 @@ export default defineEventHandler(async (event) => {
         // In edit mode, only reject if the barcode belongs to a different template
         const currentTemplateId = body.id;
         const isOwn = barcodeResults.some(
-          (r: any) => Number(r.product_tmpl_id?.[0] || r.product_tmpl_id) === currentTemplateId,
+          (r: any) =>
+            Number(r.product_tmpl_id?.[0] || r.product_tmpl_id) ===
+            currentTemplateId,
         );
         if (!isOwn) {
+          console.log(
+            `Barcode "${submittedBarcode}" already exists for another product.`,
+          );
           throw createError({
             statusCode: 400,
             statusMessage: `الباركود "${submittedBarcode}" مستخدم بالفعل لمنتج آخر`,
@@ -67,7 +86,9 @@ export default defineEventHandler(async (event) => {
         ? [[6, 0, body.pos_categ_ids.map(Number)]]
         : [],
       barcode: body.barcode || false,
-      type: ["consu", "service", "combo"].includes(body.type) ? body.type : "consu",
+      type: ["consu", "service", "combo"].includes(body.type)
+        ? body.type
+        : "consu",
       list_price: isNaN(Number(body.list_price))
         ? 0.0
         : Number(body.list_price),
@@ -84,8 +105,10 @@ export default defineEventHandler(async (event) => {
       taxes_id: body.taxes_id?.length
         ? [[6, 0, body.taxes_id.map(Number)]]
         : [[5, 0, 0]],
-      is_storable: isEditMode ? undefined : true,
     };
+    if (!isEditMode) {
+      productValues.is_storable = true;
+    }
 
     if (body.image_1920 !== undefined) {
       if (body.image_1920) {
@@ -135,7 +158,10 @@ export default defineEventHandler(async (event) => {
 
     // Propagate standard_price to all product variants so the cost change
     // persists when read back (all.get.ts computes cost from variant records).
-    if (body.standard_price !== undefined && !isNaN(Number(body.standard_price))) {
+    if (
+      body.standard_price !== undefined &&
+      !isNaN(Number(body.standard_price))
+    ) {
       const variantRecords = await safeSearchRead(
         odoo,
         "product.product",
@@ -201,19 +227,15 @@ export default defineEventHandler(async (event) => {
               { value_ids: [[6, 0, valueIds]] },
             );
           } else {
-            await odoo.execute_kw(
-              "product.template.attribute.line",
-              "create",
+            await odoo.execute_kw("product.template.attribute.line", "create", [
               [
-                [
-                  {
-                    product_tmpl_id: templateId,
-                    attribute_id: targetAttrId,
-                    value_ids: [[6, 0, valueIds]],
-                  },
-                ],
+                {
+                  product_tmpl_id: templateId,
+                  attribute_id: targetAttrId,
+                  value_ids: [[6, 0, valueIds]],
+                },
               ],
-            );
+            ]);
           }
         }
 
@@ -246,7 +268,8 @@ export default defineEventHandler(async (event) => {
 
         for (const variantData of generatedVariants) {
           const vid = variantData.id;
-          const ptavIds = variantData.product_template_attribute_value_ids || [];
+          const ptavIds =
+            variantData.product_template_attribute_value_ids || [];
           const ptavNames = ptavIds
             .map((id: number) => ptavMap[id]?.name || "")
             .filter(Boolean);
@@ -258,8 +281,7 @@ export default defineEventHandler(async (event) => {
           } else {
             matched = body.variants.find(
               (v: any) =>
-                v.name_suffix &&
-                ptavNames.includes(v.name_suffix.trim()),
+                v.name_suffix && ptavNames.includes(v.name_suffix.trim()),
             );
           }
 
@@ -271,10 +293,7 @@ export default defineEventHandler(async (event) => {
             });
           }
 
-          if (
-            matched.price_extra !== undefined &&
-            ptavIds.length > 0
-          ) {
+          if (matched.price_extra !== undefined && ptavIds.length > 0) {
             await odooWrite(
               odoo,
               "product.template.attribute.value",
@@ -285,12 +304,7 @@ export default defineEventHandler(async (event) => {
 
           if (matched.location_qty?.length) {
             for (const lq of matched.location_qty) {
-              await updateOdooStock(
-                odoo,
-                vid,
-                Number(lq.qty),
-                lq.location_id,
-              );
+              await updateOdooStock(odoo, vid, Number(lq.qty), lq.location_id);
             }
           }
         }
@@ -303,7 +317,12 @@ export default defineEventHandler(async (event) => {
 
       if (finalProductId && body.location_qty?.length) {
         for (const lq of body.location_qty) {
-          await updateOdooStock(odoo, finalProductId, Number(lq.qty), lq.location_id);
+          await updateOdooStock(
+            odoo,
+            finalProductId,
+            Number(lq.qty),
+            lq.location_id,
+          );
         }
       }
     }
@@ -319,6 +338,7 @@ export default defineEventHandler(async (event) => {
       err.statusMessage ||
       err.message ||
       "فشل في حفظ المنتج.";
+    console.error("Product save error:", message, err);
     throw createError({
       statusCode: 400,
       statusMessage: message,

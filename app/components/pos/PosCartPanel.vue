@@ -8,12 +8,14 @@ import {
   CreditCard,
   MessageSquareText,
   Users,
+  Truck,
 } from "@lucide/vue";
 import Skeleton from "@/components/ui/skeleton/Skeleton.vue";
 import { Button } from "@/components/ui/button";
 import PosCartItem from "./PosCartItem.vue";
 import { usePosCartStore } from "~~/stores/pos-cart";
 import { useNumberFormat } from "~/composables/useNumberFormat";
+import { useDb } from "~/composables/useDb";
 
 const props = withDefaults(
   defineProps<{
@@ -38,12 +40,21 @@ const emit = defineEmits<{
   showNotes: [];
   showDiscount: [];
   openClients: [];
+  showDelivery: [];
   selectItem: [index: number];
 }>();
 
 const cart = usePosCartStore();
 
 const { formatNumber } = useNumberFormat();
+
+const db = useDb();
+
+function switchDb(name: string) {
+  sessionStorage.setItem("_db_switch", "1");
+  document.cookie = `odoo_db=${name}; path=/; max-age=${60 * 60 * 24 * 365}`;
+  window.location.reload();
+}
 
 const isEmpty = computed(() => cart.items.length === 0);
 
@@ -92,6 +103,19 @@ watch(
             <Users class="w-5 h-5" />
             <span class="font-bold text-sm">العملاء</span>
           </Button>
+          <select
+            :value="db.currentDb.value"
+            @change="switchDb(($event.target as HTMLSelectElement).value)"
+            class="text-xs bg-transparent border border-outline-variant/30 rounded-lg px-2 py-1 text-muted-foreground cursor-pointer focus:outline-none"
+          >
+            <option
+              v-for="dbName in db.availableDatabases"
+              :key="dbName"
+              :value="dbName"
+            >
+              {{ dbName === 'eldokanh_one' ? 'الفرع الثاني' : 'الفرع الرئيسي' }}
+            </option>
+          </select>
         </div>
         <span
           v-if="cart.itemCount > 0"
@@ -190,6 +214,22 @@ watch(
           </span>
         </div>
         <div
+          v-if="cart.deliveryCost > 0"
+          class="flex justify-between text-primary text-sm"
+        >
+          <span>رسوم التوصيل</span>
+          <span class="tabular-nums font-medium">
+            +{{ formatNumber(cart.deliveryCost) }} ج.م
+          </span>
+        </div>
+        <div
+          v-if="cart.deliveryDriverName"
+          class="flex justify-between text-xs text-on-white-variant"
+        >
+          <span>السائق</span>
+          <span class="font-medium">{{ cart.deliveryDriverName }}</span>
+        </div>
+        <div
           class="flex justify-between text-base font-bold pt-1 border-t border-outline-variant/20"
         >
           <span>الإجمالي</span>
@@ -217,6 +257,27 @@ watch(
         >
           <CreditCard class="w-4 h-4" />
           طرق الدفع
+        </Button>
+        <Button
+          variant="outline"
+          class="w-full md:flex-1 md:w-auto gap-2 cursor-pointer"
+          :class="
+            cart.deliveryCost > 0 || cart.deliveryDriverName
+              ? 'border-primary/50 text-primary hover:bg-primary/5'
+              : ''
+          "
+          :disabled="isEmpty"
+          size="default"
+          @click="emit('showDelivery')"
+        >
+          <Truck class="w-4 h-4" />
+          <span>توصيل</span>
+          <span
+            v-if="cart.deliveryCost > 0 || cart.deliveryDriverName"
+            class="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+          >
+            ✓
+          </span>
         </Button>
         <Button
           variant="outline"

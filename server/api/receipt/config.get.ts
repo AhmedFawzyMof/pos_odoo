@@ -43,6 +43,7 @@ const DEFAULT_CONFIG = {
       showSubtotal: true,
       showDiscount: true,
       showServiceFee: true,
+      showDeliveryCost: true,
       showTax: true,
       showGrandTotal: true,
       currency: "ج.م",
@@ -77,7 +78,7 @@ const DEFAULT_CONFIG = {
 };
 
 export default defineEventHandler(async (event) => {
-  const odoo = await getAdminOdooClient(event);
+  const odoo = await getAdminOdooClient();
   await requirePermission(event, 'pos_manager')
 
   const session = await getUserSession(event);
@@ -91,7 +92,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Company not found" });
   }
 
-  const db = getDb(event.context.odooDb);
+  const db = getDb();
   let savedConfig = {};
   try {
     const row = db.prepare('SELECT config FROM receipt_configs WHERE company_id = ?').get(companyId) as any;

@@ -41,6 +41,8 @@ export default defineEventHandler(async (event) => {
     note: body.note || "",
     amount_tax: Number(body.amount_tax) || 0,
     target_location_id: body.location_id ? Number(body.location_id) : false,
+    driver_id: Number(body.driver_id) || false,
+    delivery_cost: Number(body.delivery_cost) || 0,
     source: "callcenter",
   };
 

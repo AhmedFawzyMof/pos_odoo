@@ -18,6 +18,10 @@ export const usePosCartStore = defineStore("pos-cart", () => {
   const serviceFeeType = ref<"fixed" | "percent">("fixed");
   const paymentLines = ref<PaymentLine[]>([]);
 
+  const deliveryDriverId = ref<number | null>(null);
+  const deliveryDriverName = ref("");
+  const deliveryCost = ref(0);
+
   const itemCount = computed(() =>
     items.value.reduce((sum, item) => sum + item.quantity, 0),
   );
@@ -60,7 +64,7 @@ export const usePosCartStore = defineStore("pos-cart", () => {
   const grandTotal = computed(() =>
     Math.max(
       0,
-      subtotal.value + totalTax.value + serviceFeeAmount.value - discountAmount.value,
+      subtotal.value + totalTax.value + serviceFeeAmount.value + deliveryCost.value - discountAmount.value,
     ),
   );
 
@@ -140,6 +144,18 @@ export const usePosCartStore = defineStore("pos-cart", () => {
     serviceFeeType.value = type;
   }
 
+  function setDelivery(driverId: number | null, driverName: string, cost: number) {
+    deliveryDriverId.value = driverId;
+    deliveryDriverName.value = driverName;
+    deliveryCost.value = Math.max(0, cost || 0);
+  }
+
+  function clearDelivery() {
+    deliveryDriverId.value = null;
+    deliveryDriverName.value = "";
+    deliveryCost.value = 0;
+  }
+
   function addPayment(methodId: number, methodName: string, amount: number) {
     const existing = paymentLines.value.find((p) => p.method_id === methodId);
     if (existing) {
@@ -174,6 +190,7 @@ export const usePosCartStore = defineStore("pos-cart", () => {
     customerPhone.value = "";
     customerAddress.value = "";
     resetOrderAdjustments();
+    clearDelivery();
   }
 
   return {
@@ -198,6 +215,9 @@ export const usePosCartStore = defineStore("pos-cart", () => {
     serviceFee,
     serviceFeeType,
     paymentLines,
+    deliveryDriverId,
+    deliveryDriverName,
+    deliveryCost,
     addItem,
     removeItem,
     updateQuantity,
@@ -206,6 +226,8 @@ export const usePosCartStore = defineStore("pos-cart", () => {
     setLocation,
     setOrderDiscount,
     setServiceFee,
+    setDelivery,
+    clearDelivery,
     addPayment,
     removePayment,
     clearPayments,

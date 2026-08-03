@@ -47,6 +47,7 @@ export const navLinks: NavItem[] = [
   { name: "المنتجات", path: "/products", icon: h(ShoppingBag), requiredPermission: "pos_user" },
   { name: "الأقسام", path: "/categories", icon: h(LayoutGrid), requiredPermission: "pos_user" },
   { name: "العملاء", path: "/customers", icon: h(Users), requiredPermission: "pos_user" },
+  { name: "سائقين التوصيل", path: "/drivers", icon: h(Truck), requiredPermission: "pos_user" },
   { name: "الموردين", path: "/suppliers", icon: h(Truck), requiredPermission: "purchase_user" },
   { name: "قائمة مشترايات", path: "/purchase-orders", icon: h(ClipboardList), requiredPermission: "purchase_user" },
   { name: "فواتير الموردين", path: "/vendor-bills", icon: h(ReceiptText), requiredPermission: "account_invoice" },
@@ -105,6 +106,7 @@ export const groupedNav: NavEntry[] = [
     ],
   },
   { name: "العملاء", path: "/customers", icon: h(Users), requiredPermission: "pos_user" },
+  { name: "سائقين التوصيل", path: "/drivers", icon: h(Truck), requiredPermission: "pos_user" },
   { name: "التقارير", path: "/reports", icon: h(FileText), requiredPermission: "pos_user" },
   { name: "المحاسبة", path: "/accounting", icon: h(Landmark), requiredPermission: "account_invoice" },
   {

@@ -97,6 +97,14 @@
               <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">رسوم إضافية</td>
               <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">+{{ formatPrice(serviceFeeAmount) }} {{ currency }}</td>
             </tr>
+            <tr v-if="cfg.totals?.showDeliveryCost !== false && deliveryCostAmount > 0">
+              <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">رسوم التوصيل</td>
+              <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">+{{ formatPrice(deliveryCostAmount) }} {{ currency }}</td>
+            </tr>
+            <tr v-if="deliveryDriverName">
+              <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">السائق</td>
+              <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">{{ deliveryDriverName }}</td>
+            </tr>
             <tr class="font-bold">
               <td class="text-right py-1" :style="{ borderTop: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">الإجمالي</td>
               <td class="text-left py-1" :style="{ borderTop: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">{{ formatPrice(grandTotal) }} {{ currency }}</td>
@@ -134,6 +142,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { formatDate, formatTime } from "~/lib/dateUtils";
+import { DEFAULT_RECEIPT_CONFIG } from "~/composables/useReceiptPrint";
 
 const props = defineProps<{
   orderName: string;
@@ -142,6 +151,8 @@ const props = defineProps<{
   subtotal: number;
   discountAmount: number;
   serviceFeeAmount: number;
+  deliveryCostAmount?: number;
+  deliveryDriverName?: string;
   grandTotal: number;
   customerName?: string;
   customerPhone?: string;
@@ -149,7 +160,7 @@ const props = defineProps<{
   receiptConfig: any;
 }>();
 
-const cfg = computed(() => props.receiptConfig?.receipt || {});
+const cfg = computed(() => props.receiptConfig?.receipt || DEFAULT_RECEIPT_CONFIG);
 const company = computed(() => props.receiptConfig?.company || {});
 const currency = computed(() => cfg.value.totals?.currency || "ج.م");
 const baseFontSize = computed(() => cfg.value.fontSize || 12);

@@ -67,7 +67,7 @@ const localConfig = ref<any>({
     header: { enabled: true, companyName: true, companyLogo: true, companyAddress: true, companyPhone: true, companyEmail: true, companyWebsite: true, companyVat: true, showQrCode: false, qrCodeText: "" },
     items: { enabled: true, showDescription: true, showPrice: true, showQuantity: true, showTotal: true, showDiscount: true, showTax: false },
     payments: { enabled: true, showMethod: true, showAmount: true, showChange: false },
-    totals: { enabled: true, showSubtotal: true, showDiscount: true, showServiceFee: true, showTax: true, showGrandTotal: true, currency: "ج.م" },
+    totals: { enabled: true, showSubtotal: true, showDiscount: true, showServiceFee: true, showDeliveryCost: true, showTax: true, showGrandTotal: true, currency: "ج.م" },
     footer: { enabled: true, showThankYou: true, thankYouText: "شكراً لتسوقكم معنا", showOrderNumber: true, showDate: true, showTime: true, showCashier: false, showTerms: false, termsText: "" },
     colors: { primary: "#000000", secondary: "#333333", accent: "#666666", text: "#000000", background: "#ffffff" },
     layout: { headerStyle: "standard", footerStyle: "standard", showDivider: true, dividerStyle: "dashed", showBorder: true, borderStyle: "solid" },
@@ -162,9 +162,10 @@ const demoData = computed(() => {
     subtotal: 250.50,
     discount: 25.05,
     serviceFee: 10.00,
-    grandTotal: 235.45,
+    deliveryCost: 15.00,
+    grandTotal: 250.45,
     payments: [
-      { method: "نقدي", amount: 235.45 },
+      { method: "نقدي", amount: 250.45 },
     ],
   };
 });

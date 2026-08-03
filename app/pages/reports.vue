@@ -40,6 +40,7 @@ const activeReport = ref("profit_loss");
 const dateFrom = ref(defaultDateFrom);
 const dateTo = ref(defaultDateTo);
 const locationId = ref<number | null>(null);
+const orderId = ref<number | null>(null);
 const loading = ref(false);
 const refreshKey = ref(0);
 
@@ -114,6 +115,7 @@ const onRefresh = () => {
       v-model:date-from="dateFrom"
       v-model:date-to="dateTo"
       v-model:location-id="locationId"
+      v-model:order-id="orderId"
       :active-report="activeReport"
       :loading="loading"
       @refresh="onRefresh"
@@ -131,6 +133,7 @@ const onRefresh = () => {
           :date-from="dateFrom"
           :date-to="dateTo"
           :location-id="locationId"
+          :order-id="orderId"
           :refresh-key="refreshKey"
           @loading="onLoading"
         />

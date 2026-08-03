@@ -7,6 +7,8 @@ defineProps<{
   subtotal: number
   discountAmount: number
   serviceFeeAmount: number
+  deliveryCostAmount?: number
+  deliveryDriverName?: string
   grandTotal: number
 }>()
 </script>
@@ -36,6 +38,22 @@ defineProps<{
         >+{{ formatNumber(serviceFeeAmount) }} ج.م</span
       >
       <span>رسوم إضافية</span>
+    </div>
+    <div
+      v-if="deliveryCostAmount && deliveryCostAmount > 0"
+      class="flex justify-between text-sky-600"
+    >
+      <span class="tabular-nums"
+        >+{{ formatNumber(deliveryCostAmount) }} ج.م</span
+      >
+      <span>رسوم التوصيل</span>
+    </div>
+    <div
+      v-if="deliveryDriverName"
+      class="flex justify-between text-slate-600"
+    >
+      <span class="tabular-nums">{{ deliveryDriverName }}</span>
+      <span>السائق</span>
     </div>
     <div class="flex justify-between text-base font-bold pt-2 border-t border-slate-200 text-slate-900">
       <span class="tabular-nums">{{

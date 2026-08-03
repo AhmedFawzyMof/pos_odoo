@@ -43,6 +43,7 @@ const DEFAULT_CONFIG = {
       showSubtotal: true,
       showDiscount: true,
       showServiceFee: true,
+      showDeliveryCost: true,
       showTax: true,
       showGrandTotal: true,
       currency: "ج.م",

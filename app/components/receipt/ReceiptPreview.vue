@@ -141,6 +141,10 @@ const renderBorderStyle = computed(() => {
             <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">رسوم إضافية</td>
             <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">+{{ demo.serviceFee.toFixed(2) }} {{ cfg.totals?.currency }}</td>
           </tr>
+          <tr v-if="cfg.totals?.showDeliveryCost !== false && demo.deliveryCost > 0">
+            <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">رسوم التوصيل</td>
+            <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">+{{ demo.deliveryCost.toFixed(2) }} {{ cfg.totals?.currency }}</td>
+          </tr>
           <tr v-if="cfg.totals?.showGrandTotal" class="font-bold">
             <td class="text-right py-1" :style="{ borderTop: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">الإجمالي</td>
             <td class="text-left py-1" :style="{ borderTop: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">{{ demo.grandTotal.toFixed(2) }} {{ cfg.totals?.currency }}</td>

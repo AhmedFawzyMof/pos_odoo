@@ -157,7 +157,11 @@ export default defineEventHandler(async (event) => {
     attribute_lines: t.attributeLines,
   }));
 
-  const paymentMethods = await ensureBankTransferMethod(odoo, odooData, configId);
+  const paymentMethods = (odooData.payment_methods || []).map((pm: any) => ({
+    id: pm.id,
+    name: pm.name,
+    is_cash_count: pm.is_cash_count,
+  }));
 
   return {
     success: true,
@@ -187,68 +191,3 @@ export default defineEventHandler(async (event) => {
     allowOutOfStockSale: odooData.allow_out_of_stock_sale || false,
   };
 });
-
-async function ensureBankTransferMethod(odoo: any, odooData: any, configId: number | null) {
-  const configMethods: { id: number; name: string; is_cash_count: boolean }[] =
-    (odooData.payment_methods || []).map((pm: any) => ({
-      id: pm.id,
-      name: pm.name,
-      is_cash_count: pm.is_cash_count,
-    }));
-
-  const required = ["نقدي", "حساب العميل", "بطاقة", "تحويل بنكي"];
-
-  const isMissing = required.some((name) => !configMethods.some((m) => m.name === name));
-  if (!isMissing) return configMethods;
-
-  const methodsToLink: number[] = [];
-  const newMethods: { id: number; name: string; is_cash_count: boolean }[] = [];
-
-  for (const name of required) {
-    if (configMethods.some((m) => m.name === name)) continue;
-
-    const [searchErr, existing] = await tryCatch<any[]>(
-      odoo.execute_kw("pos.payment.method", "search_read", [
-        [["name", "=", name]],
-        ["id", "name"],
-      ]),
-    );
-    let methodId: number | null = null;
-    if (!searchErr && existing && existing.length > 0) {
-      methodId = existing[0].id;
-    } else {
-      const [createErr, newId] = await tryCatch<number>(
-        odoo.execute_kw("pos.payment.method", "create", [
-          [{ name, is_cash_count: name === "نقدي" }],
-        ]),
-      );
-      if (createErr) {
-        console.error(`[master-data] Failed to create ${name}:`, createErr.message);
-        continue;
-      }
-      methodId = newId;
-    }
-
-    if (methodId) {
-      methodsToLink.push(methodId);
-      newMethods.push({ id: methodId, name, is_cash_count: name === "نقدي" });
-    }
-  }
-
-  let linked = false;
-  if (methodsToLink.length > 0 && configId) {
-    const commands = methodsToLink.map((id) => [4, id, 0]);
-    const [linkErr] = await tryCatch(
-      odoo.execute_kw("pos.config", "write", [
-        [[configId], { payment_method_ids: commands }],
-      ]),
-    );
-    if (linkErr) {
-      console.error("[master-data] Failed to link methods to config:", linkErr.message);
-    } else {
-      linked = true;
-    }
-  }
-
-  return linked || !configId ? [...configMethods, ...newMethods] : configMethods;
-}

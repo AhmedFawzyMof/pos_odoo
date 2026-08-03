@@ -40,6 +40,7 @@ export const DEFAULT_RECEIPT_CONFIG = {
     showSubtotal: true,
     showDiscount: true,
     showServiceFee: true,
+    showDeliveryCost: true,
     showTax: true,
     showGrandTotal: true,
     currency: "ج.م",
@@ -103,6 +104,8 @@ export function useReceiptPrint() {
     lastOrderSubtotal: number;
     lastOrderDiscount: number;
     lastOrderServiceFee: number;
+    lastOrderDeliveryCost?: number;
+    lastOrderDriverName?: string;
     lastOrderGrandTotal: number;
     lastOrderCustomerName?: string;
     lastOrderCustomerPhone?: string;
@@ -180,7 +183,11 @@ export function useReceiptPrint() {
       cfg.footer?.showDate ||
       cfg.footer?.showTime
         ? `<div style="text-align:center;font-size:${fontSize + 2}px;font-weight:bold;margin-bottom:8px;color:${primaryColor}">
-      ${cfg.footer?.showOrderNumber ? `<div>${params.orderName}</div>` : ""}
+      ${
+        cfg.footer?.showOrderNumber === false || !params.orderName
+          ? ""
+          : `<div>${params.orderName}</div>`
+      }
       ${cfg.footer?.showDate || cfg.footer?.showTime ? `<div>${cfg.footer?.showDate ? dateStr : ""} ${cfg.footer?.showTime ? timeStr : ""}</div>` : ""}
     </div>`
         : ""
@@ -263,6 +270,20 @@ export function useReceiptPrint() {
       if (cfg.totals?.showServiceFee && params.lastOrderServiceFee > 0) {
         totalRows.push(
           `<tr><td style="text-align:right;padding:2px 0;color:${accentColor}">رسوم إضافية</td><td style="text-align:left;padding:2px 0;color:${accentColor}">+${params.lastOrderServiceFee.toFixed(2)} ${currency}</td></tr>`,
+        );
+      }
+      if (
+        cfg.totals?.showDeliveryCost !== false &&
+        params.lastOrderDeliveryCost &&
+        params.lastOrderDeliveryCost > 0
+      ) {
+        totalRows.push(
+          `<tr><td style="text-align:right;padding:2px 0;color:${accentColor}">رسوم التوصيل</td><td style="text-align:left;padding:2px 0;color:${accentColor}">+${params.lastOrderDeliveryCost.toFixed(2)} ${currency}</td></tr>`,
+        );
+      }
+      if (params.lastOrderDriverName) {
+        totalRows.push(
+          `<tr><td style="text-align:right;padding:2px 0;color:${accentColor}">السائق</td><td style="text-align:left;padding:2px 0;color:${accentColor}">${params.lastOrderDriverName}</td></tr>`,
         );
       }
       if (cfg.totals?.showGrandTotal) {

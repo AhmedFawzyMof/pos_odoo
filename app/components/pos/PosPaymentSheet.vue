@@ -50,6 +50,8 @@ const lastOrderPayments = ref<{ methodName: string; amount: number }[]>([]);
 const lastOrderSubtotal = ref(0);
 const lastOrderDiscount = ref(0);
 const lastOrderServiceFee = ref(0);
+const lastOrderDeliveryCost = ref(0);
+const lastOrderDriverName = ref("");
 const lastOrderGrandTotal = ref(0);
 const lastOrderCustomerName = ref("");
 const lastOrderCustomerPhone = ref("");
@@ -295,6 +297,8 @@ async function handleSubmit() {
         customer_id: cart.customerId,
         location_id: cart.selectedLocationId,
         amount_tax: cart.totalTax,
+        driver_id: cart.deliveryDriverId,
+        delivery_cost: cart.deliveryCost,
       },
     });
 
@@ -318,6 +322,8 @@ async function handleSubmit() {
       lastOrderSubtotal.value = cart.subtotal;
       lastOrderDiscount.value = cart.discountAmount;
       lastOrderServiceFee.value = cart.serviceFeeAmount;
+      lastOrderDeliveryCost.value = cart.deliveryCost;
+      lastOrderDriverName.value = cart.deliveryDriverName;
       lastOrderGrandTotal.value = cart.grandTotal;
       lastOrderCustomerName.value = cart.customerName;
       lastOrderCustomerPhone.value = cart.customerPhone;
@@ -332,6 +338,8 @@ async function handleSubmit() {
         lastOrderSubtotal: lastOrderSubtotal.value,
         lastOrderDiscount: lastOrderDiscount.value,
         lastOrderServiceFee: lastOrderServiceFee.value,
+        lastOrderDeliveryCost: lastOrderDeliveryCost.value,
+        lastOrderDriverName: lastOrderDriverName.value,
         lastOrderGrandTotal: lastOrderGrandTotal.value,
         lastOrderCustomerName: lastOrderCustomerName.value,
         lastOrderCustomerPhone: lastOrderCustomerPhone.value,
@@ -361,6 +369,8 @@ async function handlePrintReceipt() {
     lastOrderSubtotal: lastOrderSubtotal.value,
     lastOrderDiscount: lastOrderDiscount.value,
     lastOrderServiceFee: lastOrderServiceFee.value,
+    lastOrderDeliveryCost: lastOrderDeliveryCost.value,
+    lastOrderDriverName: lastOrderDriverName.value,
     lastOrderGrandTotal: lastOrderGrandTotal.value,
   });
 }
@@ -426,6 +436,8 @@ async function handlePrintReceipt() {
           :subtotal="lastOrderSubtotal"
           :discount-amount="lastOrderDiscount"
           :service-fee-amount="lastOrderServiceFee"
+          :delivery-cost-amount="lastOrderDeliveryCost"
+          :delivery-driver-name="lastOrderDriverName"
           :grand-total="lastOrderGrandTotal"
           :customer-name="lastOrderCustomerName"
           :customer-phone="lastOrderCustomerPhone"
@@ -439,6 +451,8 @@ async function handlePrintReceipt() {
             :subtotal="cart.subtotal"
             :discount-amount="cart.discountAmount"
             :service-fee-amount="cart.serviceFeeAmount"
+            :delivery-cost-amount="cart.deliveryCost"
+            :delivery-driver-name="cart.deliveryDriverName"
             :grand-total="cart.grandTotal"
           />
 

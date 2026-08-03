@@ -315,6 +315,10 @@ function updateReceipt(path: string[], value: any) {
             <span class="text-sm">عرض الرسوم الإضافية</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" :checked="config.receipt.totals.showDeliveryCost !== false" @change="updateReceipt(['totals', 'showDeliveryCost'], ($event.target as HTMLInputElement).checked)" class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" />
+            <span class="text-sm">عرض رسوم التوصيل</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" :checked="config.receipt.totals.showGrandTotal" @change="updateReceipt(['totals', 'showGrandTotal'], ($event.target as HTMLInputElement).checked)" class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" />
             <span class="text-sm">عرض الإجمالي الكلي</span>
           </label>

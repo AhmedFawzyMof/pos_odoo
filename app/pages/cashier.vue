@@ -26,6 +26,7 @@ import PosPaymentCustomer from "~/components/pos/PosPaymentCustomer.vue";
 import PosPaymentSuccess from "~/components/pos/PosPaymentSuccess.vue";
 import PosCloseSessionModal from "~/components/pos/PosCloseSessionModal.vue";
 import PosHotkeyHelp from "~/components/pos/PosHotkeyHelp.vue";
+import PosDeliveryDialog from "~/components/pos/PosDeliveryDialog.vue";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { usePosCartStore } from "~~/stores/pos-cart";
@@ -101,6 +102,7 @@ const showPaymentSheet = ref(false);
 const showDiscountDialog = ref(false);
 const showNotesDialog = ref(false);
 const showCustomersDialog = ref(false);
+const showDeliveryDialog = ref(false);
 const showPaymentSuccess = ref(false);
 const isProcessingPayment = ref(false);
 
@@ -111,6 +113,8 @@ interface LastOrderData {
   subtotal: number;
   discountAmount: number;
   serviceFeeAmount: number;
+  deliveryCostAmount: number;
+  deliveryDriverName: string;
   grandTotal: number;
   customerName: string;
   customerPhone: string;
@@ -124,6 +128,8 @@ const lastOrderData = ref<LastOrderData>({
   subtotal: 0,
   discountAmount: 0,
   serviceFeeAmount: 0,
+  deliveryCostAmount: 0,
+  deliveryDriverName: "",
   grandTotal: 0,
   customerName: "",
   customerPhone: "",
@@ -422,6 +428,18 @@ function handleOpenClients() {
   showCustomersDialog.value = true;
 }
 
+function handleOpenDelivery() {
+  showDeliveryDialog.value = true;
+}
+
+function handleDeliverySave(payload: {
+  driverId: number | null;
+  driverName: string;
+  deliveryCost: number;
+}) {
+  cart.setDelivery(payload.driverId, payload.driverName, payload.deliveryCost);
+}
+
 async function handleCashPayment() {
   if (cart.items.length === 0) return;
   if (!sessionId.value) {
@@ -468,6 +486,8 @@ async function handleCashPayment() {
         customer_id: cart.customerId,
         location_id: cart.selectedLocationId,
         amount_tax: cart.totalTax,
+        driver_id: cart.deliveryDriverId,
+        delivery_cost: cart.deliveryCost,
       },
     });
 
@@ -490,6 +510,8 @@ async function handleCashPayment() {
         subtotal: cart.subtotal,
         discountAmount: cart.discountAmount,
         serviceFeeAmount: cart.serviceFeeAmount,
+        deliveryCostAmount: cart.deliveryCost,
+        deliveryDriverName: cart.deliveryDriverName,
         grandTotal: cart.grandTotal,
         customerName: cart.customerName,
         customerPhone: cart.customerPhone,
@@ -506,6 +528,8 @@ async function handleCashPayment() {
         lastOrderSubtotal: lastOrderData.value.subtotal,
         lastOrderDiscount: lastOrderData.value.discountAmount,
         lastOrderServiceFee: lastOrderData.value.serviceFeeAmount,
+        lastOrderDeliveryCost: lastOrderData.value.deliveryCostAmount,
+        lastOrderDriverName: lastOrderData.value.deliveryDriverName,
         lastOrderGrandTotal: lastOrderData.value.grandTotal,
         lastOrderCustomerName: lastOrderData.value.customerName,
         lastOrderCustomerPhone: lastOrderData.value.customerPhone,
@@ -802,6 +826,7 @@ watch(
         @show-notes="handleShowNotes"
         @show-discount="handleShowDiscount"
         @open-clients="handleOpenClients"
+        @show-delivery="handleOpenDelivery"
         @select-item="(i) => (selectedCartIndex = i)"
       />
 
@@ -1056,6 +1081,8 @@ watch(
               :subtotal="lastOrderData.subtotal"
               :discount-amount="lastOrderData.discountAmount"
               :service-fee-amount="lastOrderData.serviceFeeAmount"
+              :delivery-cost-amount="lastOrderData.deliveryCostAmount"
+              :delivery-driver-name="lastOrderData.deliveryDriverName"
               :grand-total="lastOrderData.grandTotal"
               :customer-name="lastOrderData.customerName"
               :customer-phone="lastOrderData.customerPhone"
@@ -1101,6 +1128,15 @@ watch(
       :session-id="sessionId"
       :config-id="configId"
       @order-completed="handleOrderCompleted"
+    />
+
+    <PosDeliveryDialog
+      :is-open="showDeliveryDialog"
+      :driver-id="cart.deliveryDriverId"
+      :driver-name="cart.deliveryDriverName"
+      :delivery-cost="cart.deliveryCost"
+      @update:is-open="(v) => (showDeliveryDialog = v)"
+      @save="handleDeliverySave"
     />
   </div>
   <div v-else class="flex items-center justify-center h-[calc(100vh-8rem)]">

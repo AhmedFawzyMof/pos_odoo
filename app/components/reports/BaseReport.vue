@@ -26,6 +26,7 @@ const props = defineProps<{
   dateTo: string;
   refreshKey?: number;
   locationId?: number | null;
+  orderId?: number | null;
 }>();
 
 const emit = defineEmits<{
@@ -60,6 +61,9 @@ async function fetchData() {
     if (props.locationId) {
       params.location_id = props.locationId;
     }
+    if (props.orderId) {
+      params.order_id = props.orderId;
+    }
     const data = await $fetch("/api/reports", { query: params });
     reportData.value = data;
   } catch (e: any) {
@@ -72,7 +76,7 @@ async function fetchData() {
 watch(pending, (v) => emit("loading", v));
 
 watch(
-  [() => props.reportType, () => props.dateFrom, () => props.dateTo, () => props.locationId],
+  [() => props.reportType, () => props.dateFrom, () => props.dateTo, () => props.locationId, () => props.orderId],
   fetchData,
   { immediate: true },
 );

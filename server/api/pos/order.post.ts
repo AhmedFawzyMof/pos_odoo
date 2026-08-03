@@ -36,6 +36,8 @@ export default defineEventHandler(async (event) => {
     note: body.note || "",
     amount_tax: Number(body.amount_tax) || 0,
     target_location_id: body.location_id ? Number(body.location_id) : false,
+    driver_id: Number(body.driver_id) || false,
+    delivery_cost: Number(body.delivery_cost) || 0,
   };
 
   const positionalParams = [sessionId, sanitizedPayload];
@@ -61,7 +63,7 @@ export default defineEventHandler(async (event) => {
   return {
     success: true,
     order_id: rpcResult.order_id,
-    name: rpcResult.name || "",
+    name: rpcResult.order_name || rpcResult.name || "",
     message: rpcResult.message || "Order registered successfully.",
   };
 });

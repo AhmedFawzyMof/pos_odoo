@@ -41,6 +41,7 @@ const dateFrom = ref(defaultDateFrom);
 const dateTo = ref(defaultDateTo);
 const locationId = ref<number | null>(null);
 const orderId = ref<number | null>(null);
+const terminalId = ref<number | null>(null);
 const loading = ref(false);
 const refreshKey = ref(0);
 
@@ -116,6 +117,7 @@ const onRefresh = () => {
       v-model:date-to="dateTo"
       v-model:location-id="locationId"
       v-model:order-id="orderId"
+      v-model:terminal-id="terminalId"
       :active-report="activeReport"
       :loading="loading"
       @refresh="onRefresh"
@@ -134,6 +136,7 @@ const onRefresh = () => {
           :date-to="dateTo"
           :location-id="locationId"
           :order-id="orderId"
+          :terminal-id="terminalId"
           :refresh-key="refreshKey"
           @loading="onLoading"
         />

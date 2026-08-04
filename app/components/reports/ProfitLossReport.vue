@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import BaseReport from "./BaseReport.vue";
-defineProps<{ dateFrom: string; dateTo: string; refreshKey?: number; orderId?: number | null }>();
+defineProps<{ dateFrom: string; dateTo: string; refreshKey?: number; orderId?: number | null; terminalId?: number | null }>();
 const emit = defineEmits<{ loading: [v: boolean] }>();
 
 const baseRef = ref<InstanceType<typeof BaseReport>>();
@@ -16,6 +16,7 @@ defineExpose({
     :date-from
     :date-to
     :order-id
+    :terminal-id
     :refresh-key
     @loading="emit('loading', $event)"
   />

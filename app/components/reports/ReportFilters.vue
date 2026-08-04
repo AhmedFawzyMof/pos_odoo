@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
-import { Filter, RefreshCw, Download, Warehouse, Search, X } from "@lucide/vue";
+import { Filter, RefreshCw, Download, Warehouse, Monitor, Search, X } from "@lucide/vue";
 
 const props = defineProps<{
   dateFrom: string;
@@ -9,6 +9,7 @@ const props = defineProps<{
   locationId?: number | null;
   activeReport?: string;
   orderId?: number | null;
+  terminalId?: number | null;
 }>();
 
 const stockReportTypes = [
@@ -24,9 +25,16 @@ const emit = defineEmits<{
   "update:dateTo": [value: string];
   "update:locationId": [value: number | null];
   "update:orderId": [value: number | null];
+  "update:terminalId": [value: number | null];
   refresh: [];
   export: [];
 }>();
+
+function onTerminalChange(event: Event) {
+  const target = event.target as HTMLSelectElement;
+  const val = target.value ? Number(target.value) : null;
+  emit('update:terminalId', val);
+}
 
 function onLocationChange(event: Event) {
   const target = event.target as HTMLSelectElement;
@@ -40,10 +48,18 @@ const internalLocations = computed(() =>
   locations.value.filter((loc) => loc.type === "internal"),
 );
 
+const terminals = ref<{ id: number; name: string }[]>([]);
+
 onMounted(async () => {
   try {
     const res = await $fetch<any>("/api/warehouse/locations");
     if (res.success) locations.value = res.data;
+  } catch {
+    // Silently fail
+  }
+  try {
+    const res = await $fetch<any>("/api/pos/registers");
+    if (res.success) terminals.value = res.data;
   } catch {
     // Silently fail
   }
@@ -119,6 +135,19 @@ function clearOrder() {
         type="date"
         class="h-10 px-3 border border-outline-variant rounded-lg text-sm"
       />
+    </div>
+    <div class="flex items-center gap-2">
+      <Monitor class="w-4 h-4 text-on-white-variant shrink-0" />
+      <select
+        :value="terminalId ?? ''"
+        @change="onTerminalChange"
+        class="h-10 px-3 border border-outline-variant rounded-lg text-sm bg-white outline-none cursor-pointer min-w-[160px]"
+      >
+        <option value="">كل الأجهزة</option>
+        <option v-for="term in terminals" :key="term.id" :value="term.id">
+          {{ term.name }}
+        </option>
+      </select>
     </div>
     <div v-if="activeReport && stockReportTypes.includes(activeReport)" class="flex items-center gap-2">
       <Warehouse class="w-4 h-4 text-on-white-variant shrink-0" />

@@ -6,7 +6,7 @@ async function odooWrite(
 ): Promise<boolean> {
   return await odoo.execute_kw(model, "write", [[ids, values], {}]);
 }
-import { requirePermission } from '~~/server/utils/permissions'
+import { requireAnyPermission } from '~~/server/utils/permissions'
 import { tryCatch } from '~~/server/utils/tryCatch'
 
 async function safeSearchRead(
@@ -297,9 +297,10 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // ── Stock (no-variant products only) ─────────────────────────────────────
+    // ── Determine final product id ───────────────────────────────────────────
+    let finalProductId: number | null = null;
     if (!body.variants || body.variants.length === 0) {
-      const finalProductId = await getVariantIdFromTemplate(odoo, templateId);
+      finalProductId = await getVariantIdFromTemplate(odoo, templateId);
 
       if (finalProductId && body.location_qty?.length) {
         for (const lq of body.location_qty) {
@@ -312,6 +313,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: isEditMode ? "تم تحديث المنتج بنجاح" : "تم إنشاء المنتج بنجاح",
       id: templateId,
+      product_id: finalProductId || templateId,
     };
   } catch (err: any) {
     const message =

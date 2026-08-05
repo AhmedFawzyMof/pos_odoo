@@ -17,6 +17,7 @@ const drawerOpen = ref(false);
 const drawerMode = ref<"add" | "edit">("add");
 const isSaving = ref(false);
 const selectedProductForDrawer = ref<Product | null>(null);
+const actionError = ref("");
 
 watch(drawerOpen, (open) => {
   if (!open) focusSearch();
@@ -62,22 +63,41 @@ const openCreateForm = () => {
   showDropdown.value = false;
 };
 
-const handleDrawerSave = (payload: any) => {
-  const productId = payload.id || payload.product_id;
-  lines.value.push({
-    product_id: productId,
-    product_name: payload.name,
-    quantity: 1,
-    price_unit: payload.standard_price || 0,
-    list_price: payload.list_price || 0,
-    location_allocations: [],
-    tax_ids: payload.taxes_id || [],
-  });
-  search.value = "";
-  results.value = [];
-  showDropdown.value = false;
-  drawerOpen.value = false;
-  focusSearch();
+const handleDrawerSave = async (payload: any) => {
+  isSaving.value = true;
+  actionError.value = "";
+  try {
+    const response = await $fetch<{ success: boolean; message: string; product_id?: number; id?: number }>(
+      "/api/products/save",
+      { method: "POST", body: payload },
+    );
+    if (response.success) {
+      const productId = response.product_id || response.id;
+      if (!productId) {
+        throw new Error("لم يتم إرجاع معرف المنتج");
+      }
+      lines.value.push({
+        product_id: productId,
+        product_name: payload.name,
+        quantity: 1,
+        price_unit: payload.standard_price || 0,
+        list_price: payload.list_price || 0,
+        location_allocations: [],
+        tax_ids: payload.taxes_id || [],
+      });
+      search.value = "";
+      results.value = [];
+      showDropdown.value = false;
+      drawerOpen.value = false;
+      focusSearch();
+    } else {
+      actionError.value = response.message || "فشل في حفظ المنتج";
+    }
+  } catch (err: any) {
+    actionError.value = err?.data?.statusMessage || err?.statusMessage || err?.message || "خطأ في الاتصال";
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 const addLine = (p: ProductResult) => {

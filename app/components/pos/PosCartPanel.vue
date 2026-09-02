@@ -9,6 +9,7 @@ import {
   MessageSquareText,
   Users,
   Truck,
+  ClipboardList,
 } from "@lucide/vue";
 import Skeleton from "@/components/ui/skeleton/Skeleton.vue";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ const emit = defineEmits<{
   showNotes: [];
   showDiscount: [];
   openClients: [];
+  openOrders: [];
   showDelivery: [];
   selectItem: [index: number];
 }>();
@@ -87,13 +89,23 @@ watch(
           <span class="text-xs text-blue-500 font-bold">{{
             cart.customerName
           }}</span>
-          <Button
-            @click="emit('openClients')"
-            class="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors hover:bg-accent"
-          >
-            <Users class="w-5 h-5" />
-            <span class="font-bold text-sm">العملاء</span>
-          </Button>
+          <div class="flex items-center gap-1">
+            <Button
+              @click="emit('openClients')"
+              class="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors hover:bg-accent"
+            >
+              <Users class="w-5 h-5" />
+              <span class="font-bold text-sm">العملاء</span>
+            </Button>
+            <Button
+              variant="outline"
+              @click="emit('openOrders')"
+              class="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors hover:bg-accent"
+            >
+              <ClipboardList class="w-5 h-5" />
+              <span class="font-bold text-sm">الطلبات</span>
+            </Button>
+          </div>
         </div>
         <span
           v-if="cart.itemCount > 0"

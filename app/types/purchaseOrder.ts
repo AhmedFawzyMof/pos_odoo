@@ -16,6 +16,7 @@ export interface POLine {
   id: number;
   product_id: [number, string] | false;
   name: string;
+  barcode: string;
   product_qty: number;
   qty_received: number;
   qty_invoiced: number;

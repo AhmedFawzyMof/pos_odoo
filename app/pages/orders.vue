@@ -50,6 +50,8 @@ const dateFrom = ref(todayDateStr);
 const dateTo = ref(todayDateStr);
 const debouncedDateFrom = ref(todayDateStr);
 const debouncedDateTo = ref(todayDateStr);
+const terminalFilter = ref("");
+const debouncedTerminal = ref("");
 const currentPage = ref(1);
 
 let searchTimeout: ReturnType<typeof setTimeout>;
@@ -93,6 +95,26 @@ watch(dateTo, (val) => {
   }, 400);
 });
 
+watch(terminalFilter, (val) => {
+  debouncedTerminal.value = val;
+  currentPage.value = 1;
+});
+
+const terminals = ref<{ id: number; name: string }[]>([]);
+const fetchTerminals = async () => {
+  try {
+    const res = await $fetch<{ success: boolean; data: { id: number; name: string }[] }>(
+      "/api/pos/registers",
+    );
+    terminals.value = res.data || [];
+  } catch {
+    terminals.value = [];
+  }
+};
+onMounted(() => {
+  fetchTerminals();
+});
+
 const limit = ref(28);
 
 const showToast = ref(false);
@@ -100,7 +122,7 @@ const toastMessage = ref("");
 const toastType = ref<"success" | "error">("success");
 const selectedOrderId = ref<number | null>(null);
 const drawerOpen = ref(false);
-const openInEditMode = ref(false);
+const editDrawerOpen = ref(false);
 
 const todayStr = computed(() => formatDateLong(new Date()));
 
@@ -120,6 +142,7 @@ const {
     date_from: debouncedDateFrom,
     date_to: debouncedDateTo,
     source: debouncedSource,
+    config_name: debouncedTerminal,
   },
   watch: [
     currentPage,
@@ -129,6 +152,7 @@ const {
     debouncedDateFrom,
     debouncedDateTo,
     debouncedSource,
+    debouncedTerminal,
   ],
   transform: (response) => {
     if (!response.data) response.data = [];
@@ -188,8 +212,7 @@ function openDetail(orderId: number) {
 
 function openDetailForEdit(orderId: number) {
   selectedOrderId.value = orderId;
-  openInEditMode.value = true;
-  drawerOpen.value = true;
+  editDrawerOpen.value = true;
 }
 
 function closeDetail() {
@@ -472,6 +495,17 @@ const statusIcons: Record<string, any> = {
                 <option value="pos">نقطة بيع</option>
                 <option value="callcenter">مركز الاتصال</option>
               </select>
+              <select
+                v-model="terminalFilter"
+                class="bg-white text-on-white border border-outline-variant rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+              >
+                <option value="">جميع الأجهزة</option>
+                <option
+                  v-for="t in terminals"
+                  :key="t.id"
+                  :value="t.name"
+                >{{ t.name }}</option>
+              </select>
               <button
                 @click="refresh()"
                 class="bg-white-high text-on-white-variant p-2.5 rounded-xl hover:bg-outline-variant transition-colors cursor-pointer"
@@ -501,6 +535,7 @@ const statusIcons: Record<string, any> = {
                   <th class="px-6 py-4 font-bold text-label-md">الحالة</th>
                   <th class="px-6 py-4 font-bold text-label-md">الوردية</th>
                   <th class="px-6 py-4 font-bold text-label-md">المصدر</th>
+                  <th class="px-6 py-4 font-bold text-label-md">الجهاز</th>
                   <th class="px-6 py-4 font-bold text-label-md">الإجراءات</th>
                 </tr>
               </thead>
@@ -582,6 +617,9 @@ const statusIcons: Record<string, any> = {
                       <span>{{ order.source === 'callcenter' ? 'مركز الاتصال' : 'نقطة بيع' }}</span>
                     </div>
                   </td>
+                  <td class="px-6 py-5 text-on-white-variant text-[13px]">
+                    {{ order.config_name || "—" }}
+                  </td>
                   <td class="px-6 py-5" @click.stop>
                     <div class="flex items-center gap-2">
                       <button
@@ -626,7 +664,7 @@ const statusIcons: Record<string, any> = {
                 <!-- Empty State -->
                 <tr v-if="ordersList.length === 0 && status !== 'pending'">
                   <td
-                    colspan="10"
+                    colspan="11"
                     class="p-16 text-center text-on-white-variant"
                   >
                     <AlertCircle
@@ -641,7 +679,7 @@ const statusIcons: Record<string, any> = {
 
                 <!-- Loading rows -->
                 <tr v-if="status === 'pending' && ordersList.length > 0">
-                  <td colspan="10" class="p-8 text-center">
+                  <td colspan="11" class="p-8 text-center">
                     <LoaderCircle
                       class="w-6 h-6 animate-spin inline-block text-primary"
                     />
@@ -710,8 +748,12 @@ const statusIcons: Record<string, any> = {
     <OrdersOrderDetailDrawer
       v-model:isOpen="drawerOpen"
       :order-id="selectedOrderId"
-      :open-in-edit-mode="openInEditMode"
-      @update:open-in-edit-mode="openInEditMode = $event"
+      @refresh="refresh"
+    />
+
+    <OrdersOrderEditDrawer
+      v-model:isOpen="editDrawerOpen"
+      :order-id="selectedOrderId"
       @refresh="refresh"
     />
 

@@ -255,6 +255,8 @@ export interface POSOrder {
   service_fee?: number;
   service_fee_type?: string;
   note?: string;
+  config_name?: string;
+  source?: string;
 }
 
 export interface OrderLine {

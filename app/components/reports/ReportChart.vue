@@ -47,13 +47,28 @@ const getChartColor = (i: number): string => {
 
 const colors = computed(() => [0, 1, 2, 3, 4].map((i) => getChartColor(i)));
 
+const extractName = (val: any): string => {
+  if (val === null || val === undefined) return "-";
+  if (typeof val === "string") return val;
+  if (typeof val === "number") return String(val);
+  if (Array.isArray(val)) return val.length > 1 ? String(val[1]) : String(val[0] ?? "-");
+  if (typeof val === "object") {
+    if (val.name) return String(val.name);
+    if (val.display_name) return String(val.display_name);
+    const keys = Object.keys(val);
+    if (keys.length === 1) return String(val[keys[0]]);
+    return val.en_US || val.ar_SY || val[keys[0]] || JSON.stringify(val);
+  }
+  return String(val);
+};
+
 const chartData = computed(() => {
   if (!props.chart) return { labels: [], datasets: [] };
   const isPie = props.chart.type === "pie";
   return {
-    labels: props.chart.labels,
+    labels: (props.chart.labels || []).map((l) => extractName(l)),
     datasets: props.chart.datasets.map((ds, i) => ({
-      label: ds.label,
+      label: extractName(ds.label),
       data: ds.data,
       backgroundColor: isPie
         ? colors.value.slice(0, ds.data.length)

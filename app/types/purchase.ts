@@ -22,6 +22,7 @@ export interface POLineInput {
   id?: number;
   product_id: number | null;
   product_name: string;
+  barcode?: string;
   quantity: number;
   price_unit: number;
   list_price?: number;

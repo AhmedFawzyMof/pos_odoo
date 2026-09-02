@@ -12,6 +12,7 @@ import {
   Wallet,
   LogOut,
   Scale,
+  LoaderCircle,
   Printer,
 } from "@lucide/vue";
 import PosSearchBar from "~/components/pos/PosSearchBar.vue";
@@ -23,7 +24,6 @@ import PosVaultModal from "~/components/pos/PosVaultModal.vue";
 import PosPaymentSheet from "~/components/pos/PosPaymentSheet.vue";
 import PosPaymentDiscount from "~/components/pos/PosPaymentDiscount.vue";
 import PosPaymentCustomer from "~/components/pos/PosPaymentCustomer.vue";
-import PosPaymentSuccess from "~/components/pos/PosPaymentSuccess.vue";
 import PosCloseSessionModal from "~/components/pos/PosCloseSessionModal.vue";
 import PosHotkeyHelp from "~/components/pos/PosHotkeyHelp.vue";
 import PosDeliveryDialog from "~/components/pos/PosDeliveryDialog.vue";
@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { usePosCartStore } from "~~/stores/pos-cart";
 import { usePosHotkeys } from "~/composables/usePosHotkeys";
 import { useReceiptPrint } from "~/composables/useReceiptPrint";
+import { formatDateWithTime } from "~/lib/dateUtils";
 import PosSessionMonitor from "~/components/pos/PosSessionMonitor.vue";
 import type {
   POSProduct,
@@ -103,38 +104,73 @@ const showDiscountDialog = ref(false);
 const showNotesDialog = ref(false);
 const showCustomersDialog = ref(false);
 const showDeliveryDialog = ref(false);
-const showPaymentSuccess = ref(false);
+const showOrdersDialog = ref(false);
 const isProcessingPayment = ref(false);
 
-interface LastOrderData {
-  orderName: string;
-  items: { product: { name: string }; quantity: number; price: number; discount: number }[];
-  payments: { methodName: string; amount: number }[];
-  subtotal: number;
-  discountAmount: number;
-  serviceFeeAmount: number;
-  deliveryCostAmount: number;
-  deliveryDriverName: string;
-  grandTotal: number;
-  customerName: string;
-  customerPhone: string;
-  customerAddress: string;
+const sessionOrders = ref<any[]>([]);
+const sessionOrdersLoading = ref(false);
+
+async function fetchSessionOrders() {
+  if (!sessionId.value) return;
+  sessionOrdersLoading.value = true;
+  try {
+    const res = await $fetch<any>("/api/orders", {
+      query: { session_id: sessionId.value, limit: 100 },
+    });
+    sessionOrders.value = res.data || [];
+  } catch {
+    sessionOrders.value = [];
+  } finally {
+    sessionOrdersLoading.value = false;
+  }
 }
 
-const lastOrderData = ref<LastOrderData>({
-  orderName: "",
-  items: [],
-  payments: [],
-  subtotal: 0,
-  discountAmount: 0,
-  serviceFeeAmount: 0,
-  deliveryCostAmount: 0,
-  deliveryDriverName: "",
-  grandTotal: 0,
-  customerName: "",
-  customerPhone: "",
-  customerAddress: "",
+watch(showOrdersDialog, (v) => {
+  if (v) fetchSessionOrders();
 });
+
+async function printSessionOrder(order: any) {
+  try {
+    await fetchReceiptConfig();
+    const data = await $fetch<any>("/api/orders/detail", {
+      query: { id: order.id },
+    });
+    if (!data.success) return;
+    const lines = data.lines || [];
+    const payments = data.payments || [];
+    const totalFromLines = lines.reduce(
+      (sum: number, l: any) => sum + l.price_subtotal,
+      0,
+    );
+    printReceipt({
+      orderName: order.name,
+      lastOrderItems: lines.map((l: any) => ({
+        product: { name: l.product_id?.[1] || `#${l.product_id?.[0] || ""}` },
+        quantity: l.qty,
+        price: l.price_unit,
+        discount: l.discount,
+      })),
+      lastOrderPayments: payments.map((p: any) => ({
+        methodName:
+          p.payment_method_id?.[1] || `#${p.payment_method_id?.[0] || ""}`,
+        amount: p.amount,
+      })),
+      lastOrderSubtotal: totalFromLines,
+      lastOrderDiscount: lines.reduce(
+        (sum: number, l: any) =>
+          sum + (l.price_unit * l.qty * l.discount) / 100,
+        0,
+      ),
+      lastOrderServiceFee: order.service_fee || 0,
+      lastOrderGrandTotal: order.amount_total,
+      lastOrderCustomerName: data.order.partner_id?.[1] || "",
+      lastOrderCustomerPhone: data.order.partner_phone || "",
+      lastOrderCustomerAddress: data.order.partner_address || "",
+    });
+  } catch {
+    // Silently fail
+  }
+}
 
 const showToast = ref(false);
 const toastMessage = ref("");
@@ -400,6 +436,27 @@ function handleAddToCart(
   qty?: number,
 ) {
   const quantity = qty ?? 1;
+
+  // Check stock availability for storable products
+  if (product.type === "product") {
+    let availableStock = 0;
+    if (variant?.stock_by_location && variant.stock_by_location.length > 0) {
+      availableStock = variant.stock_by_location.reduce((sum, s) => sum + s.quantity, 0);
+    } else if (product.stock_by_location && product.stock_by_location.length > 0) {
+      availableStock = product.stock_by_location.reduce((sum, s) => sum + s.quantity, 0);
+    } else {
+      availableStock = product.qty_available ?? 0;
+    }
+    if (availableStock <= 0) {
+      showFeedbackToast("لا يوجد مخزون كافٍ لهذا المنتج", "error");
+      return;
+    }
+    if (quantity > availableStock) {
+      showFeedbackToast(`الكمية المتاحة ${availableStock} فقط`, "error");
+      return;
+    }
+  }
+
   console.log("[POS] handleAddToCart", product, quantity);
   cart.addItem(product, variant, quantity);
 }
@@ -426,6 +483,10 @@ function handleShowNotes() {
 
 function handleOpenClients() {
   showCustomersDialog.value = true;
+}
+
+function handleOpenOrders() {
+  showOrdersDialog.value = true;
 }
 
 function handleOpenDelivery() {
@@ -492,48 +553,39 @@ async function handleCashPayment() {
     });
 
     if (res.success) {
-      lastOrderData.value = {
-        orderName: res.name,
-        items: cart.items.map((item) => ({
-          product: {
-            name: item.variant
-              ? `${item.product.display_name || item.product.name} (${item.variant.attribute_values?.map((v) => v.value_name).join("/") || item.variant.display_name})`
-              : item.product.display_name || item.product.name,
-          },
-          quantity: item.quantity,
-          price: item.price,
-          discount: item.discount || 0,
-        })),
-        payments: [
-          { methodName: cashMethod.name, amount: cart.grandTotal },
-        ],
-        subtotal: cart.subtotal,
-        discountAmount: cart.discountAmount,
-        serviceFeeAmount: cart.serviceFeeAmount,
-        deliveryCostAmount: cart.deliveryCost,
-        deliveryDriverName: cart.deliveryDriverName,
-        grandTotal: cart.grandTotal,
-        customerName: cart.customerName,
-        customerPhone: cart.customerPhone,
-        customerAddress: cart.customerAddress,
-      };
+      const receiptItems = cart.items.map((item) => ({
+        product: {
+          name: item.variant
+            ? `${item.product.display_name || item.product.name} (${item.variant.attribute_values?.map((v) => v.value_name).join("/") || item.variant.display_name})`
+            : item.product.display_name || item.product.name,
+        },
+        quantity: item.quantity,
+        price: item.price,
+        discount: item.discount || 0,
+      }));
+      const receiptPayments = [
+        { methodName: cashMethod.name, amount: cart.grandTotal },
+      ];
+      const receiptSubtotal = cart.subtotal;
+      const receiptDiscount = cart.discountAmount;
+      const receiptServiceFee = cart.serviceFeeAmount;
+      const receiptGrandTotal = cart.grandTotal;
+      const receiptCustomerName = cart.customerName;
+      const receiptCustomerPhone = cart.customerPhone;
+      const receiptCustomerAddress = cart.customerAddress;
       cart.clearCart();
       await fetchReceiptConfig();
-      showPaymentSuccess.value = true;
-      await nextTick();
-      await printReceipt({
-        orderName: lastOrderData.value.orderName,
-        lastOrderItems: lastOrderData.value.items,
-        lastOrderPayments: lastOrderData.value.payments,
-        lastOrderSubtotal: lastOrderData.value.subtotal,
-        lastOrderDiscount: lastOrderData.value.discountAmount,
-        lastOrderServiceFee: lastOrderData.value.serviceFeeAmount,
-        lastOrderDeliveryCost: lastOrderData.value.deliveryCostAmount,
-        lastOrderDriverName: lastOrderData.value.deliveryDriverName,
-        lastOrderGrandTotal: lastOrderData.value.grandTotal,
-        lastOrderCustomerName: lastOrderData.value.customerName,
-        lastOrderCustomerPhone: lastOrderData.value.customerPhone,
-        lastOrderCustomerAddress: lastOrderData.value.customerAddress,
+      printReceipt({
+        orderName: res.name,
+        lastOrderItems: receiptItems,
+        lastOrderPayments: receiptPayments,
+        lastOrderSubtotal: receiptSubtotal,
+        lastOrderDiscount: receiptDiscount,
+        lastOrderServiceFee: receiptServiceFee,
+        lastOrderGrandTotal: receiptGrandTotal,
+        lastOrderCustomerName: receiptCustomerName,
+        lastOrderCustomerPhone: receiptCustomerPhone,
+        lastOrderCustomerAddress: receiptCustomerAddress,
       });
     }
   } catch (error: any) {
@@ -544,18 +596,6 @@ async function handleCashPayment() {
   } finally {
     isProcessingPayment.value = false;
   }
-}
-
-async function handlePrintReceipt() {
-  await printReceipt({
-    orderName: lastOrderData.value.orderName,
-    lastOrderItems: lastOrderData.value.items,
-    lastOrderPayments: lastOrderData.value.payments,
-    lastOrderSubtotal: lastOrderData.value.subtotal,
-    lastOrderDiscount: lastOrderData.value.discountAmount,
-    lastOrderServiceFee: lastOrderData.value.serviceFeeAmount,
-    lastOrderGrandTotal: lastOrderData.value.grandTotal,
-  });
 }
 
 function handleOrderCompleted() {
@@ -576,7 +616,6 @@ function handleSessionClosed() {
 function handleSessionExpired() {
   if (!sessionId.value) return;
   sessionId.value = null;
-  showPaymentSuccess.value = false;
   showVaultModal.value = false;
   showCloseSessionModal.value = false;
   cart.clearCart();
@@ -826,6 +865,7 @@ watch(
         @show-notes="handleShowNotes"
         @show-discount="handleShowDiscount"
         @open-clients="handleOpenClients"
+        @open-orders="handleOpenOrders"
         @show-delivery="handleOpenDelivery"
         @select-item="(i) => (selectedCartIndex = i)"
       />
@@ -1058,7 +1098,7 @@ watch(
       </Transition>
     </Teleport>
 
-    <!-- Payment Success Screen -->
+    <!-- Orders Dialog -->
     <Teleport to="body">
       <Transition
         enter-active-class="transition duration-200 ease-out"
@@ -1069,39 +1109,64 @@ watch(
         leave-to-class="opacity-0 scale-95"
       >
         <div
-          v-if="showPaymentSuccess"
-          class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white"
-          dir="rtl"
+          v-if="showOrdersDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center"
         >
-          <div class="overflow-y-auto max-h-[80vh] p-6">
-            <PosPaymentSuccess
-              :order-name="lastOrderData.orderName"
-              :items="lastOrderData.items"
-              :payments="lastOrderData.payments"
-              :subtotal="lastOrderData.subtotal"
-              :discount-amount="lastOrderData.discountAmount"
-              :service-fee-amount="lastOrderData.serviceFeeAmount"
-              :delivery-cost-amount="lastOrderData.deliveryCostAmount"
-              :delivery-driver-name="lastOrderData.deliveryDriverName"
-              :grand-total="lastOrderData.grandTotal"
-              :customer-name="lastOrderData.customerName"
-              :customer-phone="lastOrderData.customerPhone"
-              :customer-address="lastOrderData.customerAddress"
-              :receipt-config="receiptConfig"
-            />
-          </div>
-          <div class="flex gap-3 p-4">
-            <Button
-              variant="outline"
-              class="gap-2 cursor-pointer"
-              @click="handlePrintReceipt"
-            >
-              <Printer class="w-4 h-4" />
-              طباعة
-            </Button>
-            <Button class="gap-2 cursor-pointer" @click="showPaymentSuccess = false">
-              تم
-            </Button>
+          <div
+            class="fixed inset-0 bg-black/50"
+            @click="showOrdersDialog = false"
+          />
+          <div class="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-4 text-right max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-bold">طلبات الجلسة الحالية</h3>
+              <Button variant="ghost" size="sm" @click="showOrdersDialog = false">✕</Button>
+            </div>
+            <div v-if="sessionOrdersLoading" class="flex items-center justify-center py-8">
+              <LoaderCircle class="w-6 h-6 animate-spin text-primary" />
+            </div>
+            <div v-else-if="sessionOrders.length === 0" class="text-center py-8 text-muted-foreground">
+              <p class="font-bold">لا توجد طلبات في هذه الجلسة</p>
+            </div>
+            <div v-else class="flex-1 overflow-y-auto space-y-2">
+              <div
+                v-for="order in sessionOrders"
+                :key="order.id"
+                class="border border-outline-variant/40 rounded-xl p-3 hover:bg-accent/50 transition-colors"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-sm">{{ order.name }}</span>
+                    <span
+                      class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                      :class="{
+                        'bg-primary/10 text-primary': order.state === 'paid' || order.state === 'done',
+                        'bg-amber-100 text-amber-700': order.state === 'draft',
+                        'bg-red-100 text-red-700': order.state === 'cancelled',
+                      }"
+                    >
+                      {{ order.state === 'paid' ? 'مدفوع' : order.state === 'done' ? 'منتهي' : order.state === 'draft' ? 'مسودة' : 'ملغي' }}
+                    </span>
+                  </div>
+                  <span class="font-bold text-primary text-sm">{{ order.amount_total.toLocaleString('en-US') }} ج.م</span>
+                </div>
+                <div class="flex items-center justify-between mt-1 text-xs text-muted-foreground">
+                  <span>{{ order.partner_id ? order.partner_id[1] : 'عميل نقدي' }}</span>
+                  <div class="flex items-center gap-2">
+                    <span>{{ formatDateWithTime(order.date_order) }}</span>
+                    <Button
+                      v-if="order.state !== 'cancelled'"
+                      variant="ghost"
+                      size="sm"
+                      class="h-7 px-2 gap-1 cursor-pointer"
+                      @click="printSessionOrder(order)"
+                    >
+                      <Printer class="w-3.5 h-3.5" />
+                      طباعة
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </Transition>

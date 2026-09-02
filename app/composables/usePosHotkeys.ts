@@ -131,8 +131,8 @@ export function usePosHotkeys(options: UsePosHotkeysOptions) {
         break;
       }
       case "F5": {
+        if (!enabled.value) return;
         e.preventDefault();
-        if (!enabled.value || isInputFocused()) return;
         onToggleWeight?.();
         break;
       }

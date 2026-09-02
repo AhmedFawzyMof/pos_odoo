@@ -28,6 +28,12 @@ export default defineEventHandler(async (event) => {
     service_fee_type: body.service_fee_type || "fixed",
     customer_id: body.customer_id ? Number(body.customer_id) : false,
     note: body.note || "",
+    state: body.state || false,
+    payments: (body.payments || []).map((p: any) => ({
+      id: p.id ? Number(p.id) : null,
+      method_id: Number(p.method_id) || 0,
+      amount: Number(p.amount) || 0,
+    })),
   };
 
   const odoo = await getAdminOdooClient();

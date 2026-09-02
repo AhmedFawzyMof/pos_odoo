@@ -403,7 +403,8 @@ const closeModal = async () => {
           <div
             class="bg-slate-50 p-3 border-b border-slate-200 text-xs font-bold text-slate-600 grid grid-cols-12 gap-2"
           >
-            <div class="col-span-6 text-right">المنتج</div>
+            <div class="col-span-4 text-right">المنتج</div>
+            <div class="col-span-2 text-right">الباركود</div>
             <div class="col-span-3 text-center">الكمية</div>
             <div class="col-span-2 text-center">الحالة</div>
             <div class="col-span-1 text-center">إجراء</div>
@@ -426,9 +427,12 @@ const closeModal = async () => {
               class="p-3 text-xs grid grid-cols-12 gap-2 items-center hover:bg-slate-50/60"
             >
               <div
-                class="col-span-6 text-right font-medium text-slate-900 truncate"
+                class="col-span-4 text-right font-medium text-slate-900 truncate"
               >
                 {{ item.product.name }}
+              </div>
+              <div class="col-span-2 text-right text-[10px] font-mono text-slate-500 truncate" :title="item.product.barcode">
+                {{ item.product.barcode || "—" }}
               </div>
               <div class="col-span-3 flex flex-col items-center gap-0.5">
                 <input

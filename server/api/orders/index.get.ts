@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
   const dateFrom = (query.date_from as string) || "";
   const dateTo = (query.date_to as string) || "";
   const source = (query.source as string) || "";
+  const configName = (query.config_name as string) || "";
 
   const odoo = await getAdminOdooClient();
   await requirePermission(event, 'pos_user')
@@ -33,6 +34,7 @@ export default defineEventHandler(async (event) => {
         date_from: dateFrom || false,
         date_to: dateTo || false,
         source: source || false,
+        config_name: configName || false,
       },
     ]),
   );

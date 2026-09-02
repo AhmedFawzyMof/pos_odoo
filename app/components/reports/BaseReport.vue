@@ -107,6 +107,21 @@ const iconMap: Record<string, any> = {
 
 const getIcon = (name: string) => iconMap[name] || Circle;
 
+const extractName = (val: any): string => {
+  if (val === null || val === undefined) return "-";
+  if (typeof val === "string") return val;
+  if (typeof val === "number") return String(val);
+  if (Array.isArray(val)) return val.length > 1 ? String(val[1]) : String(val[0] ?? "-");
+  if (typeof val === "object") {
+    if (val.name) return String(val.name);
+    if (val.display_name) return String(val.display_name);
+    const keys = Object.keys(val);
+    if (keys.length === 1) return String(val[keys[0]]);
+    return val.en_US || val.ar_SY || val[keys[0]] || JSON.stringify(val);
+  }
+  return String(val);
+};
+
 const tableRef = ref<InstanceType<typeof ReportTable> | null>(null);
 
 const handleExport = () => {
@@ -193,7 +208,7 @@ defineExpose({ refresh, handleExport });
                 'text-on-white': !kpi.color,
               }"
             >
-              {{ typeof kpi.value === 'object' ? JSON.stringify(kpi.value) : kpi.value }}
+              {{ extractName(kpi.value) }}
             </h3>
 
           </div>

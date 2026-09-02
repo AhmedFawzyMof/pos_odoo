@@ -11,6 +11,7 @@ import {
   Search,
   RefreshCw,
   FileX2,
+  Printer,
 } from "@lucide/vue";
 import * as XLSX from "@sheetjs/xlsx";
 import { usePermissions } from "~/composables/usePermissions";
@@ -43,6 +44,19 @@ interface StockTransfer {
   status: string;
   statusLabel: string;
   reference: string;
+  origin: string;
+}
+
+interface TransferGroup {
+  reference: string;
+  items: StockTransfer[];
+  date: string;
+  time: string;
+  fromLocation: string;
+  toLocation: string;
+  operator: string;
+  totalQty: number;
+  origin: string;
 }
 
 const searchQuery = ref("");
@@ -51,6 +65,9 @@ const dateFrom = ref("");
 const dateTo = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 26;
+
+const showGroupModal = ref(false);
+const selectedGroup = ref<TransferGroup | null>(null);
 
 let searchTimeout: ReturnType<typeof setTimeout>;
 watch(searchQuery, () => {
@@ -97,6 +114,35 @@ const {
 const movements = computed(() => apiResponse.value?.data || []);
 const totalItems = computed(() => apiResponse.value?.totalItems || 0);
 const totalPages = computed(() => apiResponse.value?.totalPages || 1);
+
+const groupedMovements = computed<TransferGroup[]>(() => {
+  const map = new Map<string, TransferGroup>();
+  for (const mv of movements.value) {
+    const ref = mv.reference || mv.id;
+    if (map.has(ref)) {
+      map.get(ref)!.items.push(mv);
+      map.get(ref)!.totalQty += mv.qty;
+    } else {
+      map.set(ref, {
+        reference: ref,
+        items: [mv],
+        date: mv.date,
+        time: mv.time,
+        fromLocation: mv.fromLocation,
+        toLocation: mv.toLocation,
+        operator: mv.operator,
+        totalQty: mv.qty,
+        origin: mv.origin || '',
+      });
+    }
+  }
+  return Array.from(map.values());
+});
+
+function openGroup(group: TransferGroup) {
+  selectedGroup.value = group;
+  showGroupModal.value = true;
+}
 
 const setPage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) currentPage.value = page;
@@ -152,6 +198,7 @@ const triggerExport = async () => {
       "إلى موقع": m.toLocation,
       الكمية: m.qty,
       المرجع: m.reference || "",
+      المصدر: m.origin || "",
       المسؤول: m.operator,
       الحالة: m.statusLabel,
     }));
@@ -166,6 +213,100 @@ const triggerExport = async () => {
     alert("فشل تصدير التقرير. يرجى المحاولة مرة أخرى.");
   }
 };
+
+function printGroup(group: TransferGroup) {
+  const linesHtml = group.items
+    .map(
+      (item, i) => `
+      <tr>
+        <td style="text-align:center;padding:6px 4px;border-bottom:1px solid #e2e8f0;">${i + 1}</td>
+        <td style="text-align:right;padding:6px 4px;border-bottom:1px solid #e2e8f0;">${item.productName}</td>
+        <td style="text-align:center;padding:6px 4px;border-bottom:1px solid #e2e8f0;">${item.sku}</td>
+        <td style="text-align:center;padding:6px 4px;border-bottom:1px solid #e2e8f0;">${item.qty}</td>
+        <td style="text-align:center;padding:6px 4px;border-bottom:1px solid #e2e8f0;">${item.fromLocation}</td>
+        <td style="text-align:center;padding:6px 4px;border-bottom:1px solid #e2e8f0;">${item.toLocation}</td>
+      </tr>`,
+    )
+    .join("");
+
+  const html = `
+  <!DOCTYPE html>
+  <html dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>تحويل مخزني - ${group.reference}</title>
+    <style>
+      @page { margin: 15mm; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: "Arial", sans-serif; font-size: 13px; color: #1e293b; background: #fff; max-width: 210mm; margin: 0 auto; padding: 20px; line-height: 1.6; }
+      .no-print { display: block; }
+      @media print { .no-print { display: none !important; } body { max-width: 100%; padding: 5mm; } }
+      .header { text-align: center; border-bottom: 2px solid #1e293b; padding-bottom: 12px; margin-bottom: 16px; }
+      .header h1 { font-size: 20px; color: #1e293b; margin-bottom: 4px; }
+      .info-grid { display: flex; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+      .info-grid .col { display: flex; flex-direction: column; gap: 4px; }
+      .info-grid .col .lbl { font-size: 11px; color: #64748b; }
+      .info-grid .col .val { font-weight: bold; color: #0f172a; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+      th { background: #1e40af; color: #fff; padding: 8px 4px; font-size: 12px; font-weight: bold; }
+      td { padding: 6px 4px; }
+      tr:nth-child(even) { background: #f8fafc; }
+      .footer { text-align: center; margin-top: 24px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <div class="no-print" style="text-align:center;padding:20px 0;">
+      <button onclick="window.print()" style="padding:12px 40px;font-size:14px;font-weight:bold;background:#059669;color:white;border:none;border-radius:8px;cursor:pointer;">
+        طباعة
+      </button>
+    </div>
+    <div class="header">
+      <h1>تحويل مخزني</h1>
+    </div>
+    <div class="info-grid">
+      <div class="col"><span class="lbl">المرجع</span><span class="val">${group.reference}</span></div>
+      <div class="col"><span class="lbl">المصدر</span><span class="val">${group.origin || '—'}</span></div>
+      <div class="col"><span class="lbl">التاريخ</span><span class="val">${group.date} ${group.time}</span></div>
+      <div class="col"><span class="lbl">من موقع</span><span class="val">${group.fromLocation}</span></div>
+      <div class="col"><span class="lbl">إلى موقع</span><span class="val">${group.toLocation}</span></div>
+      <div class="col"><span class="lbl">المسؤول</span><span class="val">${group.operator}</span></div>
+      <div class="col"><span class="lbl">عدد المنتجات</span><span class="val">${group.items.length}</span></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th style="text-align:right;">المنتج</th>
+          <th>SKU</th>
+          <th>الكمية</th>
+          <th>من موقع</th>
+          <th>إلى موقع</th>
+        </tr>
+      </thead>
+      <tbody>${linesHtml}</tbody>
+    </table>
+    <div class="footer"><div>${group.reference}</div></div>
+  </body>
+  </html>`;
+
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.top = "-9999px";
+  iframe.style.left = "-9999px";
+  iframe.style.width = "1px";
+  iframe.style.height = "1px";
+  iframe.style.opacity = "0";
+  document.body.appendChild(iframe);
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) return;
+  doc.write(html);
+  doc.close();
+  const win = iframe.contentWindow;
+  if (!win) return;
+  win.focus();
+  win.print();
+  win.onafterprint = () => document.body.removeChild(iframe);
+}
 </script>
 
 <template>
@@ -230,7 +371,7 @@ const triggerExport = async () => {
         <input
           v-model="searchQuery"
           class="w-full h-11 pr-10 pl-4 bg-white rounded-full border-none focus:ring-2 focus:ring-primary text-label-md outline-none text-right"
-          placeholder="بحث بالمنتج، الكود، الموقع أو المستودع..."
+          placeholder="بحث بالمنتج، الكود، الموقع، أو رقم أمر الشراء..."
           type="text"
         />
       </div>
@@ -270,104 +411,86 @@ const triggerExport = async () => {
             <tr
               class="bg-white text-on-white-variant border-b border-outline-variant"
             >
-              <th class="px-6 py-4 font-bold text-label-md">معرف الحركة</th>
+              <th class="px-6 py-4 font-bold text-label-md">المرجع</th>
+              <th class="px-6 py-4 font-bold text-label-md">المصدر</th>
               <th class="px-6 py-4 font-bold text-label-md">التاريخ والوقت</th>
-              <th class="px-6 py-4 font-bold text-label-md">المنتج</th>
-              <th class="px-6 py-4 font-bold text-label-md">نوع الحركة</th>
               <th class="px-6 py-4 font-bold text-label-md">من موقع</th>
               <th class="px-6 py-4 font-bold text-label-md">إلى موقع</th>
-              <th class="px-6 py-4 font-bold text-label-md">الكمية</th>
-              <th class="px-6 py-4 font-bold text-label-md">المرجع</th>
+              <th class="px-6 py-4 font-bold text-label-md">عدد المنتجات</th>
+              <th class="px-6 py-4 font-bold text-label-md">إجمالي الكمية</th>
               <th class="px-6 py-4 font-bold text-label-md">المسؤول</th>
-              <th class="px-6 py-4 font-bold text-label-md">الحالة</th>
+              <th class="px-6 py-4 font-bold text-label-md">الإجراءات</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-outline-variant">
             <tr
-              v-for="mv in movements"
-              :key="mv.id"
-              class="hover:bg-white-low transition-colors group"
+              v-for="group in groupedMovements"
+              :key="group.reference"
+              class="hover:bg-white-low transition-colors group cursor-pointer"
+              @click="openGroup(group)"
             >
-              <td
-                class="px-6 py-4 font-mono text-label-md font-semibold text-primary"
-              >
-                {{ mv.id }}
+              <td class="px-6 py-4 font-mono text-label-md font-semibold text-primary">
+                {{ group.reference || "—" }}
               </td>
-
-              <td class="px-6 py-4">
-                <p class="font-bold text-on-white text-body-md">
-                  {{ mv.date }}
-                </p>
-                <p class="text-[12px] text-on-white-variant font-mono">
-                  {{ mv.time }}
-                </p>
-              </td>
-
-              <td class="px-6 py-4">
-                <p class="font-bold text-on-white text-body-md">
-                  {{ mv.productName }}
-                </p>
-                <p class="text-[12px] text-on-white-variant font-mono">
-                  SKU: {{ mv.sku }}
-                </p>
-              </td>
-
-              <td class="px-6 py-4 text-xs">
+              <td class="px-6 py-4 text-label-md">
                 <span
-                  class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-label-md font-bold bg-primary/10 text-primary"
+                  v-if="group.origin"
+                  class="px-2 py-0.5 rounded-full text-xs font-bold"
+                  :class="
+                    group.origin.includes('PO')
+                      ? 'bg-blue-500/10 text-blue-600'
+                      : group.origin.includes('RPC')
+                        ? 'bg-purple-500/10 text-purple-600'
+                        : 'bg-gray-100 text-gray-600'
+                  "
                 >
-                  <ArrowLeftRight class="w-[16px] h-[16px]" />
-                  {{ mv.typeLabel || "تحويل" }}
+                  {{ group.origin }}
+                </span>
+                <span v-else class="text-on-white-variant">—</span>
+              </td>
+              <td class="px-6 py-4">
+                <p class="font-bold text-on-white text-body-md">{{ group.date }}</p>
+                <p class="text-[12px] text-on-white-variant font-mono">{{ group.time }}</p>
+              </td>
+              <td class="px-6 py-4 text-on-white-variant text-label-md font-mono">
+                {{ group.fromLocation }}
+              </td>
+              <td class="px-6 py-4 text-on-white-variant text-label-md font-mono">
+                {{ group.toLocation }}
+              </td>
+              <td class="px-6 py-4">
+                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold">
+                  {{ group.items.length }} منتج
                 </span>
               </td>
-
-              <td
-                class="px-6 py-4 text-on-white-variant text-label-md font-mono"
-              >
-                {{ mv.fromLocation }}
-              </td>
-
-              <td
-                class="px-6 py-4 text-on-white-variant text-label-md font-mono"
-              >
-                {{ mv.toLocation }}
-              </td>
-
               <td class="px-6 py-4 font-bold text-body-lg">
                 <span class="text-primary">
-                  {{ mv.qty > 0 ? "+" : "" }}{{ mv.qty }}
+                  {{ group.totalQty > 0 ? "+" : "" }}{{ group.totalQty }}
                 </span>
               </td>
-
-              <td
-                class="px-6 py-4 text-label-md text-on-white-variant font-mono max-w-[160px] truncate"
-                :title="mv.reference"
-              >
-                {{ mv.reference || "—" }}
-              </td>
-
               <td class="px-6 py-4 text-on-white text-label-md">
-                {{ mv.operator }}
+                {{ group.operator }}
               </td>
-
-              <td class="px-6 py-4">
-                <span
-                  class="bg-primary/5 text-primary border border-primary/10 px-2 py-0.5 rounded text-xs"
+              <td class="px-6 py-4" @click.stop>
+                <button
+                  @click="printGroup(group)"
+                  class="p-2 rounded-lg hover:bg-white text-secondary transition-colors cursor-pointer"
+                  title="طباعة"
                 >
-                  {{ mv.statusLabel }}
-                </span>
+                  <Printer class="w-[18px] h-[18px] text-primary" />
+                </button>
               </td>
             </tr>
-            <tr v-if="status === 'pending' && !movements.length">
-              <td colspan="10" class="p-12 text-center text-on-white-variant">
+            <tr v-if="status === 'pending' && !groupedMovements.length">
+              <td colspan="9" class="p-12 text-center text-on-white-variant">
                 <RefreshCw
                   class="w-9 h-9 block mb-2 animate-spin text-primary mx-auto"
                 />
                 جاري تحميل التحويلات المخزنية...
               </td>
             </tr>
-            <tr v-else-if="movements.length === 0">
-              <td colspan="10" class="p-12 text-center text-on-white-variant">
+            <tr v-else-if="groupedMovements.length === 0">
+              <td colspan="9" class="p-12 text-center text-on-white-variant">
                 <FileX2 class="w-9 h-9 block mb-2 text-outline mx-auto" />
                 لا توجد تحويلات مخزنية تطابق البحث المختار.
               </td>
@@ -426,5 +549,93 @@ const triggerExport = async () => {
         </div>
       </div>
     </div>
+
+    <!-- Group Detail Modal -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="showGroupModal && selectedGroup"
+          class="fixed inset-0 z-50 flex items-center justify-center"
+        >
+          <div class="fixed inset-0 bg-black/50" @click="showGroupModal = false" />
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 text-right max-h-[85vh] flex flex-col">
+            <div class="p-6 border-b border-outline-variant flex items-center justify-between">
+              <div>
+                <h3 class="text-headline-sm font-bold">تفاصيل التحويل المخزني</h3>
+                <p class="text-sm text-on-white-variant mt-1">المرجع: {{ selectedGroup.reference }}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  @click="printGroup(selectedGroup)"
+                  class="p-2 rounded-lg hover:bg-white text-secondary transition-colors cursor-pointer"
+                  title="طباعة"
+                >
+                  <Printer class="w-5 h-5 text-primary" />
+                </button>
+                <button
+                  @click="showGroupModal = false"
+                  class="p-2 rounded-lg hover:bg-white text-secondary transition-colors cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div class="p-6 grid grid-cols-2 gap-4 text-sm border-b border-outline-variant/50">
+              <div>
+                <span class="text-on-white-variant">التاريخ:</span>
+                <span class="font-bold mr-2">{{ selectedGroup.date }} {{ selectedGroup.time }}</span>
+              </div>
+              <div>
+                <span class="text-on-white-variant">المرجع:</span>
+                <span class="font-bold mr-2">{{ selectedGroup.reference }}</span>
+              </div>
+              <div>
+                <span class="text-on-white-variant">المصدر:</span>
+                <span class="font-bold mr-2">{{ selectedGroup.origin || "—" }}</span>
+              </div>
+              <div>
+                <span class="text-on-white-variant">من موقع:</span>
+                <span class="font-bold mr-2">{{ selectedGroup.fromLocation }}</span>
+              </div>
+              <div>
+                <span class="text-on-white-variant">إلى موقع:</span>
+                <span class="font-bold mr-2">{{ selectedGroup.toLocation }}</span>
+              </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+              <table class="w-full text-right border-collapse">
+                <thead>
+                  <tr class="border-b border-outline-variant">
+                    <th class="px-3 py-2 font-bold text-label-md text-on-white-variant">#</th>
+                    <th class="px-3 py-2 font-bold text-label-md text-on-white-variant">المنتج</th>
+                    <th class="px-3 py-2 font-bold text-label-md text-on-white-variant">SKU</th>
+                    <th class="px-3 py-2 font-bold text-label-md text-on-white-variant">الكمية</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/50">
+                  <tr
+                    v-for="(item, idx) in selectedGroup.items"
+                    :key="item.id"
+                    class="hover:bg-white-low transition-colors"
+                  >
+                    <td class="px-3 py-3 text-on-white-variant">{{ idx + 1 }}</td>
+                    <td class="px-3 py-3 font-bold">{{ item.productName }}</td>
+                    <td class="px-3 py-3 text-on-white-variant font-mono text-xs">{{ item.sku }}</td>
+                    <td class="px-3 py-3 font-bold text-primary">{{ item.qty }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>

@@ -308,6 +308,10 @@ export function useReceiptPrint() {
     <div style="text-align:center;font-size:${fontSize + 1}px;font-weight:bold;line-height:1.625;color:${primaryColor}">
       ${cfg.footer?.showThankYou ? `<div>${cfg.footer?.thankYouText || "شكراً لتسوقكم معنا"}</div>` : ""}
       ${cfg.footer?.showTerms && cfg.footer?.termsText ? `<div style="margin-top:4px">${cfg.footer.termsText}</div>` : ""}
+      <div style="margin-top:12px;border-top:1px dashed ${primaryColor};padding-top:8px;font-size:${fontSize - 1}px;font-weight:normal;color:${accentColor}">
+        <div>هذا النظام مبرمج بواسطة EasyWeb</div>
+        <div>01212158465 | 01147098469</div>
+      </div>
     </div>
   `
       : "";

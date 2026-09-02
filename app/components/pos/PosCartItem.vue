@@ -50,7 +50,22 @@ function emitQty(val: number) {
   if (v >= min.value) emit("updateQuantity", v);
 }
 
+function getAvailableStock(): number {
+  const p = props.item.product;
+  const v = props.item.variant;
+  if (p.type !== "product") return Infinity;
+  if (v?.stock_by_location && v.stock_by_location.length > 0) {
+    return v.stock_by_location.reduce((sum, s) => sum + s.quantity, 0);
+  }
+  if (p.stock_by_location && p.stock_by_location.length > 0) {
+    return p.stock_by_location.reduce((sum, s) => sum + s.quantity, 0);
+  }
+  return p.qty_available ?? 0;
+}
+
 function increment() {
+  const available = getAvailableStock();
+  if (localQty.value + 1 > available) return;
   const next = isWeight.value
     ? Math.round((localQty.value + 1) * 10000) / 10000
     : localQty.value + 1;

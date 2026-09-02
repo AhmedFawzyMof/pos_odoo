@@ -1,4 +1,4 @@
-  <script setup lang="ts">
+<script setup lang="ts">
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -60,22 +60,60 @@ const renderBorderStyle = computed(() => {
             class="h-12 mx-auto mb-1 object-contain"
             alt="logo"
           />
-          <div v-if="cfg.header?.companyName && company.name" class="font-bold" :style="{ fontSize: Math.round(baseFontSize * 1.3) + 'px' }">
+          <div
+            v-if="cfg.header?.companyName && company.name"
+            class="font-bold"
+            :style="{ fontSize: Math.round(baseFontSize * 1.3) + 'px' }"
+          >
             {{ company.name }}
           </div>
-          <div v-if="cfg.header?.companyAddress && company.address?.city" class="leading-relaxed" :style="{ fontSize: baseFontSize + 'px', color: cfg.colors?.secondary }">
-            {{ company.address?.street }}{{ company.address?.street2 ? ', ' + company.address?.street2 : '' }}{{ company.address?.city ? ', ' + company.address?.city : '' }}
+          <div
+            v-if="cfg.header?.companyAddress && company.address?.city"
+            class="leading-relaxed"
+            :style="{
+              fontSize: baseFontSize + 'px',
+              color: cfg.colors?.secondary,
+            }"
+          >
+            {{ company.address?.street
+            }}{{
+              company.address?.street2 ? ", " + company.address?.street2 : ""
+            }}{{ company.address?.city ? ", " + company.address?.city : "" }}
           </div>
-          <div v-if="cfg.header?.companyPhone && company.phone" :style="{ fontSize: baseFontSize + 'px', color: cfg.colors?.secondary }">
+          <div
+            v-if="cfg.header?.companyPhone && company.phone"
+            :style="{
+              fontSize: baseFontSize + 'px',
+              color: cfg.colors?.secondary,
+            }"
+          >
             {{ company.phone }}
           </div>
-          <div v-if="cfg.header?.companyEmail && company.email" :style="{ fontSize: baseFontSize + 'px', color: cfg.colors?.secondary }">
+          <div
+            v-if="cfg.header?.companyEmail && company.email"
+            :style="{
+              fontSize: baseFontSize + 'px',
+              color: cfg.colors?.secondary,
+            }"
+          >
             {{ company.email }}
           </div>
-          <div v-if="cfg.header?.companyWebsite && company.website" :style="{ fontSize: baseFontSize + 'px', color: cfg.colors?.secondary }">
+          <div
+            v-if="cfg.header?.companyWebsite && company.website"
+            :style="{
+              fontSize: baseFontSize + 'px',
+              color: cfg.colors?.secondary,
+            }"
+          >
             {{ company.website }}
           </div>
-          <div v-if="cfg.header?.companyVat && company.vat" :style="{ fontSize: baseFontSize + 'px', color: cfg.colors?.secondary }">
+          <div
+            v-if="cfg.header?.companyVat && company.vat"
+            :style="{
+              fontSize: baseFontSize + 'px',
+              color: cfg.colors?.secondary,
+            }"
+          >
             الرقم الضريبي: {{ company.vat }}
           </div>
         </div>
@@ -83,10 +121,27 @@ const renderBorderStyle = computed(() => {
       </template>
 
       <!-- Title -->
-      <div class="text-center font-bold mb-2" :style="{ fontSize: Math.round(baseFontSize * 1.15) + 'px', color: cfg.colors?.primary }">
+      <div
+        class="text-center font-bold mb-2"
+        :style="{
+          fontSize: Math.round(baseFontSize * 1.15) + 'px',
+          color: cfg.colors?.primary,
+        }"
+      >
         {{ cfg.titleAr || "فاتورة بيع" }}
       </div>
-      <div v-if="cfg.footer?.showOrderNumber || cfg.footer?.showDate || cfg.footer?.showTime" class="text-center font-bold mb-2" :style="{ fontSize: Math.round(baseFontSize * 1.15) + 'px', color: cfg.colors?.primary }">
+      <div
+        v-if="
+          cfg.footer?.showOrderNumber ||
+          cfg.footer?.showDate ||
+          cfg.footer?.showTime
+        "
+        class="text-center font-bold mb-2"
+        :style="{
+          fontSize: Math.round(baseFontSize * 1.15) + 'px',
+          color: cfg.colors?.primary,
+        }"
+      >
         <div v-if="cfg.footer?.showOrderNumber">{{ demo.orderName }}</div>
         <div>{{ demo.date }} {{ demo.time }}</div>
       </div>
@@ -96,30 +151,93 @@ const renderBorderStyle = computed(() => {
       <!-- Customer -->
       <template v-if="demo.partner">
         <div :style="{ fontSize: baseFontSize + 'px' }" class="text-center">
-          <div v-if="demo.partner.name" class="font-bold" :style="{ color: cfg.colors?.primary }">{{ demo.partner.name }}</div>
-          <div v-if="demo.partner.contact_address" :style="{ color: cfg.colors?.secondary }">{{ demo.partner.contact_address }}</div>
-          <div v-if="demo.partner.phone" :style="{ color: cfg.colors?.secondary }">{{ demo.partner.phone }}</div>
+          <div
+            v-if="demo.partner.name"
+            class="font-bold"
+            :style="{ color: cfg.colors?.primary }"
+          >
+            {{ demo.partner.name }}
+          </div>
+          <div
+            v-if="demo.partner.contact_address"
+            :style="{ color: cfg.colors?.secondary }"
+          >
+            {{ demo.partner.contact_address }}
+          </div>
+          <div
+            v-if="demo.partner.phone"
+            :style="{ color: cfg.colors?.secondary }"
+          >
+            {{ demo.partner.phone }}
+          </div>
         </div>
         <div :style="renderDivider" class="my-2"></div>
       </template>
 
       <!-- Items -->
       <template v-if="cfg.items?.enabled">
-        <table class="w-full border-collapse" :style="{ fontSize: baseFontSize + 'px' }">
+        <table
+          class="w-full border-collapse"
+          :style="{ fontSize: baseFontSize + 'px' }"
+        >
           <thead>
             <tr>
-              <th class="text-right py-1 px-0.5 font-bold" :style="{ borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">المنتج</th>
-              <th v-if="cfg.items?.showQuantity" class="text-center py-1 px-0.5 font-bold" :style="{ borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">الكمية</th>
-              <th v-if="cfg.items?.showPrice" class="text-left py-1 px-0.5 font-bold" :style="{ borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">السعر</th>
-              <th v-if="cfg.items?.showTotal" class="text-left py-1 px-0.5 font-bold" :style="{ borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">الإجمالي</th>
+              <th
+                class="text-right py-1 px-0.5 font-bold"
+                :style="{
+                  borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`,
+                  color: cfg.colors?.primary,
+                }"
+              >
+                المنتج
+              </th>
+              <th
+                v-if="cfg.items?.showQuantity"
+                class="text-center py-1 px-0.5 font-bold"
+                :style="{
+                  borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`,
+                  color: cfg.colors?.primary,
+                }"
+              >
+                الكمية
+              </th>
+              <th
+                v-if="cfg.items?.showPrice"
+                class="text-left py-1 px-0.5 font-bold"
+                :style="{
+                  borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`,
+                  color: cfg.colors?.primary,
+                }"
+              >
+                السعر
+              </th>
+              <th
+                v-if="cfg.items?.showTotal"
+                class="text-left py-1 px-0.5 font-bold"
+                :style="{
+                  borderBottom: `1px solid ${cfg.colors?.primary || '#000'}`,
+                  color: cfg.colors?.primary,
+                }"
+              >
+                الإجمالي
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, idx) in demo.items" :key="idx">
               <td class="text-right py-1 px-0.5">{{ item.name }}</td>
-              <td v-if="cfg.items?.showQuantity" class="text-center py-1 px-0.5">{{ item.qty }}</td>
-              <td v-if="cfg.items?.showPrice" class="text-left py-1 px-0.5">{{ item.price.toFixed(2) }}</td>
-              <td v-if="cfg.items?.showTotal" class="text-left py-1 px-0.5">{{ (item.price * item.qty).toFixed(2) }}</td>
+              <td
+                v-if="cfg.items?.showQuantity"
+                class="text-center py-1 px-0.5"
+              >
+                {{ item.qty }}
+              </td>
+              <td v-if="cfg.items?.showPrice" class="text-left py-1 px-0.5">
+                {{ item.price.toFixed(2) }}
+              </td>
+              <td v-if="cfg.items?.showTotal" class="text-left py-1 px-0.5">
+                {{ (item.price * item.qty).toFixed(2) }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -128,26 +246,72 @@ const renderBorderStyle = computed(() => {
 
       <!-- Totals -->
       <template v-if="cfg.totals?.enabled">
-        <table class="w-full border-collapse" :style="{ fontSize: baseFontSize + 'px' }">
+        <table
+          class="w-full border-collapse"
+          :style="{ fontSize: baseFontSize + 'px' }"
+        >
           <tr v-if="cfg.totals?.showSubtotal">
             <td class="text-right py-0.5">المجموع</td>
-            <td class="text-left py-0.5">{{ demo.subtotal.toFixed(2) }} {{ cfg.totals?.currency }}</td>
+            <td class="text-left py-0.5">
+              {{ demo.subtotal.toFixed(2) }} {{ cfg.totals?.currency }}
+            </td>
           </tr>
           <tr v-if="cfg.totals?.showDiscount && demo.discount > 0">
-            <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">الخصم</td>
-            <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">-{{ demo.discount.toFixed(2) }} {{ cfg.totals?.currency }}</td>
+            <td
+              class="text-right py-0.5"
+              :style="{ color: cfg.colors?.accent }"
+            >
+              الخصم
+            </td>
+            <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">
+              -{{ demo.discount.toFixed(2) }} {{ cfg.totals?.currency }}
+            </td>
           </tr>
           <tr v-if="cfg.totals?.showServiceFee && demo.serviceFee > 0">
-            <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">رسوم إضافية</td>
-            <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">+{{ demo.serviceFee.toFixed(2) }} {{ cfg.totals?.currency }}</td>
+            <td
+              class="text-right py-0.5"
+              :style="{ color: cfg.colors?.accent }"
+            >
+              رسوم إضافية
+            </td>
+            <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">
+              +{{ demo.serviceFee.toFixed(2) }} {{ cfg.totals?.currency }}
+            </td>
           </tr>
-          <tr v-if="cfg.totals?.showDeliveryCost !== false && demo.deliveryCost > 0">
-            <td class="text-right py-0.5" :style="{ color: cfg.colors?.accent }">رسوم التوصيل</td>
-            <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">+{{ demo.deliveryCost.toFixed(2) }} {{ cfg.totals?.currency }}</td>
+          <tr
+            v-if="
+              cfg.totals?.showDeliveryCost !== false && demo.deliveryCost > 0
+            "
+          >
+            <td
+              class="text-right py-0.5"
+              :style="{ color: cfg.colors?.accent }"
+            >
+              رسوم التوصيل
+            </td>
+            <td class="text-left py-0.5" :style="{ color: cfg.colors?.accent }">
+              +{{ demo.deliveryCost.toFixed(2) }} {{ cfg.totals?.currency }}
+            </td>
           </tr>
           <tr v-if="cfg.totals?.showGrandTotal" class="font-bold">
-            <td class="text-right py-1" :style="{ borderTop: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">الإجمالي</td>
-            <td class="text-left py-1" :style="{ borderTop: `1px solid ${cfg.colors?.primary || '#000'}`, color: cfg.colors?.primary }">{{ demo.grandTotal.toFixed(2) }} {{ cfg.totals?.currency }}</td>
+            <td
+              class="text-right py-1"
+              :style="{
+                borderTop: `1px solid ${cfg.colors?.primary || '#000'}`,
+                color: cfg.colors?.primary,
+              }"
+            >
+              الإجمالي
+            </td>
+            <td
+              class="text-left py-1"
+              :style="{
+                borderTop: `1px solid ${cfg.colors?.primary || '#000'}`,
+                color: cfg.colors?.primary,
+              }"
+            >
+              {{ demo.grandTotal.toFixed(2) }} {{ cfg.totals?.currency }}
+            </td>
           </tr>
         </table>
         <div :style="renderDivider" class="my-2"></div>
@@ -155,12 +319,25 @@ const renderBorderStyle = computed(() => {
 
       <!-- Payments -->
       <template v-if="cfg.payments?.enabled">
-        <table class="w-full border-collapse" :style="{ fontSize: baseFontSize + 'px' }">
+        <table
+          class="w-full border-collapse"
+          :style="{ fontSize: baseFontSize + 'px' }"
+        >
           <tbody>
-            <tr><th class="text-right py-1 font-bold" :style="{ color: cfg.colors?.primary }" colspan="2">طرق الدفع</th></tr>
+            <tr>
+              <th
+                class="text-right py-1 font-bold"
+                :style="{ color: cfg.colors?.primary }"
+                colspan="2"
+              >
+                طرق الدفع
+              </th>
+            </tr>
             <tr v-for="(p, idx) in demo.payments" :key="idx">
               <td class="text-right py-0.5">{{ p.method }}</td>
-              <td class="text-left py-0.5">{{ p.amount.toFixed(2) }} {{ cfg.totals?.currency }}</td>
+              <td class="text-left py-0.5">
+                {{ p.amount.toFixed(2) }} {{ cfg.totals?.currency }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -169,9 +346,35 @@ const renderBorderStyle = computed(() => {
 
       <!-- Footer -->
       <template v-if="cfg.footer?.enabled">
-        <div class="text-center leading-relaxed" :style="{ fontSize: Math.round(baseFontSize * 1.1) + 'px', fontWeight: 'bold', color: cfg.colors?.primary }">
-          <div v-if="cfg.footer?.showThankYou">{{ cfg.footer?.thankYouText }}</div>
-          <div v-if="cfg.footer?.showTerms && cfg.footer?.termsText" class="mt-1">{{ cfg.footer?.termsText }}</div>
+        <div
+          class="text-center leading-relaxed"
+          :style="{
+            fontSize: Math.round(baseFontSize * 1.1) + 'px',
+            fontWeight: 'bold',
+            color: cfg.colors?.primary,
+          }"
+        >
+          <div v-if="cfg.footer?.showThankYou">
+            {{ cfg.footer?.thankYouText }}
+          </div>
+          <div
+            v-if="cfg.footer?.showTerms && cfg.footer?.termsText"
+            class="mt-1"
+          >
+            {{ cfg.footer?.termsText }}
+          </div>
+        </div>
+        <div
+          class="text-center mt-3 pt-2"
+          :style="{
+            borderTop: '1px dashed ' + (cfg.colors?.primary || '#000'),
+            fontSize: Math.round(baseFontSize * 0.85) + 'px',
+            fontWeight: 'normal',
+            color: cfg.colors?.accent || '#666',
+          }"
+        >
+          <div>هذا النظام مبرمج بواسطة EasyWeb</div>
+          <div>01212158465 | 01147098469</div>
         </div>
       </template>
     </div>

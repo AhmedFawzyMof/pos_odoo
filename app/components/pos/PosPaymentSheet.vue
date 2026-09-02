@@ -329,9 +329,8 @@ async function handleSubmit() {
       lastOrderCustomerPhone.value = cart.customerPhone;
       lastOrderCustomerAddress.value = cart.customerAddress;
       cart.clearCart();
-
-      await nextTick();
-      await printReceipt({
+      closeCompleted();
+      printReceipt({
         orderName: orderName.value,
         lastOrderItems: lastOrderItems.value,
         lastOrderPayments: lastOrderPayments.value,
@@ -345,7 +344,6 @@ async function handleSubmit() {
         lastOrderCustomerPhone: lastOrderCustomerPhone.value,
         lastOrderCustomerAddress: lastOrderCustomerAddress.value,
       });
-      closeCompleted();
     }
   } catch (error: any) {
     errorMessage.value = error.statusMessage || "فشل إنشاء الطلب";
@@ -426,24 +424,6 @@ async function handlePrintReceipt() {
           <AlertTriangle class="w-4 h-4 shrink-0" />
           {{ errorMessage }}
         </div>
-
-        <!-- Success -->
-        <PosPaymentSuccess
-          v-if="successMessage"
-          :order-name="orderName"
-          :items="lastOrderItems"
-          :payments="lastOrderPayments"
-          :subtotal="lastOrderSubtotal"
-          :discount-amount="lastOrderDiscount"
-          :service-fee-amount="lastOrderServiceFee"
-          :delivery-cost-amount="lastOrderDeliveryCost"
-          :delivery-driver-name="lastOrderDriverName"
-          :grand-total="lastOrderGrandTotal"
-          :customer-name="lastOrderCustomerName"
-          :customer-phone="lastOrderCustomerPhone"
-          :customer-address="lastOrderCustomerAddress"
-          :receipt-config="receiptConfig"
-        />
 
         <template v-if="!successMessage">
           <!-- Order Summary -->
@@ -627,7 +607,7 @@ async function handlePrintReceipt() {
         <div v-else />
 
         <div class="flex items-center gap-3">
-          <template v-if="!successMessage">
+          <template>
             <button
               type="button"
               @click="closeModal"
@@ -643,23 +623,6 @@ async function handlePrintReceipt() {
             >
               <RefreshCw v-if="isSaving" class="w-4 h-4 animate-spin" />
               <span>{{ isSaving ? "جاري..." : "تأكيد الدفع" }}</span>
-            </button>
-          </template>
-          <template v-else>
-            <button
-              type="button"
-              @click="handlePrintReceipt"
-              class="h-11 px-5 bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-700 font-bold rounded-lg text-xs transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <Receipt class="w-4 h-4" />
-              طباعة
-            </button>
-            <button
-              type="button"
-              @click="closeCompleted"
-              class="h-11 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all cursor-pointer"
-            >
-              تم
             </button>
           </template>
         </div>

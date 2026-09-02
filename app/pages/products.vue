@@ -17,7 +17,9 @@ import {
   Tag,
   MapPin,
   Layers,
+  Download,
 } from "@lucide/vue";
+import * as XLSX from "@sheetjs/xlsx";
 import ProductsTable from "~/components/products/ProductsTable.vue";
 import ProductDrawer from "~/components/products/ProductDrawer.vue";
 import type { Product, POSCategory } from "~/types/product";
@@ -357,6 +359,70 @@ const handleDeleteFromDrawer = async () => {
     }
   }
 };
+
+const exportLoading = ref(false);
+
+const exportProducts = async () => {
+  if (exportLoading.value) return;
+  exportLoading.value = true;
+  try {
+    const res = await $fetch<{
+      success: boolean;
+      data: Product[];
+    }>("/api/products/all", {
+      query: {
+        page: 1,
+        limit: 10000,
+        archiveFilter: archiveFilter.value,
+        search: searchQuery.value,
+        locationId: selectedLocationId.value,
+        categoryId: activeCategoryId.value,
+        negativeStock: negativeStockFilter.value,
+      },
+    });
+    if (!res.success || !res.data?.length) {
+      showToastMessage("لا توجد منتجات للتصدير", "error");
+      return;
+    }
+    const rows = res.data.map((p) => ({
+      "المعرّف": p.id || "",
+      "الاسم": p.name || "",
+      "الاسم المعروض": p.display_name || "",
+      "الباركود": p.barcode || "",
+      "التصنيف": p.categ_id?.[1] || "",
+      "التصنيف الداخلي": p.internal_category?.name || "",
+      "النوع": p.type === "product" ? "مخزون" : p.type === "consu" ? "مستهلك" : "خدمة",
+      "سعر البيع": p.list_price || 0,
+      "سعر الشراء": p.standard_price || 0,
+      "المخزون المتاح": p.qty_available ?? 0,
+      "المخزون الافتراضي": p.virtual_available ?? 0,
+      "الوارد": p.incoming_qty ?? 0,
+      "الصادر": p.outgoing_qty ?? 0,
+      "الوزن": p.weight || 0,
+      "الحجم": p.volume || 0,
+      "Sale OK": p.sale_ok ? "نعم" : "لا",
+      "Purchase OK": p.purchase_ok ? "نعم" : "لا",
+      "نشط": p.active ? "نعم" : "لا",
+      "متاح في POS": p.available_in_pos ? "نعم" : "لا",
+      "الوزن": p.to_weight ? "نعم" : "لا",
+      "الضرائب": p.taxes?.map((t) => t.name).join(", ") || "",
+      "Variants": p.product_variant_ids?.length || 0,
+    }));
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, "المنتجات");
+    XLSX.writeFile(
+      wb,
+      `المنتجات_${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
+    showToastMessage(`تم تصدير ${res.data.length} منتج بنجاح`, "success");
+  } catch (err: any) {
+    console.error("Export failed:", err);
+    showToastMessage("فشل تصدير المنتجات", "error");
+  } finally {
+    exportLoading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -394,6 +460,15 @@ const handleDeleteFromDrawer = async () => {
             class="w-4 h-4"
           />
           <span>المخزون المباشر</span>
+        </button>
+        <button
+          @click="exportProducts"
+          :disabled="exportLoading"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-full border border-outline-variant text-on-white hover:bg-white transition-all active:scale-95 cursor-pointer disabled:opacity-50 text-label-md font-bold"
+          title="تصدير المنتجات"
+        >
+          <Download class="w-4 h-4" />
+          <span>تصدير</span>
         </button>
         <button
           v-if="can('product.create')"

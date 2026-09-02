@@ -104,6 +104,7 @@ const addLine = (p: ProductResult) => {
   lines.value.push({
     product_id: p.id,
     product_name: p.name,
+    barcode: p.barcode,
     quantity: 1,
     price_unit: p.standard_price || 0,
     list_price: p.list_price || 0,
@@ -203,6 +204,7 @@ const grandTotal = computed(() =>
         <thead class="bg-white-low text-on-white-variant">
           <tr>
             <th class="p-3 text-label-md font-bold">المنتج</th>
+            <th class="p-3 text-label-md font-bold">الباركود</th>
             <th class="p-3 text-label-md font-bold">الكمية</th>
             <th class="p-3 text-label-md font-bold">سعر الشراء</th>
             <th class="p-3 text-label-md font-bold">سعر البيع</th>
@@ -215,6 +217,9 @@ const grandTotal = computed(() =>
             <tr class="hover:bg-primary/5">
               <td class="p-3 font-bold text-body-md">
                 {{ line.product_name }}
+              </td>
+              <td class="p-3 text-label-md text-on-white-variant font-mono">
+                {{ line.barcode || "—" }}
               </td>
               <td class="p-3">
                 <input

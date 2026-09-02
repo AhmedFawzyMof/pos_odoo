@@ -133,34 +133,6 @@ const handleReceive = async (data: { po_id: number; lines: any[] }) => {
   }
 };
 
-const reverseReceive = async (poId: number) => {
-  if (!confirm("هل أنت متأكد من عكس استلام هذا الأمر؟ سيتم إرجاع المنتجات إلى المخزون."))
-    return;
-  try {
-    const res = await $fetch<{ success: boolean; message?: string; bill_warning?: string }>(
-      "/api/purchase-orders/reverse-receive",
-      { method: "POST", body: { po_id: poId } },
-    );
-    if (res.success) {
-      showToastMessage(res.message || "تم عكس الاستلام بنجاح", "success");
-      if (res.bill_warning) {
-        setTimeout(() => showToastMessage(res.bill_warning!, "error"), 600);
-      }
-      await refresh();
-    } else {
-      showToastMessage(res.message || "فشل عكس الاستلام", "error");
-    }
-  } catch (e: any) {
-    showToastMessage(
-      e?.data?.statusMessage ||
-        e?.statusMessage ||
-        e?.message ||
-        "خطأ في الاتصال بالخادم",
-      "error",
-    );
-  }
-};
-
 const createBill = async (poId: number) => {
   try {
     const res = await $fetch<{ success: boolean; message?: string }>(
@@ -674,17 +646,7 @@ const printPurchaseOrder = async (po: PurchaseOrder) => {
                     >
                       إنشاء فاتورة
                     </button>
-                    <button
-                      v-if="
-                        po.state === 'purchase' &&
-                        po.receipt_status === 'done' &&
-                        can('purchase.reverseReceive')
-                      "
-                      @click.stop="reverseReceive(po.id)"
-                      class="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 cursor-pointer"
-                    >
-                      عكس الاستلام
-                    </button>
+
                     <button
                       v-if="po.state === 'purchase' || po.state === 'done'"
                       @click.stop="printPurchaseOrder(po)"
